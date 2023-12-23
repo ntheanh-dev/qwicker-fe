@@ -1,10 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
+const Tab = createMaterialTopTabNavigator
 const Home = () => {
     return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Home</Text>
-        </View>
+        <Text>
+            Home
+        </Text>
     )
 }
 
