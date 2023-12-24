@@ -2,8 +2,9 @@ import * as React from 'react';
 import { View, useWindowDimensions, Text, Image, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { Entypo } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
 import { Foundation } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
+import TimePickerBottomSheet from './home/TimePickerBottomSheet';
 
 const DATA = [
     {

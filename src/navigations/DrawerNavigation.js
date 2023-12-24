@@ -1,8 +1,8 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { ROUTES } from '../constants'
-import Home from '../screens/Home'
+import Home from '../screens/home/Home'
 import Wallet from '../screens/Wallet'
 import Order from '../screens/Order'
 import { Feather } from '@expo/vector-icons';
@@ -11,6 +11,9 @@ import CustomDrawer from '../components/CustomDrawer'
 import Profile from '../screens/Profile'
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'
+import { EvilIcons } from '@expo/vector-icons';
+import Notification from '../screens/Notification'
+import MainNavigation from './MainNavigation'
 const Drawer = createDrawerNavigator()
 const DrawerNavigation = () => {
     const navigation = useNavigation()
@@ -28,13 +31,27 @@ const DrawerNavigation = () => {
         >
             <Drawer.Screen
                 name={ROUTES.HOME_DRAWER}
-                component={Home}
-                options={{
+                component={MainNavigation}
+                options={({ navigation }) => ({
                     drawerIcon: ({ color, size }) => (
                         <AntDesign name="home" size={24} color="black" />
                     ),
-                    drawerItemStyle: { height: 0 }
-                }}
+                    drawerItemStyle: { height: 0 },
+                    headerTitle: (props) => (
+                        <Image
+                            style={{ height: 35, resizeMode: 'contain', }}
+                            source={require('../assets/images/Logo.png')}
+                        />
+                    ),
+                    headerRight: (props) => (
+                        <TouchableOpacity
+                            className="pr-3"
+                            onPress={() => navigation.navigate(ROUTES.NOTIFICATION)}
+                        >
+                            <EvilIcons name="bell" size={30} color="black" />
+                        </TouchableOpacity>
+                    )
+                })}
             />
             <Drawer.Screen
                 name={ROUTES.WALLET_DRAWER}
@@ -75,6 +92,23 @@ const DrawerNavigation = () => {
                 options={({ navigation }) => ({
                     drawerItemStyle: { height: 0 },
                     headerTitle: "Thông tin cá nhân",
+                    headerLeft: (props) => (
+                        <TouchableOpacity className="ml-3"
+                            onPress={() => navigation.goBack()}
+                        >
+                            <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                })}
+
+            />
+            <Drawer.Screen
+                name={ROUTES.NOTIFICATION}
+                component={Notification}
+                options={({ navigation }) => ({
+                    drawerItemStyle: { height: 0 },
+                    headerTitle: "Tin nhắn",
+                    drawerItemStyle: { height: 0 },
                     headerLeft: (props) => (
                         <TouchableOpacity className="ml-3"
                             onPress={() => navigation.goBack()}

@@ -15,4 +15,10 @@ export default {
     TOP_TABBAR_ORDER: 'Top Tabbar order',
     CURRENT_ORDER_TOP_TABBAR: 'Current Order Top Tabbar',
 
+    NOTIFICATION: 'Notification',
+
+    INIT_MAP_NAVIGATE: 'Init map navigate',
+    MAP_NAVIGATE: 'Map Navigate',
+    LOCATION_NAVIGATE: 'Location Navigate'
+
 }
