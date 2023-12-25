@@ -12,7 +12,7 @@ const Stack = createNativeStackNavigator();
 const MainNavigation = () => {
     return (
         <Stack.Navigator initialRouteName={ROUTES.INIT_MAP_NAVIGATE}>
-            <Stack.Screen name={ROUTES.INIT_MAP_NAVIGATE} component={Home} />
+            <Stack.Screen name={ROUTES.INIT_MAP_NAVIGATE} component={Home} options={{ headerShown: false }} />
             <Stack.Screen name={ROUTES.LOCATION_NAVIGATE} component={LocationPicker} />
             <Stack.Screen name={ROUTES.MAP_NAVIGATE} component={ChooseLocation} />
         </Stack.Navigator>

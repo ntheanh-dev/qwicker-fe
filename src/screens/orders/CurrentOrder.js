@@ -4,7 +4,6 @@ import { useNavigation } from '@react-navigation/native'
 
 const CurrentOrder = ({ index }) => {
     const navigation = useNavigation()
-    console.log(index)
     return (
         <View>
             <Text>CurrentOrder</Text>

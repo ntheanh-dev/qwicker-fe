@@ -55,7 +55,11 @@ const Home = () => {
     const [isShowBottomSheet, setIsShowBottomSheet] = useState(false)
     const [selectedDate, setSelectedDate] = useState(null)
     const navigation = useNavigation()
-    console.log(selectedDate)
+
+    const handlePickTimeAgain = () => {
+        setIsShowBottomSheet(true)
+    }
+
     return (
         <ScrollView
             className="bg-white flex-1"
@@ -70,21 +74,24 @@ const Home = () => {
                     className=" rounded-xl py-3  flex-col border border-gray-200"
                 >
                     {selectedDate && (
-                        <View className="flex-row items-center py-2 pl-6 space-x-3 border-b border-gray-300">
+                        <TouchableOpacity
+                            className="flex-row items-center py-2 pl-6 space-x-3 border-b border-gray-300"
+                            onPress={handlePickTimeAgain}
+                        >
                             <AntDesign name="calendar" size={24} color="black" />
-                            <Text className="font-bold">{`Lấy hàng Th4, ${formatDate(selectedDate.data, selectedDate.time)}`}</Text>
-                        </View>
+                            <Text className="font-bold">{`Lấy hàng ${formatDate(selectedDate.date, selectedDate.time)}`}</Text>
+                        </TouchableOpacity>
                     )}
                     <View className="flex-row px-4 pt-2">
-                        <View className="basis-1/6 flex-col justify-between py-2">
-                            <View className="flex items-center w-10"><Entypo name="circle" size={20} color="#3422F1" /></View>
-                            <View className="flex items-center w-10"><Foundation name="marker" size={24} color="#3422F1" /></View>
+                        <View className="basis-1/6 flex-col justify-center">
+                            <View className="flex items-center w-10"><Entypo name="circle" size={18} color="#3422F1" /></View>
+                            <View className="flex items-center w-10"><Foundation name="marker" size={22} color="#3422F1" /></View>
                         </View>
                         <View className="basis-5/6 ml-[-12]">
-                            <View className="py-3 flex-row justify-between items-center border-b border-gray-300">
+                            <View className="flex-row justify-between items-center border-b border-gray-300">
                                 <TouchableOpacity><Text>5, Hẻm 89</Text></TouchableOpacity>
                                 {selectedDate === null && <TouchableOpacity
-                                    onPress={() => setIsShowBottomSheet(!isShowBottomSheet)}
+                                    onPress={() => setIsShowBottomSheet(true)}
                                     className="flex-row space-x-1"
                                 >
                                     <Text className="text-base font-medium">Ngay bây giờ</Text>
@@ -97,7 +104,7 @@ const Home = () => {
                         </View>
                     </View>
                 </View>
-                {isShowBottomSheet && <TimePickerBottomSheet setSelectedDate={setSelectedDate} />}
+                {isShowBottomSheet && <TimePickerBottomSheet setSelectedDate={setSelectedDate} setIsShowBottomSheet={setIsShowBottomSheet} />}
             </View>
             <View className="px-4 mb-8">
                 <Text className="text-base mt-6">Phương tiện có sẵn</Text>

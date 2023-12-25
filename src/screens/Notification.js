@@ -42,7 +42,6 @@ function FirstRoute({ index }) {
 
 
 const renderScene = ({ route, jumpTo }) => {
-    // console.log(jumpTo)
     switch (route.key) {
         case '1':
             return <FirstRoute index={route.key} />;
