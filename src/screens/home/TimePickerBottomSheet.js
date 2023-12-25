@@ -1,38 +1,111 @@
-import React, { useMemo, useRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import BottomSheet from '@gorhom/bottom-sheet';
+import RBSheet from "react-native-raw-bottom-sheet";
+import { Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+const TimePickerBottomSheet = ({ setSelectedDate }) => {
+    const refRBSheet = useRef();
+    useEffect(() => {
+        refRBSheet.current.open()
+    }, [])
+    //Date time picker
+    const [date, setDate] = useState(new Date());
+    const [mode, setMode] = useState('date');
+    const [show, setShow] = useState(false);
 
-const TimePickerBottomSheet = () => {
-    // const bottomSheetRef = useRef < BottomSheet > (null);
-    const bottomSheetRef = React.createRef(BottomSheet)
+    const onChange = (event, selectedValue) => {
+        setShow(Platform.OS === 'ios');
+        if (mode == 'date') {
+            const currentDate = selectedValue || new Date();
+            setDate(currentDate);
+            setMode('time');
+            setShow(Platform.OS !== 'ios'); // to show the picker again in time mode
+        } else {
+            const selectedTime = selectedValue || new Date();
+            setSelectedDate({ date: date, time: selectedTime })
+            setShow(Platform.OS === 'ios');
+            setMode('date');
 
-    // variables
-    const snapPoints = useMemo(() => ['25%', '50%'], []);
+            refRBSheet.current.close()
+        }
+    };
 
-    // renders
+    const showMode = currentMode => {
+        setShow(true);
+        setMode(currentMode);
+    };
+
+    const showDatepicker = () => {
+        showMode('date');
+    };
+
+    const showTimepicker = () => {
+        showMode('time');
+    };
+
+    const pickedCurrentDate = () => {
+        refRBSheet.current.close()
+    }
+
     return (
-        <View style={styles.container}>
-            <BottomSheet
-                ref={bottomSheetRef}
-                index={1}
-                snapPoints={snapPoints}
-            >
-                <View style={styles.contentContainer}>
-                    <Text>Awesome 🎉</Text>
+        <RBSheet
+            ref={refRBSheet}
+            customStyles={{
+                wrapper: {
+                    backgroundColor: "rgba(0,0,0,0.4)"
+                },
+                draggableIcon: {
+                    backgroundColor: "#000"
+                },
+                container: {
+                    borderTopLeftRadius: 20,
+                    borderTopRightRadius: 20,
+                    overflow: 'hidden'
+                }
+            }}
+            height={190}
+        >
+            <View className="h-full w-full px-4 py-5 flex-col justify-center">
+                <View className="mb-4">
+                    <Text className="text-xl font-semibold">Thời gian nhận hàng</Text>
                 </View>
-            </BottomSheet>
-        </View>
-    );
+                <TouchableOpacity
+                    className="border-b border-gray-400 py-3 relative flex-row items-center"
+                    onPress={pickedCurrentDate}
+                >
+                    <View className="flex-row space-x-3 items-center">
+                        <Ionicons name="alarm-outline" size={24} color="black" />
+                        <Text className="text-lg">Ngay bây giờ</Text>
+                    </View>
+                    <View className="absolute right-0" >
+                        <AntDesign name="checkcircle" size={26} color="#3422F1" />
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    className="flex-row items-center space-x-3 py-3 relative"
+                    onPress={showDatepicker}
+                >
+                    <AntDesign name="calendar" size={24} color="black" />
+                    <Text className="text-lg">Đặt lịch giao và nhận hàng</Text>
+                    <View className="absolute right-0" >
+
+                    </View>
+
+                </TouchableOpacity>
+                {show && <DateTimePicker
+                    testID="dateTimePicker"
+                    timeZoneOffsetInMinutes={0}
+                    value={date}
+                    mode={mode}
+                    is24Hour={true}
+                    display="default"
+                    onChange={onChange}
+                    onTouchCancel={() => alert('a')}
+                />}
+            </View>
+        </RBSheet>
+    )
 }
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 24,
-        backgroundColor: 'grey',
-    },
-    contentContainer: {
-        flex: 1,
-        alignItems: 'center',
-    },
-});
-export default TimePickerBottomSheet
+export default memo(TimePickerBottomSheet)

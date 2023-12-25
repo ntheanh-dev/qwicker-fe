@@ -2,15 +2,15 @@ import { View, Text, Image, Animated, ScrollView } from 'react-native'
 // import {ScrollView } from 'react-native-gesture-handler';
 import React, { useEffect, useRef, useState } from 'react'
 import CustomCarousel from '../../components/CustomCarousel'
-import { Entypo } from '@expo/vector-icons';
-import { Foundation } from '@expo/vector-icons';
+import { Foundation, Entypo } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 import Vehicel from './Vehicel';
 import TimePickerBottomSheet from './TimePickerBottomSheet';
 import MapPickerNavigation from '../../navigations/MapPickerNavigation';
 import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../../constants';
+import { formatDate } from '../../features/ultils';
 const DATA = [
     {
         id: 1,
@@ -53,7 +53,9 @@ const DATA = [
 const Home = () => {
     const [scorllY, setScrollY] = useState(0)
     const [isShowBottomSheet, setIsShowBottomSheet] = useState(false)
+    const [selectedDate, setSelectedDate] = useState(null)
     const navigation = useNavigation()
+    console.log(selectedDate)
     return (
         <ScrollView
             className="bg-white flex-1"
@@ -65,29 +67,37 @@ const Home = () => {
             <CustomCarousel />
             <View className="px-4 pt-2">
                 <View
-                    className=" rounded-xl py-4 px-5 flex-row border border-gray-200"
+                    className=" rounded-xl py-3  flex-col border border-gray-200"
                 >
-                    <View className="basis-1/6 flex-col justify-between py-2">
-                        <View className="flex items-center w-10"><Entypo name="circle" size={20} color="#3422F1" /></View>
-                        <View className="flex items-center w-10"><Foundation name="marker" size={24} color="#3422F1" /></View>
-                    </View>
-                    <View className="basis-5/6 ">
-                        <View className="py-2 flex-row justify-between items-center border-b border-gray-300">
-                            <TouchableOpacity><Text>5, Hẻm 89</Text></TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate(ROUTES.LOCATION_NAVIGATE)}
-                                className="flex-row space-x-1"
-                            >
-                                <Text className="text-base font-medium">Ngay bây giờ</Text>
-                                <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+                    {selectedDate && (
+                        <View className="flex-row items-center py-2 pl-6 space-x-3 border-b border-gray-300">
+                            <AntDesign name="calendar" size={24} color="black" />
+                            <Text className="font-bold">{`Lấy hàng Th4, ${formatDate(selectedDate.data, selectedDate.time)}`}</Text>
+                        </View>
+                    )}
+                    <View className="flex-row px-4 pt-2">
+                        <View className="basis-1/6 flex-col justify-between py-2">
+                            <View className="flex items-center w-10"><Entypo name="circle" size={20} color="#3422F1" /></View>
+                            <View className="flex items-center w-10"><Foundation name="marker" size={24} color="#3422F1" /></View>
+                        </View>
+                        <View className="basis-5/6 ml-[-12]">
+                            <View className="py-3 flex-row justify-between items-center border-b border-gray-300">
+                                <TouchableOpacity><Text>5, Hẻm 89</Text></TouchableOpacity>
+                                {selectedDate === null && <TouchableOpacity
+                                    onPress={() => setIsShowBottomSheet(!isShowBottomSheet)}
+                                    className="flex-row space-x-1"
+                                >
+                                    <Text className="text-base font-medium">Ngay bây giờ</Text>
+                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+                                </TouchableOpacity>}
+                            </View>
+                            <TouchableOpacity className="py-2 flex-row justify-between items-center ">
+                                <Text>Hà Nội</Text>
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity className="py-2 flex-row justify-between items-center ">
-                            <Text>Hà Nội</Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
-                {isShowBottomSheet && <TimePickerBottomSheet />}
+                {isShowBottomSheet && <TimePickerBottomSheet setSelectedDate={setSelectedDate} />}
             </View>
             <View className="px-4 mb-8">
                 <Text className="text-base mt-6">Phương tiện có sẵn</Text>
