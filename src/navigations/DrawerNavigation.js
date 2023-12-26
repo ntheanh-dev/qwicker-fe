@@ -1,17 +1,15 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native'
+import { TouchableOpacity, Image, View } from 'react-native'
 import React from 'react'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import { ROUTES } from '../constants'
-import Home from '../screens/home/Home'
 import Wallet from '../screens/Wallet'
+import CommingSoon from '../screens/CommingSoon'
 import Order from '../screens/Order'
-import { Feather } from '@expo/vector-icons';
-import { AntDesign } from '@expo/vector-icons';
+import { Feather, AntDesign, MaterialIcons, EvilIcons, Fontisto, Foundation, MaterialCommunityIcons }
+    from '@expo/vector-icons';
 import CustomDrawer from '../components/CustomDrawer'
 import Profile from '../screens/Profile'
-import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'
-import { EvilIcons } from '@expo/vector-icons';
 import Notification from '../screens/Notification'
 import MapPickerNavigation from './MapPickerNavigation.js'
 const Drawer = createDrawerNavigator()
@@ -25,7 +23,10 @@ const DrawerNavigation = () => {
                 headerTitleAlign: 'center',
                 headerTitle: '',
                 drawerLabelStyle: {
-                    marginLeft: -20
+                    marginLeft: -20,
+                    fontSize: 18,
+                    paddingBottom: 3,
+                    paddingTop: 3
                 },
             }}
         >
@@ -53,28 +54,13 @@ const DrawerNavigation = () => {
                     )
                 })}
             />
+
             <Drawer.Screen
-                name={ROUTES.WALLET_DRAWER}
-                component={Wallet}
-                options={{
-                    drawerIcon: ({ color, size }) => (
-                        <AntDesign name="wallet" size={24} color="black" />
-                    ),
-                    headerLeft: (props) => (
-                        <TouchableOpacity className="ml-3"
-                            onPress={() => navigation.goBack()}
-                        >
-                            <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
-                        </TouchableOpacity>
-                    ),
-                }}
-            />
-            <Drawer.Screen
-                name={ROUTES.ORDER_DRAWER}
+                name={'Đơn hàng'}
                 component={Order}
                 options={{
                     drawerIcon: ({ color, size }) => (
-                        <Feather name="package" size={24} color="black" />
+                        <View className="flex justify-center items-center w-6 h-6"><Feather name="package" size={24} color="#3422F1" /></View>
                     ),
                     headerTitle: "Đơn hàng",
                     headerLeft: (props) => (
@@ -86,6 +72,103 @@ const DrawerNavigation = () => {
                     ),
                 }}
             />
+            <Drawer.Screen
+                name={'Ví Qwiker'}
+                component={Wallet}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <View className="flex justify-center items-center w-6 h-6"><AntDesign name="wallet" size={24} color="#3422F1" /></View>
+                    ),
+                    headerLeft: (props) => (
+                        <TouchableOpacity className="ml-3"
+                            onPress={() => navigation.goBack()}
+                        >
+                            <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name={'Phiếu giao hàng'}
+                component={CommingSoon}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <View className="flex justify-center items-center w-6 h-6"><Foundation name="clipboard-notes" size={24} color="#3422F1" /></View>
+                    ),
+                    headerLeft: (props) => (
+                        <TouchableOpacity className="ml-3"
+                            onPress={() => navigation.goBack()}
+                        >
+                            <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name={'Ưu đãi'}
+                component={CommingSoon}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <View className="flex justify-center items-center w-6 h-6"><MaterialCommunityIcons name="sale" size={24} color="#3422F1" /></View>
+                    ),
+                    headerLeft: (props) => (
+                        <TouchableOpacity className="ml-3"
+                            onPress={() => navigation.goBack()}
+                        >
+                            <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name={'Tài xế yêu thích'}
+                component={CommingSoon}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <View className="flex justify-center items-center w-6 h-6"><Fontisto name="persons" size={24} color="#3422F1" /></View>
+                    ),
+                    headerLeft: (props) => (
+                        <TouchableOpacity className="ml-3"
+                            onPress={() => navigation.goBack()}
+                        >
+                            <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name={'Giới thiệu bạn hàng'}
+                component={CommingSoon}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <View className="flex justify-center items-center w-6 h-6"><Feather name="gift" size={24} color="#3422F1" /></View>
+                    ),
+                    headerLeft: (props) => (
+                        <TouchableOpacity className="ml-3"
+                            onPress={() => navigation.goBack()}
+                        >
+                            <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name={'Cài đặt khác'}
+                component={CommingSoon}
+                options={{
+                    drawerIcon: ({ color, size }) => (
+                        <View className="flex justify-center items-center w-6 h-6"><Feather name="settings" size={24} color="#3422F1" /></View>
+                    ),
+                    headerLeft: (props) => (
+                        <TouchableOpacity className="ml-3"
+                            onPress={() => navigation.goBack()}
+                        >
+                            <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                }}
+            />
+            {/* Hided Drawer.screen */}
             <Drawer.Screen
                 name={ROUTES.PROFILE_DRAWER}
                 component={Profile}
@@ -108,7 +191,6 @@ const DrawerNavigation = () => {
                 options={({ navigation }) => ({
                     drawerItemStyle: { height: 0 },
                     headerTitle: "Tin nhắn",
-                    drawerItemStyle: { height: 0 },
                     headerLeft: (props) => (
                         <TouchableOpacity className="ml-3"
                             onPress={() => navigation.goBack()}
@@ -117,8 +199,8 @@ const DrawerNavigation = () => {
                         </TouchableOpacity>
                     ),
                 })}
-
             />
+
         </Drawer.Navigator>
     )
 }

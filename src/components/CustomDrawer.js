@@ -8,15 +8,15 @@ const CustomDrawer = (props) => {
     return (
         <DrawerContentScrollView {...props}>
             <TouchableOpacity
-                className="h-[140] flex-col items-center ml-[-40] justify-around"
+                className="h-[140] flex-col  ml-[-40] justify-around items-center bg-gray-50 pt-6 "
                 onPress={() => navigation.navigate(ROUTES.PROFILE_DRAWER)}
             >
                 <Image
                     source={require('../assets/logo/user.png')}
-                    className="w-[70] h-[70] rounded-full"
+                    className="w-[60] h-[60] rounded-full"
                 />
                 <View>
-                    <Text className="text-2xl font-medium">Nguyễn Thế Anh</Text>
+                    <Text className="text-xl font-medium">Nguyễn Thế Anh</Text>
                 </View>
             </TouchableOpacity>
             <View>
