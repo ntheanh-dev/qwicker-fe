@@ -4,7 +4,7 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-const TimePickerBottomSheet = ({ setSelectedDate, setIsShowBottomSheet }) => {
+const TimePickerBottomSheet = ({ setSelectedDate, setShowTimePickerBTS }) => {
     const refRBSheet = useRef();
     useEffect(() => {
         refRBSheet.current.open()
@@ -24,7 +24,7 @@ const TimePickerBottomSheet = ({ setSelectedDate, setIsShowBottomSheet }) => {
         } else {
             const selectedTime = selectedValue || new Date();
             setSelectedDate({ date: date, time: selectedTime })
-            setIsShowBottomSheet(false)
+            setShowTimePickerBTS(false)
             setShow(Platform.OS === 'ios');
             setMode('date');
             // close buttom sheet
@@ -47,7 +47,7 @@ const TimePickerBottomSheet = ({ setSelectedDate, setIsShowBottomSheet }) => {
 
     const pickedCurrentDate = () => {
         setSelectedDate(null)
-        setIsShowBottomSheet(false)
+        setShowTimePickerBTS(false)
     }
 
     return (

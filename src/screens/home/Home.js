@@ -1,14 +1,9 @@
-import { View, Text, Image, Animated, ScrollView } from 'react-native'
-// import {ScrollView } from 'react-native-gesture-handler';
-import React, { useEffect, useRef, useState } from 'react'
+import { View, Text, Image, Animated } from 'react-native'
+import React, { useRef, useState } from 'react'
 import CustomCarousel from '../../components/CustomCarousel'
-import { Foundation, Entypo, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { } from '@expo/vector-icons';
 import Vehicel from './Vehicel';
-import TimePickerBottomSheet from './TimePickerBottomSheet';
-import { formatDate } from '../../features/ultils';
-import { ROUTES } from '../../constants';
+import ConfirmOrderBottomShee from './ConfirmOrderBottomSheet'
+import LocationDatePicker from './LocationDatePicker';
 const DATA = [
     {
         id: 1,
@@ -63,13 +58,13 @@ const DATA = [
 ]
 
 const Home = ({ navigation }) => {
-    const [isShowBottomSheet, setIsShowBottomSheet] = useState(false)
-    const [selectedDate, setSelectedDate] = useState(null)
-    const scrollY = useRef(new Animated.Value(0)).current
-    const handlePickTimeAgain = () => {
-        setIsShowBottomSheet(true)
-    }
+    const [selectedVehicel, setSelectedVehicel] = useState(null)
+    // open only as order fill fully
+    const orderFormFilled = true
+    const [showConfirmOrderBTS, setShowConfimOrderBTS] = useState(orderFormFilled)
 
+    const scrollY = useRef(new Animated.Value(0)).current
+    const scrollView = React.createRef()
     return (
         <Animated.ScrollView
             className="bg-white flex-1"
@@ -78,52 +73,26 @@ const Home = ({ navigation }) => {
                 { useNativeDriver: false }
             )}
             scrollEventThrottle={200}
+            ref={scrollView}
         >
+            {/* ------------------Carousel---------------- */}
             <CustomCarousel />
-            <View className="px-4 pt-2">
-                <View
-                    className=" rounded-xl py-3  flex-col border border-gray-200"
-                >
-                    {selectedDate && (
-                        <TouchableOpacity
-                            className="flex-row items-center py-2 pl-6 space-x-3 border-b border-gray-300"
-                            onPress={handlePickTimeAgain}
-                        >
-                            <AntDesign name="calendar" size={24} color="black" />
-                            <Text className="font-bold">{`Lấy hàng ${formatDate(selectedDate.date, selectedDate.time)}`}</Text>
-                        </TouchableOpacity>
-                    )}
-                    <View className="flex-row px-4 pt-2">
-                        <View className="basis-1/6 flex-col justify-center space-y-2">
-                            <View className="flex items-center w-10"><Entypo name="circle" size={18} color="#3422F1" /></View>
-                            <View className="flex items-center w-10"><Foundation name="marker" size={22} color="#3422F1" /></View>
-                        </View>
-                        <View className="basis-5/6 ml-[-12] ">
-                            <View className="flex-row justify-between items-center border-b border-gray-300 py-2">
-                                <TouchableOpacity
-                                    onPress={() => navigation.navigate(ROUTES.MAP_NAVIGATE)}
-                                ><Text>5, Hẻm 89</Text>
-                                </TouchableOpacity>
-                                {selectedDate === null && <TouchableOpacity
-                                    onPress={() => setIsShowBottomSheet(true)}
-                                    className="flex-row space-x-1"
-                                >
-                                    <Text className="text-base font-medium">Ngay bây giờ</Text>
-                                    <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
-                                </TouchableOpacity>}
-                            </View>
-                            <TouchableOpacity className="py-2 flex-row justify-between items-center ">
-                                <Text>Hà Nội</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-                {isShowBottomSheet && <TimePickerBottomSheet setSelectedDate={setSelectedDate} setIsShowBottomSheet={setIsShowBottomSheet} />}
-            </View>
+            {/* ----------Pick location and date time----- */}
+            <LocationDatePicker />
+            {/* -----------------Pick Vehicel------------- */}
             <View className="px-4 mb-8">
                 <Text className="text-base mt-6">Phương tiện có sẵn</Text>
-                {DATA.map(ele => <Vehicel key={ele.id} scrollY={scrollY} data={ele} />)}
+                {DATA.map(ele => <Vehicel
+                    key={ele.id}
+                    scrollY={scrollY}
+                    data={ele}
+                    selectedVehicel={selectedVehicel}
+                    setSelectedVehicel={setSelectedVehicel}
+                    scrollView={scrollView}
+                />)}
             </View>
+            {showConfirmOrderBTS && <ConfirmOrderBottomShee setShowConfimOrderBTS={setShowConfimOrderBTS} />}
+            {/* <ConfirmOrderBottomShee open={showConfirmOrderBTS} /> */}
         </Animated.ScrollView>
     )
 }

@@ -11,14 +11,10 @@ export default {
     WALLET_DRAWER: 'Wallet Drawer',
     ORDER_DRAWER: 'Order Drawer',
     PROFILE_DRAWER: 'Profille Drawer',
+    NOTIFICATION_DRAWER: 'Notification',
 
-    TOP_TABBAR_ORDER: 'Top Tabbar order',
-    CURRENT_ORDER_TOP_TABBAR: 'Current Order Top Tabbar',
-
-    NOTIFICATION: 'Notification',
-
-    INIT_MAP_NAVIGATE: 'Init map navigate',
-    MAP_NAVIGATE: 'Map Navigate',
-    LOCATION_NAVIGATE: 'Location Navigate',
-    ADDRESS_INPUTER_NAVIGATE: 'Address Input Navigate'
+    HOME_STACK: 'Home Stack',
+    MAP_STACK: 'Map Stack',
+    ADDRESS_INPUTER_STACK: 'Address Input Stack',
+    MORE_ORDER_DETAIL_STACK: 'More Order Detail Stack'
 }

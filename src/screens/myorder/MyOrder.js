@@ -57,7 +57,7 @@ const renderScene = ({ route, jumpTo }) => {
     }
 };
 
-export default function Order() {
+export default function MyOrder() {
     const layout = useWindowDimensions();
     const [text, setText] = React.useState("")
 

@@ -1,18 +1,34 @@
-import { View, Text, TouchableOpacity, Animated, Image } from 'react-native'
-import React, { memo, useEffect, useRef } from 'react'
-import { Feather } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, Animated, Image, StyleSheet } from 'react-native'
+import React from 'react'
+import { Feather, AntDesign } from '@expo/vector-icons';
 
-const Vehicel = ({ scrollY, data }) => {
+
+const Vehicel = ({ scrollY, data, selectedVehicel, setSelectedVehicel, scrollView }) => {
     const { title, content, foodContent, image } = data
+
     const containerHeight = scrollY.interpolate({
         inputRange: [0, 60],
         outputRange: [0, 60],
         extrapolate: 'clamp',
     });
 
+    const isSelected = selectedVehicel !== null && selectedVehicel === data.id
+    const handleSelect = () => {
+        if (isSelected) {
+            setSelectedVehicel(null)
+            scrollView.current.scrollTo({ x: 0, y: 0, animated: true })
+        } else {
+            setSelectedVehicel(data.id)
+            scrollView.current.scrollTo({ x: 0, y: 300, animated: true })
+        }
+    }
     return (
-        <TouchableOpacity>
-            <View className="flex-row w-full px-3 py-3 border border-gray-300 rounded-xl mt-3">
+        <TouchableOpacity
+            onPress={handleSelect}
+        >
+            <View className="flex-row w-full px-3 py-3 border border-gray-300 rounded-xl mt-3 relative"
+                style={isSelected && style.selected}
+            >
                 <View className="basis-1/5 justify-center">
                     <Image style={{ width: 50, height: 40, resizeMode: 'contain' }} source={image} />
                 </View>
@@ -26,9 +42,16 @@ const Vehicel = ({ scrollY, data }) => {
                         </View>
                     </Animated.View>
                 </View>
+                {isSelected && <View className="flex justify-center items-center absolute right-[-14] top-[-14]" >
+                    <AntDesign name="checkcircle" size={30} color="#3422F1" />
+                </View>}
             </View>
         </TouchableOpacity>
     )
 }
-
-export default memo(Vehicel)
+const style = StyleSheet.create({
+    selected: {
+        borderColor: '#3422F1',
+    },
+});
+export default Vehicel

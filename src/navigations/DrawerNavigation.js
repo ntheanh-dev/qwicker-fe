@@ -10,9 +10,9 @@ import CustomDrawer from '../components/CustomDrawer'
 import Profile from '../screens/Profile'
 import { useNavigation } from '@react-navigation/native'
 import Notification from '../screens/Notification'
-import MapPickerNavigation from './MapPickerNavigation.js'
+import HomeNavigation from './HomeNavigation.js'
 import Setting from '../screens/setting/Setting.js'
-import Order from '../screens/order/Order.js'
+import MyOrder from '../screens/myorder/MyOrder.js'
 const Drawer = createDrawerNavigator()
 const DrawerNavigation = () => {
     const navigation = useNavigation()
@@ -33,7 +33,7 @@ const DrawerNavigation = () => {
         >
             <Drawer.Screen
                 name={ROUTES.HOME_DRAWER}
-                component={MapPickerNavigation}
+                component={HomeNavigation}
                 options={({ navigation }) => ({
                     drawerIcon: ({ color, size }) => (
                         <AntDesign name="home" size={24} color="black" />
@@ -48,7 +48,7 @@ const DrawerNavigation = () => {
                     headerRight: (props) => (
                         <TouchableOpacity
                             className="pr-3"
-                            onPress={() => navigation.navigate(ROUTES.NOTIFICATION)}
+                            onPress={() => navigation.navigate(ROUTES.NOTIFICATION_DRAWER)}
                         >
                             <EvilIcons name="bell" size={30} color="black" />
                         </TouchableOpacity>
@@ -58,7 +58,7 @@ const DrawerNavigation = () => {
 
             <Drawer.Screen
                 name={'Đơn hàng'}
-                component={Order}
+                component={MyOrder}
                 options={{
                     drawerIcon: ({ color, size }) => (
                         <View className="flex justify-center items-center w-6 h-6"><Feather name="package" size={24} color="#3422F1" /></View>
@@ -188,7 +188,7 @@ const DrawerNavigation = () => {
 
             />
             <Drawer.Screen
-                name={ROUTES.NOTIFICATION}
+                name={ROUTES.NOTIFICATION_DRAWER}
                 component={Notification}
                 options={({ navigation }) => ({
                     drawerItemStyle: { height: 0 },
