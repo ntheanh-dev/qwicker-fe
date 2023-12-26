@@ -2,9 +2,9 @@ import { View, Text, Image, Animated, ScrollView } from 'react-native'
 // import {ScrollView } from 'react-native-gesture-handler';
 import React, { useEffect, useRef, useState } from 'react'
 import CustomCarousel from '../../components/CustomCarousel'
-import { Foundation, Entypo } from '@expo/vector-icons';
+import { Foundation, Entypo, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { } from '@expo/vector-icons';
 import Vehicel from './Vehicel';
 import TimePickerBottomSheet from './TimePickerBottomSheet';
 import { formatDate } from '../../features/ultils';
@@ -45,24 +45,38 @@ const DATA = [
         foodContent: '3 x 1.6 x 1.6 Mét Lên đến 1000 kg',
         image: require('../../assets/images/truck.png'),
     },
+    {
+        id: 6,
+        title: 'Xe Tải 500kg',
+        content: 'Giờ Cấm Tải 6H-9H & 16H-20H | Chở tối đa 500Kg & 1.5CBM',
+        foodContent: '1.9 x 1.4 x 1.4 Mét Lên đến 500 kg',
+        image: require('../../assets/images/truck.png'),
+    },
+    {
+        id: 7,
+        title: 'Xe Tải 1000kg',
+        content: 'Giờ Cấm Tải 6H-9H & 16H-20H | Chở tối đa 1000Kg & 5CBM',
+        foodContent: '3 x 1.6 x 1.6 Mét Lên đến 1000 kg',
+        image: require('../../assets/images/truck.png'),
+    },
 
 ]
 
 const Home = ({ navigation }) => {
-    const [scorllY, setScrollY] = useState(0)
     const [isShowBottomSheet, setIsShowBottomSheet] = useState(false)
     const [selectedDate, setSelectedDate] = useState(null)
-
+    const scrollY = useRef(new Animated.Value(0)).current
     const handlePickTimeAgain = () => {
         setIsShowBottomSheet(true)
     }
 
     return (
-        <ScrollView
+        <Animated.ScrollView
             className="bg-white flex-1"
-            onScroll={event => {
-                setScrollY(event.nativeEvent.contentOffset.y)
-            }}
+            onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+                { useNativeDriver: false }
+            )}
             scrollEventThrottle={200}
         >
             <CustomCarousel />
@@ -108,9 +122,9 @@ const Home = ({ navigation }) => {
             </View>
             <View className="px-4 mb-8">
                 <Text className="text-base mt-6">Phương tiện có sẵn</Text>
-                {DATA.map(ele => <Vehicel key={ele.id} scorllY={scorllY} data={ele} />)}
+                {DATA.map(ele => <Vehicel key={ele.id} scrollY={scrollY} data={ele} />)}
             </View>
-        </ScrollView>
+        </Animated.ScrollView>
     )
 }
 

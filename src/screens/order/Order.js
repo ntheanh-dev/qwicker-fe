@@ -2,7 +2,8 @@ import * as React from 'react';
 import { View, useWindowDimensions, Text, Image, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { Entypo, Foundation, Feather } from '@expo/vector-icons';
-import TimePickerBottomSheet from './home/TimePickerBottomSheet';
+import OrderItem from './OrderItem';
+import OrderItemNotFound from './OrderItemNotFound';
 
 const DATA = [
     {
@@ -26,30 +27,6 @@ const DATA = [
         title: 'Third Item',
     },
 ];
-const OrderNotFound = () => (
-    <View className="flex-1 justify-center items-center mb-14 opacity-50">
-        <Image className="w-28 h-28" source={require('../assets/images/nonefile.png')} />
-        <Text className="text-lg mt-3">Hiện chưa có đơn hàng</Text>
-    </View>
-)
-
-const OrderItem = () => (
-    <View className="flex-col pt-3 bg-white mt-4 rounded-lg space-y-3 overflow-hidden">
-        <View className="border-b border-gray-200 pb-3 px-4"><Text>Th 5, thg 12 21, 20:21</Text></View>
-        <View className='flex-row items-center px-4'>
-            <View className="flex items-center w-10"><Entypo name="circle" size={24} color="#3422F1" /></View>
-            <Text>5 89</Text>
-        </View>
-        <View className='flex-row items-center px-4'>
-            <View className="flex items-center w-10"><Foundation name="marker" size={24} color="#3422F1" /></View>
-            <Text>Hà nội</Text>
-        </View>
-        <View className="flex-row justify-between items-center  px-4 bg-gray-300 py-2">
-            <Text>Xe Tải 500 kg</Text>
-            <Text>đ0</Text>
-        </View>
-    </View>
-)
 
 function FirstRoute({ index }) {
     return (
@@ -62,7 +39,7 @@ function FirstRoute({ index }) {
                     showsVerticalScrollIndicator={false}
                 />
             ) : (
-                <OrderNotFound />
+                <OrderItemNotFound />
             )}
         </View>
     )
@@ -82,7 +59,7 @@ const renderScene = ({ route, jumpTo }) => {
 
 export default function Order() {
     const layout = useWindowDimensions();
-    const [text, onChangeText] = React.useState("")
+    const [text, setText] = React.useState("")
 
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
@@ -93,20 +70,19 @@ export default function Order() {
 
     return (
         <>
-            <View className="bg-white px-3 relative pb-3">
+            <View className="bg-white px-3 relative">
                 <TextInput
-                    className="bg-gray-200 rounded-lg text-sm py-2 px-9"
+                    className="bg-gray-200 rounded-lg text-lg py-2 px-9"
                     placeholder='Tìm kiếm tất cả các đơn hàng'
-                    onChangeText={onChangeText}
+                    onChangeText={txt => setText(txt)}
                     value={text}
                 />
-                <View className="absolute top-3 left-5" >
+                <View className="flex justify-center items-center absolute left-5 top-2" >
                     <Entypo name="magnifying-glass" size={22} color="gray" />
                 </View>
-                <TouchableOpacity className="absolute top-3 right-5" onPress={() => onChangeText('')}>
+                <TouchableOpacity className="flex justify-center items-center absolute right-5 top-2" onPress={() => setText('')}>
                     <Feather name="x" size={22} color="gray" />
                 </TouchableOpacity>
-
             </View>
             <TabView
                 navigationState={{ index, routes }}
@@ -122,7 +98,7 @@ export default function Order() {
                         indicatorStyle={{
                             backgroundColor: '#3422F1'
                         }}
-
+                        pressColor='rgba(0, 0, 0, 0)'
                     />
                 }
             />

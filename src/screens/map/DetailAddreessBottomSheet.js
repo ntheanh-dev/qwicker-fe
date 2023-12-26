@@ -1,10 +1,9 @@
 import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import RBSheet from "react-native-raw-bottom-sheet";
-import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { ROUTES } from '../../constants';
 
-const DetailAddreessButtomSheet = () => {
+const DetailAddreessBottomSheet = () => {
     const navigation = useNavigation()
     const refRBSheet = useRef();
     const [addressDetail, setAddressDetail] = useState('')
@@ -66,4 +65,4 @@ const DetailAddreessButtomSheet = () => {
     )
 }
 
-export default DetailAddreessButtomSheet
+export default DetailAddreessBottomSheet

@@ -2,8 +2,8 @@ import { View, Text, Dimensions, TouchableOpacity } from 'react-native'
 import React, { useEffect } from 'react'
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { MaterialIcons, Entypo } from '@expo/vector-icons';
-import DetailAddreessButtomSheet from './DetailAddreessButtomSheet'
 import { ROUTES } from '../../constants';
+import DetailAddreessBottomSheet from './DetailAddreessBottomSheet';
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.09;
@@ -50,7 +50,7 @@ const Map = ({ navigation }) => {
                     <Text className="text text-gray-500">5 89, Tổ 3, Hóc Môn, Thành phố Hồ Chí Minh, VietNam</Text>
                 </TouchableOpacity>
             </View>
-            <DetailAddreessButtomSheet setShowHeader={setShowHeader} />
+            <DetailAddreessBottomSheet setShowHeader={setShowHeader} />
         </View>
     )
 }

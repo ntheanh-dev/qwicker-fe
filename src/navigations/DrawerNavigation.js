@@ -4,7 +4,6 @@ import { createDrawerNavigator } from '@react-navigation/drawer'
 import { ROUTES } from '../constants'
 import Wallet from '../screens/Wallet'
 import CommingSoon from '../screens/CommingSoon'
-import Order from '../screens/Order'
 import { Feather, AntDesign, MaterialIcons, EvilIcons, Fontisto, Foundation, MaterialCommunityIcons }
     from '@expo/vector-icons';
 import CustomDrawer from '../components/CustomDrawer'
@@ -12,6 +11,8 @@ import Profile from '../screens/Profile'
 import { useNavigation } from '@react-navigation/native'
 import Notification from '../screens/Notification'
 import MapPickerNavigation from './MapPickerNavigation.js'
+import Setting from '../screens/setting/Setting.js'
+import Order from '../screens/order/Order.js'
 const Drawer = createDrawerNavigator()
 const DrawerNavigation = () => {
     const navigation = useNavigation()
@@ -154,7 +155,7 @@ const DrawerNavigation = () => {
             />
             <Drawer.Screen
                 name={'Cài đặt khác'}
-                component={CommingSoon}
+                component={Setting}
                 options={{
                     drawerIcon: ({ color, size }) => (
                         <View className="flex justify-center items-center w-6 h-6"><Feather name="settings" size={24} color="#3422F1" /></View>
@@ -166,6 +167,7 @@ const DrawerNavigation = () => {
                             <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
                         </TouchableOpacity>
                     ),
+                    headerTitle: "Cài đặt khác",
                 }}
             />
             {/* Hided Drawer.screen */}
