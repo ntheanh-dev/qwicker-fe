@@ -1,5 +1,6 @@
-import { View, Text } from 'react-native'
+import { View, Text, Image } from 'react-native'
 import React from 'react'
+import { Entypo, Foundation } from '@expo/vector-icons';
 
 const OrderItem = () => {
     return (

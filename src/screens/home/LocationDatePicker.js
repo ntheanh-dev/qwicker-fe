@@ -4,8 +4,10 @@ import { Foundation, Entypo, MaterialIcons, AntDesign, Feather } from '@expo/vec
 import TimePickerBottomSheet from './TimePickerBottomSheet';
 import { formatDate } from '../../features/ultils';
 import { ROUTES } from '../../constants';
+import { useNavigation } from '@react-navigation/native';
 
 const LocationDatePicker = () => {
+    const navigation = useNavigation()
     const [selectedDate, setSelectedDate] = useState(null)
     const [showTimePickerBTS, setShowTimePickerBTS] = useState(false)
 
@@ -34,7 +36,7 @@ const LocationDatePicker = () => {
                     <View className="basis-5/6 ml-[-12] ">
                         <View className="flex-row justify-between items-center border-b border-gray-300 py-2">
                             <TouchableOpacity
-                                onPress={() => navigation.navigate(ROUTES.MAP_NAVIGATE)}
+                                onPress={() => navigation.navigate(ROUTES.MAP_STACK)}
                             ><Text>5, Hẻm 89</Text>
                             </TouchableOpacity>
                             {selectedDate === null && <TouchableOpacity

@@ -44,7 +44,7 @@ const Map = ({ navigation }) => {
                 <View className="basis-1/12 justify-center pl-2"><Entypo name="circle" size={12} color="#3422F1" /></View>
                 <TouchableOpacity
                     className="basis-10/12 flex-col flex-shrink-0 pl-2"
-                    onPress={() => navigation.navigate(ROUTES.ADDRESS_INPUTER_NAVIGATE)}
+                    onPress={() => navigation.navigate(ROUTES.ADDRESS_INPUTER_STACK)}
                 >
                     <Text className="text-lg font-bold">5, Hẻm 89</Text>
                     <Text className="text text-gray-500">5 89, Tổ 3, Hóc Môn, Thành phố Hồ Chí Minh, VietNam</Text>
