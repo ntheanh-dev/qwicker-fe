@@ -13,7 +13,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native'
 import { EvilIcons } from '@expo/vector-icons';
 import Notification from '../screens/Notification'
-import MainNavigation from './MainNavigation'
+import MapPickerNavigation from './MapPickerNavigation.js'
 const Drawer = createDrawerNavigator()
 const DrawerNavigation = () => {
     const navigation = useNavigation()
@@ -31,7 +31,7 @@ const DrawerNavigation = () => {
         >
             <Drawer.Screen
                 name={ROUTES.HOME_DRAWER}
-                component={MainNavigation}
+                component={MapPickerNavigation}
                 options={({ navigation }) => ({
                     drawerIcon: ({ color, size }) => (
                         <AntDesign name="home" size={24} color="black" />

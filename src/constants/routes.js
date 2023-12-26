@@ -19,6 +19,6 @@ export default {
 
     INIT_MAP_NAVIGATE: 'Init map navigate',
     MAP_NAVIGATE: 'Map Navigate',
-    LOCATION_NAVIGATE: 'Location Navigate'
-
+    LOCATION_NAVIGATE: 'Location Navigate',
+    ADDRESS_INPUTER_NAVIGATE: 'Address Input Navigate'
 }

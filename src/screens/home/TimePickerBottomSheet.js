@@ -1,6 +1,5 @@
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import BottomSheet from '@gorhom/bottom-sheet';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
@@ -110,4 +109,4 @@ const TimePickerBottomSheet = ({ setSelectedDate, setIsShowBottomSheet }) => {
         </RBSheet>
     )
 }
-export default TimePickerBottomSheet
+export default memo(TimePickerBottomSheet)

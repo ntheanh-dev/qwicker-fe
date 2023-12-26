@@ -7,10 +7,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 import Vehicel from './Vehicel';
 import TimePickerBottomSheet from './TimePickerBottomSheet';
-import MapPickerNavigation from '../../navigations/MapPickerNavigation';
-import { useNavigation } from '@react-navigation/native';
-import { ROUTES } from '../../constants';
 import { formatDate } from '../../features/ultils';
+import { ROUTES } from '../../constants';
 const DATA = [
     {
         id: 1,
@@ -50,11 +48,10 @@ const DATA = [
 
 ]
 
-const Home = () => {
+const Home = ({ navigation }) => {
     const [scorllY, setScrollY] = useState(0)
     const [isShowBottomSheet, setIsShowBottomSheet] = useState(false)
     const [selectedDate, setSelectedDate] = useState(null)
-    const navigation = useNavigation()
 
     const handlePickTimeAgain = () => {
         setIsShowBottomSheet(true)
@@ -83,13 +80,16 @@ const Home = () => {
                         </TouchableOpacity>
                     )}
                     <View className="flex-row px-4 pt-2">
-                        <View className="basis-1/6 flex-col justify-center">
+                        <View className="basis-1/6 flex-col justify-center space-y-2">
                             <View className="flex items-center w-10"><Entypo name="circle" size={18} color="#3422F1" /></View>
                             <View className="flex items-center w-10"><Foundation name="marker" size={22} color="#3422F1" /></View>
                         </View>
-                        <View className="basis-5/6 ml-[-12]">
-                            <View className="flex-row justify-between items-center border-b border-gray-300">
-                                <TouchableOpacity><Text>5, Hẻm 89</Text></TouchableOpacity>
+                        <View className="basis-5/6 ml-[-12] ">
+                            <View className="flex-row justify-between items-center border-b border-gray-300 py-2">
+                                <TouchableOpacity
+                                    onPress={() => navigation.navigate(ROUTES.MAP_NAVIGATE)}
+                                ><Text>5, Hẻm 89</Text>
+                                </TouchableOpacity>
                                 {selectedDate === null && <TouchableOpacity
                                     onPress={() => setIsShowBottomSheet(true)}
                                     className="flex-row space-x-1"

@@ -23,7 +23,7 @@ const Vehicel = ({ scorllY, data }) => {
     };
 
     useEffect(() => {
-        if (scorllY > 70)
+        if (scorllY > 0)
             fadeIn();
         else
             fadeOut()
