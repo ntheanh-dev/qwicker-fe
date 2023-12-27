@@ -1,7 +1,6 @@
-import { View, Text } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useEffect, useRef } from 'react'
 import RBSheet from "react-native-raw-bottom-sheet";
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../../constants';

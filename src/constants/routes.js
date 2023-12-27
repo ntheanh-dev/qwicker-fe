@@ -16,5 +16,6 @@ export default {
     HOME_STACK: 'Home Stack',
     MAP_STACK: 'Map Stack',
     ADDRESS_INPUTER_STACK: 'Address Input Stack',
-    MORE_ORDER_DETAIL_STACK: 'More Order Detail Stack'
+    MORE_ORDER_DETAIL_STACK: 'More Order Detail Stack',
+    ORDER_DETAIL_STACK: 'Order Detail Stack'
 }

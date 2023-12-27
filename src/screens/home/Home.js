@@ -2,8 +2,8 @@ import { View, Text, Image, Animated } from 'react-native'
 import React, { useRef, useState } from 'react'
 import CustomCarousel from '../../components/CustomCarousel'
 import Vehicel from './Vehicel';
-import ConfirmOrderBottomShee from './ConfirmOrderBottomSheet'
 import LocationDatePicker from './LocationDatePicker';
+import ConfirmOrderBottomSheet from './ConfirmOrderBottomSheet';
 const DATA = [
     {
         id: 1,
@@ -91,8 +91,7 @@ const Home = ({ navigation }) => {
                     scrollView={scrollView}
                 />)}
             </View>
-            {showConfirmOrderBTS && <ConfirmOrderBottomShee setShowConfimOrderBTS={setShowConfimOrderBTS} />}
-            {/* <ConfirmOrderBottomShee open={showConfirmOrderBTS} /> */}
+            {showConfirmOrderBTS && <ConfirmOrderBottomSheet setShowConfimOrderBTS={setShowConfimOrderBTS} />}
         </Animated.ScrollView>
     )
 }
