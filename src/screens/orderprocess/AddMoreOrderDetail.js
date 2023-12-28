@@ -17,18 +17,6 @@ const AddMoreOrderDetail = ({ navigation }) => {
             headerShown: false,
         });
         navigation.setOptions({
-            headerTitleAlign: 'center',
-            headerTitle: () => (
-                <View className="flex-col justify-between space-y-1">
-                    <Text className="text-lg font-semibold">Bổ sung chi tiết</Text>
-                    <View className="flex-row justify-center space-x-3">
-                        <View className="w-10 bg-[#3422F1]" style={{ height: 2 }}></View>
-                        <View className="w-10 bg-[#3422F1]" style={{ height: 2 }}></View>
-                    </View>
-                </View>
-
-            ),
-            headerBackVisible: false,
             headerLeft: () => (
                 <TouchableOpacity
                     onPress={handleBack}
@@ -56,7 +44,10 @@ const AddMoreOrderDetail = ({ navigation }) => {
                     </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity className="flex-row justify-between items-center py-4 pr-4  border-b border-gray-300">
+                <TouchableOpacity
+                    onPress={() => navigation.navigate(ROUTES.ADD_COMMENT_FOR_COURIER_STACK)}
+                    className="flex-row justify-between items-center py-4 pr-4  border-b border-gray-300"
+                >
                     <View className="flex-row items-center space-x-3">
                         <MaterialCommunityIcons name="message-text-outline" size={24} color="#3422F1" />
                         <Text className="text-sm text-gray-500">Ghi chú cho tài xế</Text>

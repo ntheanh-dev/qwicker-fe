@@ -56,15 +56,7 @@ const OrderDetail = ({ navigation }) => {
         }
     }
     useEffect(() => {
-        navigation.getParent().setOptions({
-            headerShown: false,
-        });
         navigation.setOptions({
-            headerTitleAlign: 'center',
-            headerTitle: () => (
-                <Text className="text-lg font-semibold">Chi tiết giao hàng</Text>
-            ),
-            headerBackVisible: false,
 
             headerLeft: () => (
                 <TouchableOpacity
