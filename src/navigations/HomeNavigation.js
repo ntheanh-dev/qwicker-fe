@@ -36,6 +36,7 @@ const HomeNavigation = () => {
 
                     ),
                     headerBackVisible: false,
+                    animation: 'default'
                 }}
             />
             {/* navigeted from AddMoreOrderDetail stack */}

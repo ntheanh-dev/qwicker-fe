@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Feather, AntDesign } from '@expo/vector-icons';
 
 const AddCommentForCourier = ({ navigation }) => {
-    const [word, setWord] = useState(10)
+    const [word, setWord] = useState(500)
     const [txt, setText] = useState('')
     // useEffect(() => {
 
@@ -25,16 +25,16 @@ const AddCommentForCourier = ({ navigation }) => {
                     textAlignVertical="top"
                     value={txt}
                     onChangeText={t => handleTextChange(t)}
-                    maxLength={10}
+                    maxLength={500}
                 />
-                <Text className="text-base text-gray-500 absolute left-4 bottom-4">Ký tự còn lại: {word}</Text>
+                <Text className="text-base text-gray-500 absolute left-4 top-48">Ký tự còn lại: {word}</Text>
                 <TouchableHighlight
                     underlayColor={'rbga(0,0,0,0)'}
                     className="bg-white rounded-lg w-full flex justify-center items-center h-14 mt-5"
-                    style={false && { backgroundColor: '#3422F1' }}
+                    style={txt.length > 0 && { backgroundColor: '#3422F1' }}
                     onPress={handleSubmit}
                 >
-                    <Text className="text-lg font-medium" style={false && { color: 'white' }}>Lưu</Text>
+                    <Text className="text-lg font-medium" style={txt.length > 0 && { color: 'white' }}>Lưu</Text>
                 </TouchableHighlight>
             </View>
         </View>
