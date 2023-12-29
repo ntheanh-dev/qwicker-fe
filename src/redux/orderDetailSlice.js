@@ -1,16 +1,29 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-export const orderDetailSlice = createSlice({
+
+const INITIAL_ORDER = {
+    pickUp: null,
+    deliveryAddress: null,
+    dateTime: null,
+    vehicel: null,
+    paymentMethod: null,
+    comment: null,
+    productType: null,
+    mass: null,
+}
+
+
+const orderDetailSlice = createSlice({
     name: 'orderdetail',
     initialState: {
         items: [],
         status: 'idle'
     },
     reducers: {
-        deleteData: (state, action) => {
-            state = null;
-        },
+        addPickUp: (state, action) => {
+            state.pickUp = action.payload
+        }
     }
 })
-export const { deleteData } = orderDetailSlice.actions
+export const { addPickUp } = orderDetailSlice.actions
 export default orderDetailSlice.reducer

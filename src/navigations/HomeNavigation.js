@@ -9,13 +9,14 @@ import AddMoreOrderDetail from '../screens/orderprocess/AddMoreOrderDetail';
 import OrderDetail from '../screens/orderprocess/OrderDetail';
 import { MaterialIcons, Feather, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import AddCommentForCourier from '../screens/orderprocess/AddCommentForCourier';
+import OrderStatus from '../screens/orderprocess/OrderStatus';
 
 const Stack = createNativeStackNavigator();
 
 
 const HomeNavigation = () => {
     return (
-        <Stack.Navigator initialRouteName={ROUTES.HOME_STACK}
+        <Stack.Navigator initialRouteName={ROUTES.ORDER_STATUS_STACK}
         >
             <Stack.Screen name={ROUTES.HOME_STACK} component={Home} options={{ headerShown: false }} />
             <Stack.Screen name={ROUTES.MAP_STACK} component={Map} options={{ headerShown: false }} />
@@ -69,6 +70,25 @@ const HomeNavigation = () => {
                     ),
                 })}
             />
+            <Stack.Screen
+                name={ROUTES.ORDER_STATUS_STACK}
+                component={OrderStatus}
+                options={({ navigation }) => ({
+                    headerTitleAlign: 'center',
+                    headerTitle: () => (
+                        <Text className="text-lg font-semibold">Đang tìm tài xế</Text>
+                    ),
+                    headerBackVisible: false,
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.goBack()}
+                        >
+                            <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                })}
+            />
+
         </Stack.Navigator>
     )
 }
