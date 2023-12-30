@@ -9,6 +9,7 @@ export default {
     ACCOUNT_REGISTER: 'Account Register',
     DRIVER_INFO_REGISTER: 'Driver info register',
     AVATAR_REGISTER: 'Avatar register',
+    COMPELETE_REGISTER: 'Complete register',
 
     HOME_DRAWER: 'Home Drawer',
     WALLET_DRAWER: 'Wallet Drawer',

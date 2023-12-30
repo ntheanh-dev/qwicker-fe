@@ -6,7 +6,8 @@ import BasicInfoRegister from '../screens/auth/BasicInfoRegister';
 import AccountRegister from '../screens/auth/AccountRegister';
 import DriverInfoRegister from '../screens/auth/DriverInfoRegister';
 import AvatarRegister from '../screens/auth/AvatarRegister';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Feather } from '@expo/vector-icons';
+import CompleteRegister from '../screens/auth/CompleteRegister';
 const Stack = createNativeStackNavigator();
 
 const RegisterNavigation = () => {
@@ -29,9 +30,19 @@ const RegisterNavigation = () => {
             <Stack.Screen name={ROUTES.ACCOUNT_REGISTER} component={AccountRegister} />
             <Stack.Screen name={ROUTES.DRIVER_INFO_REGISTER} component={DriverInfoRegister} />
             <Stack.Screen name={ROUTES.AVATAR_REGISTER} component={AvatarRegister} />
+            <Stack.Screen name={ROUTES.COMPELETE_REGISTER} component={CompleteRegister}
+                options={({ navigation }) => ({
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate(ROUTES.LOGIN)}
+                        >
+                            <Feather name="x" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                })}
+            />
         </Stack.Navigator>
     )
 }
 
 export default RegisterNavigation
-options = {}

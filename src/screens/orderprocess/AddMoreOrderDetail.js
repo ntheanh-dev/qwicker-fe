@@ -64,6 +64,11 @@ const AddMoreOrderDetail = ({ navigation }) => {
         });
     }, [])
 
+    const handlePlaceOrder = () => {
+        placeOrderBTS.current.close()
+        navigation.navigate(ROUTES.ORDER_STATUS_STACK)
+    }
+
     return (
         <View className="bg-white flex-1 py-4 relative">
             <View className="bg-white flex-col px-4">
@@ -218,7 +223,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                     }}
                 >
                     <View className="px-4 pt-5 pb-8 flex-col">
-                        <Text className="text-2xl font-bold">Xem và đặt đơn hàng</Text>
+                        <Text className="text-2xl font-bold">Xem lại đơn hàng</Text>
                         {/*---------------Time--------------- */}
                         <View className="flex-col py-4 border-b border-gray-300">
                             <Text className="text-base text-gray-500">Thời gian nhận hàng</Text>
@@ -253,7 +258,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                         {/* -------------Place BTN-------------- */}
                         <TouchableOpacity
                             activeOpacity={1}
-                            onPress={() => navigation.navigate(ROUTES.ORDER_STATUS_STACK)}
+                            onPress={handlePlaceOrder}
                             className="flex justify-center items-center bg-[#3422F1] py-3 rounded-lg"
                         >
                             <Text className="text-lg font-bold text-white">Đặt giao hàng</Text>

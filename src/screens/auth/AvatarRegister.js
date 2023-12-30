@@ -28,7 +28,7 @@ const AvatarRegister = ({ navigation }) => {
 
     const handleSignUp = () => {
         if (isFullfil()) {
-            navigation.navigate(ROUTES.HOME)
+            navigation.navigate(role === 1 ? ROUTES.HOME : ROUTES.COMPELETE_REGISTER)
         }
     }
 
