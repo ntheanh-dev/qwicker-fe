@@ -1,11 +1,14 @@
 export default {
     ONBOARDING: 'On boarding',
-
     HOME: 'Home',
-
     LOGIN: 'Login',
-    REGISTER: 'Register',
+    REGISTER_NAVIGATE: 'Register navigate',
     CHOOSEACCOUNT: 'Choose Account',
+
+    BASIC_INFO_REGISTER: 'Basic info register',
+    ACCOUNT_REGISTER: 'Account Register',
+    DRIVER_INFO_REGISTER: 'Driver info register',
+    AVATAR_REGISTER: 'Avatar register',
 
     HOME_DRAWER: 'Home Drawer',
     WALLET_DRAWER: 'Wallet Drawer',

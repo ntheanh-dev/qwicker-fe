@@ -1,36 +1,40 @@
-import { View, Text } from 'react-native'
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Loign from '../screens/auth/Loign';
 import { ROUTES } from '../constants';
-import Register from '../screens/auth/Register';
 import ChooseAccount from '../screens/auth/ChooseAccount';
 import DrawerNavigation from './DrawerNavigation';
+import OnbroadingScreen from '../screens/OnbroadingScreen';
+import RegisterNavigation from './RegisterNavigation';
+import { useSelector } from 'react-redux';
+import { getIsUseAppBefore } from '../redux/appSlice';
+import Login from '../screens/auth/Login';
 const Stack = createNativeStackNavigator();
 const AuthNavigation = () => {
+    const useAppBefore = useSelector(getIsUseAppBefore)
     return (
-        <Stack.Navigator initialRouteName={ROUTES.HOME}>
+        <Stack.Navigator initialRouteName={useAppBefore ? ROUTES.CHOOSEACCOUNT : ROUTES.ONBOARDING}
+            screenOptions={{ headerShown: false }}
+        >
             <Stack.Screen
                 name={ROUTES.LOGIN}
-                component={Loign}
-                options={{ headerShown: false }}
+                component={Login}
             />
             <Stack.Screen
                 name={ROUTES.HOME}
                 component={DrawerNavigation}
-                options={{ headerShown: false }}
             />
             <Stack.Screen
-                name={ROUTES.REGISTER}
-                component={Register}
+                name={ROUTES.REGISTER_NAVIGATE}
+                component={RegisterNavigation}
                 options={{ title: '' }}
             />
             <Stack.Screen
                 name={ROUTES.CHOOSEACCOUNT}
                 component={ChooseAccount}
-                options={{
-                    title: '',
-                }}
+            />
+            <Stack.Screen
+                name={ROUTES.ONBOARDING}
+                component={OnbroadingScreen}
             />
         </Stack.Navigator>
     )

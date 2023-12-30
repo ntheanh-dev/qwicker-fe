@@ -10,7 +10,8 @@ const LocationDatePicker = () => {
     const navigation = useNavigation()
     const [selectedDate, setSelectedDate] = useState(null)
     const [showTimePickerBTS, setShowTimePickerBTS] = useState(false)
-
+    const [pickUp, setPickUp] = useState(null)
+    const [deliveryAddress, setDeliveryAddress] = useState(null)
     const handlePickTimeAgain = () => {
         setShowTimePickerBTS(true)
     }
@@ -37,7 +38,12 @@ const LocationDatePicker = () => {
                         <View className="flex-row justify-between items-center border-b border-gray-300 py-2">
                             <TouchableOpacity
                                 onPress={() => navigation.navigate(ROUTES.MAP_STACK)}
-                            ><Text>5, Hẻm 89</Text>
+                            >
+                                {pickUp ? (
+                                    <Text className="font-medium text-sm">{pickUp}</Text>
+                                ) : (
+                                    <Text className="font-medium text-sm text-gray-600">Địa điểm lấy hàng</Text>
+                                )}
                             </TouchableOpacity>
                             {selectedDate === null && <TouchableOpacity
                                 onPress={() => setShowTimePickerBTS(true)}
@@ -48,7 +54,11 @@ const LocationDatePicker = () => {
                             </TouchableOpacity>}
                         </View>
                         <TouchableOpacity className="py-2 flex-row justify-between items-center ">
-                            <Text>Hà Nội</Text>
+                            {pickUp ? (
+                                <Text className="font-medium text-sm">{deliveryAddress}</Text>
+                            ) : (
+                                <Text className="font-medium text-sm text-gray-600">Địa điểm trả hàng</Text>
+                            )}
                         </TouchableOpacity>
                     </View>
                 </View>

@@ -3,16 +3,13 @@ import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Onboarding from 'react-native-onboarding-swiper';
 import LottieView from 'lottie-react-native';
-import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../constants';
-const { width, height } = Dimensions.get('window')
-const OnbroadingScreen = () => {
-    const navigation = useNavigation()
+const OnbroadingScreen = ({ navigation }) => {
     return (
         <SafeAreaView className="flex-1">
             <Onboarding
-                onDone={() => navigation.navigate(ROUTES.LOGIN)}
-                onSkip={() => navigation.navigate(ROUTES.LOGIN)}
+                onDone={() => navigation.navigate(ROUTES.CHOOSEACCOUNT)}
+                onSkip={() => navigation.navigate(ROUTES.CHOOSEACCOUNT)}
                 pages={[
                     {
                         backgroundColor: '#fff',

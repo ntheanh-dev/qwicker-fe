@@ -170,7 +170,7 @@ const DrawerNavigation = () => {
                     headerTitle: "Cài đặt khác",
                 }}
             />
-            {/* Hided Drawer.screen */}
+            {/*------------ Hided Drawer.screen -------------*/}
             <Drawer.Screen
                 name={ROUTES.PROFILE_DRAWER}
                 component={Profile}
