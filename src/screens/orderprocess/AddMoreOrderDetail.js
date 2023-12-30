@@ -252,6 +252,8 @@ const AddMoreOrderDetail = ({ navigation }) => {
                         </View>
                         {/* -------------Place BTN-------------- */}
                         <TouchableOpacity
+                            activeOpacity={1}
+                            onPress={() => navigation.navigate(ROUTES.ORDER_STATUS_STACK)}
                             className="flex justify-center items-center bg-[#3422F1] py-3 rounded-lg"
                         >
                             <Text className="text-lg font-bold text-white">Đặt giao hàng</Text>

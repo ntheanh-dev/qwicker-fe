@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Feather, AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
 import CheckBox from 'react-native-check-box'
 import * as ImagePicker from 'expo-image-picker';
-import RBSheet from "react-native-raw-bottom-sheet";
 import Dialog from "react-native-dialog";
 import { deleteData } from '../../redux/orderDetailSlice';
 import { useDispatch } from 'react-redux';
@@ -20,7 +19,6 @@ const OrderDetail = ({ navigation }) => {
     const fullfilled = false
     const [image, setImage] = useState()
     const inputRef = useRef()
-    const refRBSheet = useRef();
     const [visible, setVisible] = useState(false);
     const dispath = useDispatch()
 

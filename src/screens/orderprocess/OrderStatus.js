@@ -1,8 +1,8 @@
 import { View, Text, Dimensions, Animated, ScrollView, FlatList, Image, TouchableOpacity, RefreshControl } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { MaterialIcons, Ionicons, Entypo, Foundation, AntDesign, Feather } from '@expo/vector-icons';
-import { Easing, interpolateColor, useAnimatedProps, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import MapView, { Marker } from 'react-native-maps';
+import { MaterialIcons, Ionicons, Entypo, Foundation, AntDesign, } from '@expo/vector-icons';
+import { Easing, } from 'react-native-reanimated';
 import Dialog from "react-native-dialog";
 
 const INIT_REGION = {
@@ -38,7 +38,7 @@ const OrderStatus = ({ navigation }) => {
         ).start()
         Animated.loop(
             Animated.timing(animatedScale, {
-                toValue: 2,
+                toValue: 1.5,
                 duration: 2000,
                 useNativeDriver: true,
                 easing: Easing.linear
@@ -58,7 +58,7 @@ const OrderStatus = ({ navigation }) => {
         }, 2000);
     }, []);
     //--------------------------------------------------------
-    const [showDialogConfirm, setShowDialogConfim] = useState(true)
+    const [showDialogConfirm, setShowDialogConfim] = useState(false)
 
     const handleConfirmShipper = () => {
         setShowDialogConfim(false)
@@ -73,11 +73,11 @@ const OrderStatus = ({ navigation }) => {
             <MapView initialRegion={INIT_REGION} className="h-full w-full" >
                 <Marker
                     coordinate={{ latitude: INIT_REGION.latitude, longitude: INIT_REGION.longitude }}
-                    className="relative flex justify-center items-center w-72 h-72"
+                    className="relative flex justify-center items-center w-80 h-80"
                 >
                     <Animated.View
                         style={{
-                            backgroundColor: color, width: 288, height: 288, borderRadius: 1000,
+                            backgroundColor: color, width: 220, height: 220, borderRadius: 1000,
                             transform: [{ scale: scale }]
                         }}
                     >
@@ -142,7 +142,6 @@ const OrderStatus = ({ navigation }) => {
                     />
 
                     {/* -------Dialog confirm choosing shipper */}
-                    {/* -------------------Dialog----------------- */}
                     <Dialog.Container visible={showDialogConfirm} className="rounded-3xl relative">
                         <Dialog.Title>
                             <Text className="text-2xl">Bạn có chắc chắn không?</Text>
@@ -167,6 +166,7 @@ const OrderStatus = ({ navigation }) => {
                         </View>
                         <View className="px-3 mt-2">
                             <TouchableOpacity
+                                activeOpacity={1}
                                 onPress={handleConfirmShipper}
                                 className="w-full bg-[#3422F1] rounded-xl py-2 flex-row justify-center "
                             >

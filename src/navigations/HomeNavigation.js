@@ -16,7 +16,7 @@ const Stack = createNativeStackNavigator();
 
 const HomeNavigation = () => {
     return (
-        <Stack.Navigator initialRouteName={ROUTES.ORDER_STATUS_STACK}
+        <Stack.Navigator initialRouteName={ROUTES.HOME_STACK}
         >
             <Stack.Screen name={ROUTES.HOME_STACK} component={Home} options={{ headerShown: false }} />
             <Stack.Screen name={ROUTES.MAP_STACK} component={Map} options={{ headerShown: false }} />
