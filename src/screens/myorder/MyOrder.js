@@ -4,6 +4,7 @@ import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { Entypo, Foundation, Feather } from '@expo/vector-icons';
 import OrderItem from './OrderItem';
 import OrderItemNotFound from './OrderItemNotFound';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const DATA = [
     {
@@ -69,7 +70,7 @@ export default function MyOrder() {
     ]);
 
     return (
-        <>
+        <SafeAreaView className="flex-1">
             <View className="bg-white px-3 relative">
                 <TextInput
                     className="bg-gray-200 rounded-lg text-lg py-2 px-9"
@@ -102,6 +103,6 @@ export default function MyOrder() {
                     />
                 }
             />
-        </>
+        </SafeAreaView>
     );
 }

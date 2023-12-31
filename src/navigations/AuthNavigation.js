@@ -8,11 +8,14 @@ import RegisterNavigation from './RegisterNavigation';
 import { useSelector } from 'react-redux';
 import { getIsUseAppBefore } from '../redux/appSlice';
 import Login from '../screens/auth/Login';
+import BottomNavigation from './BottomNavigation';
 const Stack = createNativeStackNavigator();
 const AuthNavigation = () => {
     const useAppBefore = useSelector(getIsUseAppBefore)
     return (
-        <Stack.Navigator initialRouteName={useAppBefore ? ROUTES.CHOOSEACCOUNT : ROUTES.ONBOARDING}
+        <Stack.Navigator
+            // initialRouteName={useAppBefore ? ROUTES.CHOOSEACCOUNT : ROUTES.ONBOARDING}
+            initialRouteName={ROUTES.HOME_DRIVER_TAB}
             screenOptions={{ headerShown: false }}
         >
             <Stack.Screen
@@ -22,6 +25,10 @@ const AuthNavigation = () => {
             <Stack.Screen
                 name={ROUTES.HOME}
                 component={DrawerNavigation}
+            />
+            <Stack.Screen
+                name={ROUTES.HOME_DRIVER_TAB}
+                component={BottomNavigation}
             />
             <Stack.Screen
                 name={ROUTES.REGISTER_NAVIGATE}

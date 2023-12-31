@@ -23,5 +23,10 @@ export default {
     MORE_ORDER_DETAIL_STACK: 'More Order Detail Stack',
     ORDER_DETAIL_STACK: 'Order Detail Stack',
     ADD_COMMENT_FOR_COURIER_STACK: 'Add comment for courier stack',
-    ORDER_STATUS_STACK: 'Order Status Stack'
+    ORDER_STATUS_STACK: 'Order Status Stack',
+
+    HOME_DRIVER_TAB: 'Home driver tab',
+    ORDER_DRIVER_TAB: 'Order driver tab',
+    WALLET_DRIVER_TAB: 'Wallet driver tab',
+    PROFILE_DRIVER_TAB: 'Profile driver tab'
 }
