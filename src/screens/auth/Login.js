@@ -8,6 +8,10 @@ import { getRole } from '../../redux/appSlice';
 const Login = ({ navigation }) => {
     const role = useSelector(getRole)
 
+    const handleLogin = () => {
+        navigation.navigate(role === 1 ? ROUTES.HOME : ROUTES.DRIVER_NAVIGATION)
+    }
+
     return (
         <SafeAreaView className="flex-1 flex-col justify-around h-full">
             <View className=" basis-1/6 flex justify-center items-center">
@@ -28,7 +32,7 @@ const Login = ({ navigation }) => {
                     </View>
                     <TouchableOpacity
                         className={`w-full flex bg-[#3422F1] items-center rounded-lg p-4`}
-                        onPress={() => navigation.navigate(ROUTES.DRIVER_NAVIGATION)}
+                        onPress={handleLogin}
                     >
                         <Text className="text-lg font-normal text-white">Đăng nhập</Text>
                     </TouchableOpacity>

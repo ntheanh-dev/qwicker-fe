@@ -3,11 +3,12 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { ROUTES } from '../constants';
 import Home from '../screens/driver/Home';
-import Profile from '../screens/driver/Profile';
+import DriverBottomTab from '../screens/driver/DriverBottomTab';
 import Wallet from '../screens/Wallet'
 import MyOrder from '../screens/myorder/MyOrder';
 import { Feather, MaterialCommunityIcons, AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import Notification from '../screens/Notification'
+import DriverProfileNavigation from './DriverProfileNavigation';
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
     return (
@@ -25,7 +26,7 @@ const BottomNavigation = () => {
                         return <FontAwesome name="tasks" size={30} color={focused ? '#3422F1' : 'black'} />
                     } else if (route.name === ROUTES.NOTIFICATION_DRIVER_TAB) {
                         return <Feather name="bell" size={30} color={focused ? '#3422F1' : 'black'} />
-                    } else if (route.name === ROUTES.PROFILE_DRIVER_TAB) {
+                    } else if (route.name === ROUTES.DRIVER_PROFILE_NAVIGATION) {
                         return <Ionicons name="person-circle-outline" size={30} color={focused ? '#3422F1' : 'black'} />
                     }
                 },
@@ -59,17 +60,20 @@ const BottomNavigation = () => {
             <Tab.Screen options={{ title: 'Ví' }} name={ROUTES.WALLET_DRIVER_TAB} component={Wallet} />
             <Tab.Screen options={{ title: 'Thông báo' }} name={ROUTES.NOTIFICATION_DRIVER_TAB} component={Notification} />
             <Tab.Screen
-                name={ROUTES.PROFILE_DRIVER_TAB}
-                component={Profile}
+                name={ROUTES.DRIVER_PROFILE_NAVIGATION}
+                component={DriverProfileNavigation}
                 options={({ navigation }) => ({
                     title: "Tài xế",
-                    headerShown: true,
-                    headerTitle: '',
-                    headerRight: () => (
-                        <TouchableOpacity className="mr-4">
-                            <Feather name="settings" size={24} color="black" />
-                        </TouchableOpacity>
-                    )
+                    // headerShown: true,
+                    // headerTitle: '',
+                    // headerRight: () => (
+                    //     <TouchableOpacity
+                    //         onPress={() => navigation.navigate(ROUTES.SETTING_DRIVER_TAB)}
+                    //         className="mr-4"
+                    //     >
+                    //         <Feather name="settings" size={24} color="black" />
+                    //     </TouchableOpacity>
+                    // )
                 })}
             />
         </Tab.Navigator>
