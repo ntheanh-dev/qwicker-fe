@@ -25,8 +25,10 @@ export default {
     ADD_COMMENT_FOR_COURIER_STACK: 'Add comment for courier stack',
     ORDER_STATUS_STACK: 'Order Status Stack',
 
+    DRIVER_NAVIGATION: 'Driver navigation',
     HOME_DRIVER_TAB: 'Home driver tab',
     ORDER_DRIVER_TAB: 'Order driver tab',
     WALLET_DRIVER_TAB: 'Wallet driver tab',
+    NOTIFICATION_DRIVER_TAB: 'Notification driver tab',
     PROFILE_DRIVER_TAB: 'Profile driver tab'
 }

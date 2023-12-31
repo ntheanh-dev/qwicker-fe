@@ -27,7 +27,7 @@ const AuthNavigation = () => {
                 component={DrawerNavigation}
             />
             <Stack.Screen
-                name={ROUTES.HOME_DRIVER_TAB}
+                name={ROUTES.DRIVER_NAVIGATION}
                 component={BottomNavigation}
             />
             <Stack.Screen

@@ -28,7 +28,7 @@ const Login = ({ navigation }) => {
                     </View>
                     <TouchableOpacity
                         className={`w-full flex bg-[#3422F1] items-center rounded-lg p-4`}
-                        onPress={() => navigation.navigate(ROUTES.HOME)}
+                        onPress={() => navigation.navigate(ROUTES.DRIVER_NAVIGATION)}
                     >
                         <Text className="text-lg font-normal text-white">Đăng nhập</Text>
                     </TouchableOpacity>

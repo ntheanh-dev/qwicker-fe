@@ -1,6 +1,7 @@
 import { View, Text, useWindowDimensions, Image } from 'react-native'
 import React from 'react'
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { TabView, TabBar } from 'react-native-tab-view';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 function NotificaItem(props) {
@@ -61,24 +62,26 @@ const Notification = () => {
     ]);
 
     return (
-        <TabView
-            navigationState={{ index, routes }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            initialLayout={{ width: layout.width }}
-            renderTabBar={props =>
-                <TabBar
-                    {...props}
-                    style={{ backgroundColor: 'white' }}
-                    activeColor={"black"}
-                    inactiveColor={"gray"}
-                    indicatorStyle={{
-                        backgroundColor: '#3422F1'
-                    }}
+        <SafeAreaView className="flex-1">
+            <TabView
+                navigationState={{ index, routes }}
+                renderScene={renderScene}
+                onIndexChange={setIndex}
+                initialLayout={{ width: layout.width }}
+                renderTabBar={props =>
+                    <TabBar
+                        {...props}
+                        style={{ backgroundColor: 'white' }}
+                        activeColor={"black"}
+                        inactiveColor={"gray"}
+                        indicatorStyle={{
+                            backgroundColor: '#3422F1'
+                        }}
 
-                />
-            }
-        />
+                    />
+                }
+            />
+        </SafeAreaView>
     );
 }
 

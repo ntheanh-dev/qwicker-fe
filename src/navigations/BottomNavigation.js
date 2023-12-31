@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { ROUTES } from '../constants';
@@ -7,7 +7,7 @@ import Profile from '../screens/driver/Profile';
 import Wallet from '../screens/Wallet'
 import MyOrder from '../screens/myorder/MyOrder';
 import { Feather, MaterialCommunityIcons, AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
-import CustomBottomTabbarItem from '../components/CustomBottomTabbarItem';
+import Notification from '../screens/Notification'
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
     return (
@@ -23,6 +23,8 @@ const BottomNavigation = () => {
                         return <AntDesign name="wallet" size={30} color={focused ? '#3422F1' : 'black'} />
                     } else if (route.name === ROUTES.TASK_DRIVER_TAB) {
                         return <FontAwesome name="tasks" size={30} color={focused ? '#3422F1' : 'black'} />
+                    } else if (route.name === ROUTES.NOTIFICATION_DRIVER_TAB) {
+                        return <Feather name="bell" size={30} color={focused ? '#3422F1' : 'black'} />
                     } else if (route.name === ROUTES.PROFILE_DRIVER_TAB) {
                         return <Ionicons name="person-circle-outline" size={30} color={focused ? '#3422F1' : 'black'} />
                     }
@@ -34,10 +36,42 @@ const BottomNavigation = () => {
             })}
 
         >
-            <Tab.Screen options={{ title: 'Nhận hàng' }} name={ROUTES.HOME_DRIVER_TAB} component={Home} />
+            <Tab.Screen
+                name={ROUTES.HOME_DRIVER_TAB}
+                component={Home}
+                options={({ navigation }) => ({
+                    title: "Nhận hàng",
+                    headerShown: true,
+                    headerTitle: () => (
+                        <View className="flex-row items-center border border-[#3422F1] rounded-2xl py-2 pl-6 pr-7">
+                            <Text className="font-medium text-[#3422F1]">Đang làm việc</Text>
+                            <View className="h-2 w-2 translate-x-3 bg-[#3422F1] rounded-full"></View>
+                        </View>
+                    ),
+                    headerRight: () => (
+                        <TouchableOpacity className="mr-4">
+                            <MaterialCommunityIcons name="filter-variant" size={24} color="black" />
+                        </TouchableOpacity>
+                    )
+                })}
+            />
             <Tab.Screen options={{ title: 'Đơn hàng' }} name={ROUTES.ORDER_DRIVER_TAB} component={MyOrder} />
             <Tab.Screen options={{ title: 'Ví' }} name={ROUTES.WALLET_DRIVER_TAB} component={Wallet} />
-            <Tab.Screen options={{ title: 'Tài xế' }} name={ROUTES.PROFILE_DRIVER_TAB} component={Profile} />
+            <Tab.Screen options={{ title: 'Thông báo' }} name={ROUTES.NOTIFICATION_DRIVER_TAB} component={Notification} />
+            <Tab.Screen
+                name={ROUTES.PROFILE_DRIVER_TAB}
+                component={Profile}
+                options={({ navigation }) => ({
+                    title: "Tài xế",
+                    headerShown: true,
+                    headerTitle: '',
+                    headerRight: () => (
+                        <TouchableOpacity className="mr-4">
+                            <Feather name="settings" size={24} color="black" />
+                        </TouchableOpacity>
+                    )
+                })}
+            />
         </Tab.Navigator>
     )
 }
