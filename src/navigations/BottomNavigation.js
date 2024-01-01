@@ -49,11 +49,11 @@ const BottomNavigation = () => {
                             <View className="h-2 w-2 translate-x-3 bg-[#3422F1] rounded-full"></View>
                         </View>
                     ),
-                    headerRight: () => (
-                        <TouchableOpacity className="mr-4">
-                            <MaterialCommunityIcons name="filter-variant" size={24} color="black" />
-                        </TouchableOpacity>
-                    )
+                    // headerRight: () => (
+                    //     <TouchableOpacity className="mr-4">
+                    //         <MaterialCommunityIcons name="filter-variant" size={24} color="black" />
+                    //     </TouchableOpacity>
+                    // )
                 })}
             />
             <Tab.Screen options={{ title: 'Đơn hàng' }} name={ROUTES.ORDER_DRIVER_TAB} component={MyOrder} />
@@ -95,6 +95,6 @@ const styles = StyleSheet.create({
         marginBottom: 18,
     },
     tabBarLabelStyle: {
-        fontSize: 16
+        fontSize: 14
     }
 })
