@@ -4,6 +4,7 @@ import { TabView, TabBar } from 'react-native-tab-view';
 import { Entypo, Feather } from '@expo/vector-icons';
 import OrderItem from './OrderItem';
 import OrderItemNotFound from './OrderItemNotFound';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const DATA = [
     {
@@ -16,14 +17,6 @@ const DATA = [
     },
     {
         id: '3',
-        title: 'Third Item',
-    },
-    {
-        id: '4',
-        title: 'Third Item',
-    },
-    {
-        id: '5',
         title: 'Third Item',
     },
 ];
@@ -56,7 +49,7 @@ const renderScene = ({ route, jumpTo }) => {
     }
 };
 
-export default function MyOrder() {
+export default function OrderOwnedDriver() {
     const layout = useWindowDimensions();
     const [text, setText] = React.useState("")
 
@@ -68,7 +61,7 @@ export default function MyOrder() {
     ]);
 
     return (
-        <View className="flex-1">
+        <SafeAreaView className="flex-1">
             <View className="bg-white px-3 relative">
                 <TextInput
                     className="bg-gray-200 rounded-lg text-lg py-2 px-9"
@@ -101,6 +94,6 @@ export default function MyOrder() {
                     />
                 }
             />
-        </View>
+        </SafeAreaView>
     );
 }

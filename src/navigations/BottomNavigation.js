@@ -3,12 +3,11 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { ROUTES } from '../constants';
 import Home from '../screens/driver/Home';
-import DriverBottomTab from '../screens/driver/DriverBottomTab';
 import Wallet from '../screens/Wallet'
-import MyOrder from '../screens/myorder/MyOrder';
 import { Feather, MaterialCommunityIcons, AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import Notification from '../screens/Notification'
 import DriverProfileNavigation from './DriverProfileNavigation';
+import OrderOwnedDriver from '../screens/driver/order/OrderOwnedDriver';
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
     return (
@@ -56,7 +55,7 @@ const BottomNavigation = () => {
                     // )
                 })}
             />
-            <Tab.Screen options={{ title: 'Đơn hàng' }} name={ROUTES.ORDER_DRIVER_TAB} component={MyOrder} />
+            <Tab.Screen options={{ title: 'Đơn hàng' }} name={ROUTES.ORDER_DRIVER_TAB} component={OrderOwnedDriver} />
             <Tab.Screen options={{ title: 'Ví' }} name={ROUTES.WALLET_DRIVER_TAB} component={Wallet} />
             <Tab.Screen options={{ title: 'Thông báo' }} name={ROUTES.NOTIFICATION_DRIVER_TAB} component={Notification} />
             <Tab.Screen
@@ -64,16 +63,6 @@ const BottomNavigation = () => {
                 component={DriverProfileNavigation}
                 options={({ navigation }) => ({
                     title: "Tài xế",
-                    // headerShown: true,
-                    // headerTitle: '',
-                    // headerRight: () => (
-                    //     <TouchableOpacity
-                    //         onPress={() => navigation.navigate(ROUTES.SETTING_DRIVER_TAB)}
-                    //         className="mr-4"
-                    //     >
-                    //         <Feather name="settings" size={24} color="black" />
-                    //     </TouchableOpacity>
-                    // )
                 })}
             />
         </Tab.Navigator>
