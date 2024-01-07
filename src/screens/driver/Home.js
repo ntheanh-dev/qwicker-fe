@@ -1,7 +1,6 @@
 import { View, Text, TouchableOpacity, ScrollView, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Entypo, Foundation, Octicons, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 
 const FILTER_DATA = [{ id: 1, content: 'Tất cả' }, { id: 2, content: 'Ngay bây giờ' }, { id: 3, content: 'Hôm nay' }, { id: 4, content: 'Khác' },]
@@ -77,13 +76,105 @@ const Home = ({ navigation }) => {
 
                 </View>
             </TouchableOpacity>}
-            <View className="flex justify-center items-center mt-24">
+            <ScrollView>
+                <TouchableOpacity className="flex-col rounded-lg my-4">
+                    <View className="p-3 bg-orange-500">
+                        <Text className="text-lg text-white">Giao ngay</Text>
+                    </View>
+                    <View className="flex-row px-4 pt-2">
+                        <View className="basis-1/6 flex-col justify-center space-y-3">
+                            <View className="flex items-center w-10"><Entypo name="circle" size={18} color="#3422F1" /></View>
+                            <View className="flex items-center w-10"><Foundation name="marker" size={22} color="#3422F1" /></View>
+                        </View>
+                        <View className="basis-5/6 ml-[-12] ">
+                            <View>
+                                <Text className="font-medium text-lg">Thanh Xuan</Text>
+                            </View>
+                            <View className="py-2 flex-row justify-between items-center ">
+                                <Text className="font-medium text-lg">Ha Noi</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View className="flex-row items-center space-x-4 px-4 mt-2">
+                        <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
+                        <Text className="text-base text-gray-600">Đây là ghi chú</Text>
+                    </View>
+                    <View className="flex-row justify-between items-center p-4 border-b border-gray-300">
+                        <Ionicons name="cash-outline" size={24} color="#3422F1" />
+                        <Text className="text-xl font-semibold">đ99999999</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity className="flex-col rounded-lg my-4">
+                    <View className="flex-row justify-between items-center p-3 bg-yellow-500">
+                        <Text className="text-lg text-white">Hôm nay</Text>
+                        <View className="flex-row items-center space-x-1">
+                            <SimpleLineIcons name="clock" size={18} color="white" />
+                            <Text className="text-lg font-medium text-white">19:00</Text>
+                        </View>
+                    </View>
+                    <View className="flex-row px-4 pt-2">
+                        <View className="basis-1/6 flex-col justify-center space-y-3">
+                            <View className="flex items-center w-10"><Entypo name="circle" size={18} color="#3422F1" /></View>
+                            <View className="flex items-center w-10"><Foundation name="marker" size={22} color="#3422F1" /></View>
+                        </View>
+                        <View className="basis-5/6 ml-[-12] ">
+                            <View>
+                                <Text className="font-medium text-lg">Thanh Xuan</Text>
+                            </View>
+                            <View className="py-2 flex-row justify-between items-center ">
+                                <Text className="font-medium text-lg">Ha Noi</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View className="flex-row items-center space-x-4 px-4 mt-2">
+                        <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
+                        <Text className="text-base text-gray-600">Đây là ghi chú</Text>
+                    </View>
+                    <View className="flex-row justify-between items-center p-4 border-b border-gray-300">
+                        <Ionicons name="cash-outline" size={24} color="#3422F1" />
+                        <Text className="text-xl font-semibold">đ99999999</Text>
+                    </View>
+                </TouchableOpacity>
+                <TouchableOpacity className="flex-col rounded-lg my-4">
+                    <View className="flex-row justify-between items-center p-3 bg-blue-500">
+                        <Text className="text-lg text-white">t4, 21 thg5</Text>
+                        <View className="flex-row items-center space-x-1">
+                            <SimpleLineIcons name="clock" size={18} color="white" />
+                            <Text className="text-lg font-medium text-white">19:00</Text>
+                        </View>
+                    </View>
+                    <View className="flex-row px-4 pt-2">
+                        <View className="basis-1/6 flex-col justify-center space-y-3">
+                            <View className="flex items-center w-10"><Entypo name="circle" size={18} color="#3422F1" /></View>
+                            <View className="flex items-center w-10"><Foundation name="marker" size={22} color="#3422F1" /></View>
+                        </View>
+                        <View className="basis-5/6 ml-[-12] ">
+                            <View>
+                                <Text className="font-medium text-lg">Thanh Xuan</Text>
+                            </View>
+                            <View className="py-2 flex-row justify-between items-center ">
+                                <Text className="font-medium text-lg">Ha Noi</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View className="flex-row items-center space-x-4 px-4 mt-2">
+                        <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
+                        <Text className="text-base text-gray-600">Đây là ghi chú</Text>
+                    </View>
+                    <View className="flex-row justify-between items-center p-4 border-b border-gray-300">
+                        <Ionicons name="cash-outline" size={24} color="#3422F1" />
+                        <Text className="text-xl font-semibold">đ99999999</Text>
+                    </View>
+                </TouchableOpacity>
+                <View className="h-80 w-full"></View>
+            </ScrollView>
+            {/* <View className="flex justify-center items-center mt-24">
                 <LottieView style={{ width: 250, height: 250 }} source={require('../../assets/animations/onboarding4.json')} loop autoPlay />
                 <Text className="text-lg my-3 text-center">Thử xoá tuỳ chọn bộ lọc để xem thêm các đơn hàng</Text>
                 <TouchableOpacity className="py-3 px-5 rounded-lg bg-[#3422F1]" onPress={handleClearFilter}>
                     <Text className="text-white font-medium text-xl">Xoá tất cả bộ lọc</Text>
                 </TouchableOpacity>
-            </View>
+            </View> */}
         </View>
     )
 }

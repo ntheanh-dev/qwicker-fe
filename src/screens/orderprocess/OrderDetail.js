@@ -17,7 +17,7 @@ const OrderDetail = ({ navigation }) => {
     const [checkedMass, setCheckedMass] = useState(null)
     // true only as order detail full fill
     const fullfilled = false
-    const [image, setImage] = useState()
+    const [image, setImage] = useState(null)
     const inputRef = useRef()
     const [visible, setVisible] = useState(false);
     const dispath = useDispatch()
@@ -29,10 +29,7 @@ const OrderDetail = ({ navigation }) => {
         dispath(deleteData())
         navigation.goBack()
     };
-    ///    Confim bottom sheet
-    // useEffect(() => {
-    //     refRBSheet.current.open()
-    // }, [])
+
     const pickImage = async () => {
         let { status } =
             await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -47,7 +44,7 @@ const OrderDetail = ({ navigation }) => {
     }
 
     const handleBack = () => {
-        if (fullfilled) {
+        if (isFullField() !== null) {
             setVisible(true)
         } else {
             navigation.goBack()
@@ -65,6 +62,16 @@ const OrderDetail = ({ navigation }) => {
             ),
         });
     }, [])
+    const isFullField = () => {
+        return productType || checkedMass || image
+    }
+    const handleSave = () => {
+        if (isFullField() !== null) {
+            navigation.goBack()
+        }
+    }
+
+    console.log(isFullField())
     return (
         <View className="flex-1 bg-white">
             <ScrollView className="flex-1 bg-white py-4 px-4">
@@ -145,9 +152,19 @@ const OrderDetail = ({ navigation }) => {
                     <TouchableOpacity
                         onPress={pickImage}
                         className="flex-col justify-center space-y-2 items-center border border-gray-600 rounded-xl w-24 h-24 ml-10"
+                        style={image && { backgroundColor: 'rgb(147, 197, 253)' }}
                     >
-                        <Feather name="camera" size={24} color="black" />
-                        <Text className="font-medium">Thêm ảnh</Text>
+                        {image ? (
+                            <>
+                                <AntDesign name="checkcircle" size={24} color="#3422F1" />
+                                <Text className="font-medium text-[#3422F1]">Đã tải ảnh</Text>
+                            </>
+                        ) : (
+                            <>
+                                <Feather name="camera" size={24} color="black" />
+                                <Text className="font-medium">Thêm ảnh</Text>
+                            </>
+                        )}
                     </TouchableOpacity>
                 </View>
 
@@ -175,13 +192,13 @@ const OrderDetail = ({ navigation }) => {
                             <Text className="text-lg font-semibold text-[#3422F1]">Tiếp tục chỉnh sửa</Text>
                         </TouchableHighlight>
                     </View>
-                    <TouchableHighlight
-                        underlayColor={'rbga(0,0,0,0)'}
+                    <TouchableOpacity
+                        activeOpacity={1}
                         onPress={() => setVisible(false)}
                         className="absolute right-3 top-3"
                     >
                         <Feather name="x" size={30} color="#D1D5DB" />
-                    </TouchableHighlight>
+                    </TouchableOpacity>
                 </Dialog.Container>
             </ScrollView>
             {/* -------------Confirm bottom sheet-------- */}
@@ -189,13 +206,14 @@ const OrderDetail = ({ navigation }) => {
                 className="h-28 w-full px-4 pt-5 pb-8 flex-col justify-center items-center relative bottom-0 left-0 right-0"
                 style={{ backgroundColor: 'rgba(209, 213, 219, 0.4)' }}
             >
-                <TouchableHighlight
-                    underlayColor={'rbga(0,0,0,0)'}
+                <TouchableOpacity
+                    activeOpacity={1}
+                    onPress={handleSave}
                     className="bg-white rounded-lg h-full w-full flex justify-center items-center"
-                    style={fullfilled && { backgroundColor: '#3422F1' }}
+                    style={isFullField() !== null && { backgroundColor: '#3422F1' }}
                 >
-                    <Text className="text-lg font-medium" style={fullfilled && { color: 'white' }}>Lưu</Text>
-                </TouchableHighlight>
+                    <Text className="text-lg font-medium" style={isFullField() !== null && { color: 'white' }}>Lưu</Text>
+                </TouchableOpacity>
             </View>
         </View>
     )

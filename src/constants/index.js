@@ -1,5 +1,5 @@
 import ROUTES from './routes';
 import COLORS from './colors';
-
-export { ROUTES, COLORS }
+import LOCATION from './location';
+export { ROUTES, COLORS, LOCATION }
 

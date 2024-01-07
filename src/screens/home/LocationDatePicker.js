@@ -1,19 +1,34 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { memo, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import { Foundation, Entypo, MaterialIcons, AntDesign, Feather } from '@expo/vector-icons';
 import TimePickerBottomSheet from './TimePickerBottomSheet';
 import { formatDate } from '../../features/ultils';
-import { ROUTES } from '../../constants';
-import { useNavigation } from '@react-navigation/native';
+import { LOCATION, ROUTES } from '../../constants';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { getDeliveryAddress, getPickUP } from '../../redux/addressSlice';
+import { setTypeChoosingLocation } from '../../redux/appSlice';
 
 const LocationDatePicker = () => {
     const navigation = useNavigation()
+    const dispath = useDispatch()
     const [selectedDate, setSelectedDate] = useState(null)
     const [showTimePickerBTS, setShowTimePickerBTS] = useState(false)
-    const [pickUp, setPickUp] = useState(null)
-    const [deliveryAddress, setDeliveryAddress] = useState(null)
+    const pickUp = useSelector(getPickUP)
+    const deliveryAddress = useSelector(getDeliveryAddress)
     const handlePickTimeAgain = () => {
         setShowTimePickerBTS(true)
+    }
+    const handleChooseLocation = (type) => {
+        dispath(setTypeChoosingLocation(type))
+        switch (type) {
+            case LOCATION.PICK_UP:
+                navigation.navigate(pickUp.location ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK)
+                break
+            case LOCATION.DELIVERY_ADDRESS:
+                navigation.navigate(deliveryAddress.location ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK)
+                break
+        }
     }
     return (
         <View className="px-4 pt-2">
@@ -37,10 +52,10 @@ const LocationDatePicker = () => {
                     <View className="basis-5/6 ml-[-12] ">
                         <View className="flex-row justify-between items-center border-b border-gray-300 py-2">
                             <TouchableOpacity
-                                onPress={() => navigation.navigate(ROUTES.MAP_STACK)}
+                                onPress={() => handleChooseLocation(LOCATION.PICK_UP)}
                             >
-                                {pickUp ? (
-                                    <Text className="font-medium text-sm">{pickUp}</Text>
+                                {pickUp?.location ? (
+                                    <Text className="font-medium text-sm">{pickUp?.title}</Text>
                                 ) : (
                                     <Text className="font-medium text-sm text-gray-600">Địa điểm lấy hàng</Text>
                                 )}
@@ -53,9 +68,12 @@ const LocationDatePicker = () => {
                                 <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
                             </TouchableOpacity>}
                         </View>
-                        <TouchableOpacity className="py-2 flex-row justify-between items-center ">
-                            {pickUp ? (
-                                <Text className="font-medium text-sm">{deliveryAddress}</Text>
+                        <TouchableOpacity
+                            onPress={() => handleChooseLocation(LOCATION.DELIVERY_ADDRESS)}
+                            className="py-2 flex-row justify-between items-center "
+                        >
+                            {deliveryAddress?.location ? (
+                                <Text className="font-medium text-sm">{deliveryAddress?.title}</Text>
                             ) : (
                                 <Text className="font-medium text-sm text-gray-600">Địa điểm trả hàng</Text>
                             )}
