@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import ChangeUserInforBottomSheet from './ChangeUserInforBottomSheet';
-import { ROUTES } from '../../constants';
+import { ROLE, ROUTES } from '../../constants';
 import { useSelector } from 'react-redux';
 import { getRole } from '../../redux/appSlice'
 const Setting = ({ navigation }) => {
@@ -64,7 +64,7 @@ const Setting = ({ navigation }) => {
             <TouchableOpacity
                 onPress={login}
                 className="flex justify-between items-center py-4 bg-white"
-                style={role === 1 && { position: 'absolute', left: 0, right: 0, bottom: 32 }}
+                style={role === ROLE.TRADITIONAL_USER && { position: 'absolute', left: 0, right: 0, bottom: 32 }}
             >
                 <Text className="text-[#3422F1] text-lg font-medium">Đăng xuất</Text>
             </TouchableOpacity>

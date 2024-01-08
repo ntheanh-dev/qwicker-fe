@@ -54,12 +54,17 @@ const DATA = [
 const vehicelSlice = createSlice({
     name: 'vehicel',
     initialState: {
-        items: DATA
+        items: DATA,
+        pickedVehicel: null
     },
     reducers: {
-
+        pickVehicel: (state, action) => {
+            state.pickedVehicel = action.payload;
+        },
     }
 })
 
 export const getVehicel = (state) => state.vehicel.items
+export const getPickedVehicel = (state) => state?.vehicel.pickedVehicel
+export const { pickVehicel } = vehicelSlice.actions
 export default vehicelSlice.reducer

@@ -71,7 +71,6 @@ const OrderDetail = ({ navigation }) => {
         }
     }
 
-    console.log(isFullField())
     return (
         <View className="flex-1 bg-white">
             <ScrollView className="flex-1 bg-white py-4 px-4">

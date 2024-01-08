@@ -11,8 +11,6 @@ const INITIAL_ADDRESS = {
         title: null,
 
     },
-    status: 'idle'
-
 }
 const INITIAL_ADDRESS_2 = {
     pickUp: {
@@ -23,14 +21,15 @@ const INITIAL_ADDRESS_2 = {
         location: '5 Hẻm 891 Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Name',
         title: '5, Hẻm 89',
     },
-    status: 'idle'
-
 }
 
 
 const addressSlice = createSlice({
     name: 'address',
-    initialState: INITIAL_ADDRESS,
+    initialState: {
+        ...INITIAL_ADDRESS_2,
+        status: 'idle'
+    },
     reducers: {
         addPickUp: (state, action) => {
             state.pickUp.location = action.payload.location
@@ -45,5 +44,5 @@ const addressSlice = createSlice({
 export const { addPickUp, addDeliveryAddress } = addressSlice.actions
 export default addressSlice.reducer
 
-export const getPickUP = state => state.address.pickUp
-export const getDeliveryAddress = state => state.address.deliveryAddress
+export const getPickUP = state => state?.address.pickUp
+export const getDeliveryAddress = state => state?.address.deliveryAddress

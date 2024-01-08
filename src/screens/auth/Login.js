@@ -1,7 +1,7 @@
 import { View, Text, Image, TextInput, Button, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ROUTES } from '../../constants'
+import { ROLE, ROUTES } from '../../constants'
 import { AntDesign, EvilIcons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { getRole } from '../../redux/appSlice';
@@ -9,7 +9,7 @@ const Login = ({ navigation }) => {
     const role = useSelector(getRole)
 
     const handleLogin = () => {
-        navigation.navigate(role === 1 ? ROUTES.HOME : ROUTES.DRIVER_NAVIGATION)
+        navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.HOME : ROUTES.DRIVER_NAVIGATION)
     }
 
     return (
@@ -22,7 +22,7 @@ const Login = ({ navigation }) => {
             </View>
             <View className='basis-4/6 items-center '>
                 <Text className='text-4xl font-semibold'>Đăng nhập</Text>
-                <Text className='text-lg font-normal text-gray-500 pt-2'>{`( Với tư cách là ${role === 1 ? 'thành viên' : 'người vận chuyển'} )`}</Text>
+                <Text className='text-lg font-normal text-gray-500 pt-2'>{`( Với tư cách là ${role === ROLE.TRADITIONAL_USER ? 'thành viên' : 'người vận chuyển'} )`}</Text>
                 <View className="w-full px-5 mt-6 flex-col space-y-4">
                     <View className="rounded-lg border-2 border-[#D1D1D1] p-4 bg-white">
                         <TextInput placeholderTextColor={'#A5A5A5'} placeholder="Email" />
@@ -36,7 +36,7 @@ const Login = ({ navigation }) => {
                     >
                         <Text className="text-lg font-normal text-white">Đăng nhập</Text>
                     </TouchableOpacity>
-                    {role === 1 && <View className="flex-col space-y-3">
+                    {role === ROLE.TRADITIONAL_USER && <View className="flex-col space-y-3">
                         <Text className="text-center text-gray-500 font-medium text-sm py-2">hoặc đăng nhập bằng</Text>
                         <View className="flex-row justify-center space-x-4">
                             <TouchableOpacity className="border-2 border-gray-400 rounded-full p-3">

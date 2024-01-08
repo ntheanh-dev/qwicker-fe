@@ -1,9 +1,12 @@
 import { View, Text, TouchableOpacity, Animated, Image, StyleSheet } from 'react-native'
 import React from 'react'
 import { Feather, AntDesign } from '@expo/vector-icons';
+import { useDispatch } from 'react-redux';
+import { pickVehicel } from '../../redux/vehicelSilce';
 
 
 const Vehicel = ({ scrollY, data, selectedVehicel, setSelectedVehicel, scrollView }) => {
+    const dispatch = useDispatch()
     const { title, content, foodContent, image } = data
 
     const containerHeight = scrollY.interpolate({
@@ -16,9 +19,11 @@ const Vehicel = ({ scrollY, data, selectedVehicel, setSelectedVehicel, scrollVie
     const handleSelect = () => {
         if (isSelected) {
             setSelectedVehicel(null)
+            dispatch(pickVehicel(null))
             scrollView.current.scrollTo({ x: 0, y: 0, animated: true })
         } else {
             setSelectedVehicel(data.id)
+            dispatch(pickVehicel(data))
             scrollView.current.scrollTo({ x: 0, y: 300, animated: true })
         }
     }
