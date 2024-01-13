@@ -47,41 +47,8 @@ const Home = ({ navigation }) => {
                         scrollView={scrollView}
                     />)}
                 </View>
-                {/* <RBSheet
-                    ref={refRBSheet}
-                    customStyles={{
-                        wrapper: {
-                            backgroundColor: "rgba(0,0,0,0.3)"
-                        },
-                        draggableIcon: {
-                            backgroundColor: "#000"
-                        },
-                        container: {
-                            borderTopLeftRadius: 20,
-                            borderTopRightRadius: 20,
-                            overflow: 'hidden'
-                        }
-                    }}
-                    height={190}
-                >
-                    <View className="h-48 w-full px-4 py-9 flex-col justify-between">
-                        <View className="flex-row justify-between items-center">
-                            <Text className="text-base font-semibold text-gray-600">Tổng cộng</Text>
-                            <View className="flex-row space-x-2 items-center">
-                                <Text className="text-2xl font-bold">đ36.396</Text>
-                                <AntDesign name="exclamationcircleo" size={20} color="black" />
-                            </View>
-    
-                        </View>
-                        <TouchableOpacity
-                            onPress={handleNextStep}
-                            className="flex justify-center items-center bg-[#3422F1] py-3 rounded-lg"
-                        >
-                            <Text className="text-lg font-bold text-white">Bước tiếp theo</Text>
-                        </TouchableOpacity>
-                    </View>
-                </RBSheet> */}
             </Animated.ScrollView>
+            {/*-------------Comfirm botton btn-------------  */}
             {isFullFill && <View className="h-44 px-4 py-9 flex-col justify-between absolute bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 rounded-l-lg rounded-r-lg">
                 <View className="flex-row justify-between items-center">
                     <Text className="text-base font-semibold text-gray-600">Tổng cộng</Text>

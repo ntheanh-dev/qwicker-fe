@@ -1,14 +1,14 @@
-import { View, Text, Image, Dimensions, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { MaterialIcons, FontAwesome, AntDesign, Ionicons, Entypo } from '@expo/vector-icons';
-import { ROUTES } from '../../constants';
+import { View, Text, Image, Dimensions, TouchableOpacity, SafeAreaView } from 'react-native'
+import React, { useEffect } from 'react'
+import { MaterialIcons, FontAwesome, AntDesign, Ionicons, Entypo, Feather } from '@expo/vector-icons';
+import { ROUTES } from '../../../constants';
 
 const { height } = Dimensions.get('window')
 const top = (height * 25 / 100) - 32
 const DriverBottomTab = ({ navigation }) => {
+
     return (
-        <View className="flex-1 flex-col relative items-center">
+        <SafeAreaView className="flex-1 flex-col relative items-center">
             <View className="w-40 h-16 bg-white border-2 border-gray-200 shadow-lg absolute z-10 rounded-3xl flex-row justify-center items-center space-x-2"
                 style={{ top: top }}
             >
@@ -21,7 +21,7 @@ const DriverBottomTab = ({ navigation }) => {
             >
                 <Image
                     style={{ height: 80, width: 80, resizeMode: 'center' }}
-                    source={require('../../assets/logo/user.png')}
+                    source={require('../../../assets/logo/user.png')}
                 />
                 <Text className="font-semibold text-2xl mt-2 mb-3">Nguyen The Anh</Text>
                 <View className="flex-row items-center space-x-4">
@@ -87,7 +87,7 @@ const DriverBottomTab = ({ navigation }) => {
                     </View>
                 </TouchableOpacity>
             </View>
-        </View>
+        </SafeAreaView>
     )
 }
 

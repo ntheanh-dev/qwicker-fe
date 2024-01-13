@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ROUTES } from '../constants';
 import Setting from '../screens/setting/Setting';
 import Profile from '../screens/Profile';
-import DriverBottomTab from '../screens/driver/DriverBottomTab';
+import DriverBottomTab from '../screens/driver/routes/DriverBottomTab';
 import { Feather } from '@expo/vector-icons';
 
 const Stack = createNativeStackNavigator();

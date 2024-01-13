@@ -2,20 +2,20 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { ROUTES } from '../constants';
-import Home from '../screens/driver/Home';
 import Wallet from '../screens/Wallet'
 import { Feather, MaterialCommunityIcons, AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import Notification from '../screens/Notification'
-import DriverProfileNavigation from './DriverProfileNavigation';
 import OrderOwnedDriver from '../screens/driver/order/OrderOwnedDriver';
+import FindOrder from '../screens/driver/routes/FindOrder';
+import DriverProfileNavigation from './DriverProfileNavigation';
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
     return (
-        <Tab.Navigator initialRouteName={ROUTES.HOME_DRIVER_TAB}
+        <Tab.Navigator initialRouteName={ROUTES.ORDER_DRIVER_TAB}
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarIcon: ({ color, focused, size }) => {
-                    if (route.name === ROUTES.HOME_DRIVER_TAB) {
+                    if (route.name === ROUTES.FIND_ORDER_DRIVER_TAB) {
                         return <Feather name="download" size={30} color={focused ? '#3422F1' : 'black'} />
                     } else if (route.name === ROUTES.ORDER_DRIVER_TAB) {
                         return <MaterialCommunityIcons name="clipboard-text-multiple-outline" size={30} color={focused ? '#3422F1' : 'black'} />
@@ -37,8 +37,8 @@ const BottomNavigation = () => {
 
         >
             <Tab.Screen
-                name={ROUTES.HOME_DRIVER_TAB}
-                component={Home}
+                name={ROUTES.FIND_ORDER_DRIVER_TAB}
+                component={FindOrder}
                 options={({ navigation }) => ({
                     title: "Nhận hàng",
                     headerShown: true,
@@ -48,11 +48,6 @@ const BottomNavigation = () => {
                             <View className="h-2 w-2 translate-x-3 bg-[#3422F1] rounded-full"></View>
                         </View>
                     ),
-                    // headerRight: () => (
-                    //     <TouchableOpacity className="mr-4">
-                    //         <MaterialCommunityIcons name="filter-variant" size={24} color="black" />
-                    //     </TouchableOpacity>
-                    // )
                 })}
             />
             <Tab.Screen options={{ title: 'Đơn hàng' }} name={ROUTES.ORDER_DRIVER_TAB} component={OrderOwnedDriver} />

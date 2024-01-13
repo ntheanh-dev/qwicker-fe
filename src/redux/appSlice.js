@@ -4,7 +4,7 @@ const appSlice = createSlice({
     name: 'app',
     initialState: {
         isUseAppBefore: false,
-        role: 1, // 1:user, 2:shipper,
+        role: 2, // 1:user, 2:shipper,
         typeChoosingLocation: 1, // 1: pick up, 2:deliver address
     },
     reducers: {

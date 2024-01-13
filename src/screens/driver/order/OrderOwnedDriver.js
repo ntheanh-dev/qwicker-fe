@@ -1,51 +1,21 @@
 import * as React from 'react';
-import { View, useWindowDimensions, Text, Image, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import { View, useWindowDimensions, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { Entypo, Feather } from '@expo/vector-icons';
-import OrderItem from './OrderItem';
-import OrderItemNotFound from './OrderItemNotFound';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, ScrollView } from 'react-native-safe-area-context';
+import ProcessingOrderTab from './ProcessingOrderTab';
+import CompletedOrderTab from './CompletedOrderTab';
+import CanceledOrderTab from './CanceledOrderTab';
 
-const DATA = [
-    {
-        id: '1',
-        title: 'First Item',
-    },
-    {
-        id: '2',
-        title: 'Second Item',
-    },
-    {
-        id: '3',
-        title: 'Third Item',
-    },
-];
-
-function FirstRoute({ index }) {
-    return (
-        <View style={{ flex: 1, backgroundColor: '#E5E7EB' }}>
-            {index === '1' ? (
-                <FlatList
-                    data={DATA}
-                    renderItem={({ item }) => <OrderItem />}
-                    keyExtractor={item => item.id}
-                    showsVerticalScrollIndicator={false}
-                />
-            ) : (
-                <OrderItemNotFound />
-            )}
-        </View>
-    )
-}
 
 const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
         case '1':
-            return <FirstRoute index={route.key} />;
+            return <ProcessingOrderTab title={route.title} index={route.key} />;
         case '2':
-            return <FirstRoute index={route.key} />;
+            return <CompletedOrderTab title={route.title} index={route.key} />;
         case '3':
-            return <FirstRoute index={route.key} />;
+            return <CanceledOrderTab title={route.title} index={route.key} />;
     }
 };
 
@@ -55,7 +25,7 @@ export default function OrderOwnedDriver() {
 
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
-        { key: '1', title: 'Đang tải' },
+        { key: '1', title: 'Đang xử lý' },
         { key: '2', title: 'Đã hoàn thành' },
         { key: '3', title: 'Đã huỷ' },
     ]);

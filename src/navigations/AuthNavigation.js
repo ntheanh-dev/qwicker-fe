@@ -15,7 +15,7 @@ const AuthNavigation = () => {
     return (
         <Stack.Navigator
             // initialRouteName={useAppBefore ? ROUTES.CHOOSEACCOUNT : ROUTES.ONBOARDING}
-            initialRouteName={ROUTES.HOME}
+            initialRouteName={ROUTES.DRIVER_NAVIGATION}
             screenOptions={{ headerShown: false }}
         >
             <Stack.Screen
