@@ -19,7 +19,7 @@ const renderScene = ({ route, jumpTo }) => {
     }
 };
 
-export default function OrderOwnedDriver() {
+export default function MyOrderTab() {
     const layout = useWindowDimensions();
     const [text, setText] = React.useState("")
 

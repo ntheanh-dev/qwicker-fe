@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { MaterialIcons, Entypo, Foundation, Ionicons } from '@expo/vector-icons';
+import { MaterialIcons, Entypo, Foundation, Ionicons, Octicons } from '@expo/vector-icons';
 
-const OrderDetail = ({ route, navigation }) => {
+const PickOrder = ({ route, navigation }) => {
     const { itemId } = route.params;
 
     return (
@@ -43,9 +43,17 @@ const OrderDetail = ({ route, navigation }) => {
                     </View>
                     {/* ----------Vehicel---------- */}
                     <View className="flex-col bg-white rounded-lg border border-gray-300 p-4 mb-2">
-                        <View className="flex-row justify-between">
-                            <Text className="text-lg font-medium">Xe máy</Text>
-                            <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+                        <View className="flex-col">
+                            <View className="flex-row justify-between">
+                                <Text className="text-lg font-medium">Xe máy</Text>
+                                <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
+                            </View>
+
+                            <View className="flex-row items-center space-x-2 pt-3">
+                                <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
+                                <Text className="text-base text-gray-600">Giao hai thung bia</Text>
+                            </View>
+
                         </View>
                     </View>
                     {/* ----------Vehicel---------- */}
@@ -73,4 +81,4 @@ const OrderDetail = ({ route, navigation }) => {
     )
 }
 
-export default OrderDetail
+export default PickOrder

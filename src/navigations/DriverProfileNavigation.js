@@ -4,8 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ROUTES } from '../constants';
 import Setting from '../screens/setting/Setting';
 import Profile from '../screens/Profile';
-import DriverBottomTab from '../screens/driver/routes/DriverBottomTab';
 import { Feather } from '@expo/vector-icons';
+import ProfileTab from '../screens/driver/profileTab';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,7 +14,7 @@ const DriverProfileNavigation = () => {
         <Stack.Navigator initialRouteName={ROUTES.DRIVER_PROFILE_STACK}>
             <Stack.Screen
                 name={ROUTES.DRIVER_PROFILE_STACK}
-                component={DriverBottomTab}
+                component={ProfileTab}
                 options={({ navigation }) => ({
                     title: "Tài xế",
                     headerShown: true,

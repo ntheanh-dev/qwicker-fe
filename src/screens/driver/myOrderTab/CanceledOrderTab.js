@@ -1,8 +1,9 @@
 import { View, FlatList } from 'react-native'
-import React from 'react'
+import React, { memo } from 'react'
 import OrderItemNotFound from './OrderItemNotFound';
 
 const CanceledOrderTab = () => {
+    console.log('tab3')
 
     return (
         <View className="flex-1 bg-white">
@@ -11,4 +12,4 @@ const CanceledOrderTab = () => {
     )
 }
 
-export default CanceledOrderTab
+export default memo(CanceledOrderTab)

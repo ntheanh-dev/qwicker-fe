@@ -5,14 +5,15 @@ import { ROUTES } from '../constants';
 import Wallet from '../screens/Wallet'
 import { Feather, MaterialCommunityIcons, AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons';
 import Notification from '../screens/Notification'
-import OrderOwnedDriver from '../screens/driver/order/OrderOwnedDriver';
-import FindOrder from '../screens/driver/routes/FindOrder';
-import OrderDetail from '../screens/driver/routes/OrderDetail';
+import PickOrder from '../screens/driver/hideTab/PickOrder';
 import DriverProfileNavigation from './DriverProfileNavigation';
+import MyOrderTab from '../screens/driver/myOrderTab';
+import FindOrderTab from '../screens/driver/findOrderTab';
+import ReviewOrder from '../screens/driver/hideTab/ReviewOrder';
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
     return (
-        <Tab.Navigator initialRouteName={ROUTES.FIND_ORDER_DRIVER_TAB}
+        <Tab.Navigator initialRouteName={ROUTES.ORDER_DRIVER_TAB}
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarIcon: ({ color, focused, size }) => {
@@ -40,7 +41,7 @@ const BottomNavigation = () => {
         >
             <Tab.Screen
                 name={ROUTES.FIND_ORDER_DRIVER_TAB}
-                component={FindOrder}
+                component={FindOrderTab}
                 options={({ navigation }) => ({
                     title: "Nhận hàng",
                     headerShown: true,
@@ -52,7 +53,7 @@ const BottomNavigation = () => {
                     ),
                 })}
             />
-            <Tab.Screen options={{ title: 'Đơn hàng' }} name={ROUTES.ORDER_DRIVER_TAB} component={OrderOwnedDriver} />
+            <Tab.Screen options={{ title: 'Đơn hàng' }} name={ROUTES.ORDER_DRIVER_TAB} component={MyOrderTab} />
             <Tab.Screen options={{ title: 'Ví' }} name={ROUTES.WALLET_DRIVER_TAB} component={Wallet} />
             <Tab.Screen options={{ title: 'Thông báo' }} name={ROUTES.NOTIFICATION_DRIVER_TAB} component={Notification} />
             <Tab.Screen
@@ -63,7 +64,7 @@ const BottomNavigation = () => {
                 })}
             />
             {/* -------------Hided screen-------------- */}
-            <Tab.Screen name={ROUTES.ORDER_DETAIL_DRIVER_TAB} component={OrderDetail} options={({ navigation }) => ({
+            <Tab.Screen name={ROUTES.PICK_ORDER_DRIVER_TAB} component={PickOrder} options={({ navigation }) => ({
                 tabBarButton: () => null,
                 tabBarStyle: { display: 'none' },
                 headerLeft: () => (
@@ -79,6 +80,24 @@ const BottomNavigation = () => {
                 headerStyle: {
                     backgroundColor: '#3422F1'
                 }
+            })} />
+            <Tab.Screen name={ROUTES.REVIEW_ORDER_DRIVER_TAB} component={ReviewOrder} options={({ navigation, route }) => ({
+                tabBarButton: () => null,
+                tabBarStyle: { display: 'none' },
+                headerLeft: () => (
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate(ROUTES.ORDER_DRIVER_TAB)}
+                        className="ml-4"
+                    >
+                        <Ionicons name="arrow-back-sharp" size={24} color="black" />
+                    </TouchableOpacity>
+                ),
+                headerRight: () => (
+                    <Text className="text-lg mr-4 font-medium text-[#3422F1]">TRỢ GIÚP</Text>
+                ),
+                headerShown: true,
+                headerTitle: route.params?.title,
+                headerTitleAlign: 'center'
             })} />
         </Tab.Navigator>
     )

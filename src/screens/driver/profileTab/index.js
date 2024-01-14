@@ -5,8 +5,7 @@ import { ROUTES } from '../../../constants';
 
 const { height } = Dimensions.get('window')
 const top = (height * 25 / 100) - 32
-const DriverBottomTab = ({ navigation }) => {
-
+const ProfileTab = ({ navigation }) => {
     return (
         <SafeAreaView className="flex-1 flex-col relative items-center">
             <View className="w-40 h-16 bg-white border-2 border-gray-200 shadow-lg absolute z-10 rounded-3xl flex-row justify-center items-center space-x-2"
@@ -91,4 +90,4 @@ const DriverBottomTab = ({ navigation }) => {
     )
 }
 
-export default DriverBottomTab
+export default ProfileTab

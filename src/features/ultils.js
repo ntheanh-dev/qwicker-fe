@@ -48,6 +48,25 @@ export function formatMomentDateToVietnamese(dateString) {
 
     return formattedDate;
 }
+
+export function formatMomentDateToVietnamese2(dateString) {
+    // "2024-01-14 20:00:00"
+    var moment = require('moment-timezone');
+    moment.tz.setDefault('Asia/Ho_Chi_Minh')
+    const date = moment(dateString)
+    const diff = getDiffBetweenTwoTime(dateString)
+
+    const day = date.day() + 1
+    const hour = date.hour()
+    const minute = date.minute()
+    const strM = minute >= 10 ? minute : `0${minute}`
+    if (diff.day <= 1) {
+        return `Hôm nay, ${hour}:${strM}`
+    } else {
+        return `${date.date()} Th${date.month() + 1},${hour}:${strM}`;
+    }
+}
+
 export const getDiffBetweenTwoTime = (time) => {
     var moment = require('moment-timezone');
     moment.tz.setDefault('Asia/Ho_Chi_Minh')
