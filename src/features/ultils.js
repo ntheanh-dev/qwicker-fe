@@ -1,3 +1,4 @@
+
 export const formatDate = (date, time) => {
     const dayOfWeek = date.getUTCDay() === 7 ? "CN" : date.getUTCDay() + 1
     return `Th ${dayOfWeek}, thg ${date.getMonth() + 1} ${date.getDate()}, ${time.getUTCHours()}:${time.getMinutes()}`;
@@ -33,4 +34,26 @@ export function formatDateToVietnamese(dateString) {
     const formattedDate = `Th ${dateObject.getDay() + 1}, ${monthInVietnamese} ${day}`;
 
     return formattedDate;
+}
+export function formatMomentDateToVietnamese(dateString) {
+    // "2024-01-14 20:00:00"
+    var moment = require('moment-timezone');
+    moment.tz.setDefault('Asia/Ho_Chi_Minh')
+    const date = moment(dateString)
+
+    const day = date.day() + 1
+    const strDay = day === 1 ? 'CN' : `Th ${day}`
+
+    const formattedDate = `${strDay}, ${date.date()} thg ${date.month() + 1}`;
+
+    return formattedDate;
+}
+export const getDiffBetweenTwoTime = (time) => {
+    var moment = require('moment-timezone');
+    moment.tz.setDefault('Asia/Ho_Chi_Minh')
+    const orderTiem = moment(time)
+    const diff = orderTiem.diff(moment())
+    const duration = moment.duration(diff);
+
+    return { hour: duration.hours(), day: duration.days() };
 }

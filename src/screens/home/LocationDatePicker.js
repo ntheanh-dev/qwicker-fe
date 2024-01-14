@@ -48,6 +48,7 @@ const LocationDatePicker = ({ navigation }) => {
                 dispath(addDate(value))
                 break;
         }
+        console.log(value)
     }
     const pickCurrentDate = () => {
         dispath(addDate(null))
