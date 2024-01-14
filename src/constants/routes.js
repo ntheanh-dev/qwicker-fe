@@ -31,6 +31,7 @@ export default {
     WALLET_DRIVER_TAB: 'Wallet driver tab',
     NOTIFICATION_DRIVER_TAB: 'Notification driver tab',
     FIND_ORDER_DRIVER_TAB: 'Find order driver tab',
+    ORDER_DETAIL_DRIVER_TAB: 'Order detail driver tab',
 
     DRIVER_PROFILE_NAVIGATION: 'Driver profile navigation',
     DRIVER_PROFILE_STACK: 'Driver profile stack',

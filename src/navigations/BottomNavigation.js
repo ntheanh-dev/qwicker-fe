@@ -7,11 +7,12 @@ import { Feather, MaterialCommunityIcons, AntDesign, FontAwesome, Ionicons } fro
 import Notification from '../screens/Notification'
 import OrderOwnedDriver from '../screens/driver/order/OrderOwnedDriver';
 import FindOrder from '../screens/driver/routes/FindOrder';
+import OrderDetail from '../screens/driver/routes/OrderDetail';
 import DriverProfileNavigation from './DriverProfileNavigation';
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
     return (
-        <Tab.Navigator initialRouteName={ROUTES.ORDER_DRIVER_TAB}
+        <Tab.Navigator initialRouteName={ROUTES.FIND_ORDER_DRIVER_TAB}
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarIcon: ({ color, focused, size }) => {
@@ -31,7 +32,8 @@ const BottomNavigation = () => {
                 },
                 tabBarStyle: styles.tabBarStyle,
                 tabBarItemStyle: styles.tabBarItemStyle,
-                tabBarLabelStyle: styles.tabBarLabelStyle
+                tabBarLabelStyle: styles.tabBarLabelStyle,
+                tabBarHideOnKeyboard: true,
                 // title: ({ focused }) => (<CustomBottomTabbarItem focused={focused} />)
             })}
 
@@ -60,6 +62,24 @@ const BottomNavigation = () => {
                     title: "Tài xế",
                 })}
             />
+            {/* -------------Hided screen-------------- */}
+            <Tab.Screen name={ROUTES.ORDER_DETAIL_DRIVER_TAB} component={OrderDetail} options={({ navigation }) => ({
+                tabBarButton: () => null,
+                tabBarStyle: { display: 'none' },
+                headerLeft: () => (
+                    <TouchableOpacity
+                        onPress={() => navigation.goBack()}
+                        className="ml-4"
+                    >
+                        <Ionicons name="arrow-back-sharp" size={24} color="white" />
+                    </TouchableOpacity>
+                ),
+                headerShown: true,
+                headerTitle: '',
+                headerStyle: {
+                    backgroundColor: '#3422F1'
+                }
+            })} />
         </Tab.Navigator>
     )
 }

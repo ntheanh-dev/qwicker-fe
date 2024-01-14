@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, ScrollView, FlatList } from 'react-native
 import React, { useEffect, useState } from 'react'
 import { MaterialCommunityIcons, Entypo, Foundation, Octicons, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
+import { ROUTES } from '../../../constants';
 
 const FILTER_DATA = [{ id: 1, content: 'Tất cả' }, { id: 2, content: 'Ngay bây giờ' }, { id: 3, content: 'Hôm nay' }, { id: 4, content: 'Khác' },]
 const SORT_DATA = [{ id: 1, content: 'Thời gian' }, { id: 2, content: 'Địa điểm' }]
@@ -78,7 +79,10 @@ const FindOrder = ({ navigation }) => {
             </TouchableOpacity>}
 
             <ScrollView showsVerticalScrollIndicator={false}>
-                <TouchableOpacity className="flex-col rounded-md overflow-hidden my-2">
+                <TouchableOpacity
+                    onPress={() => navigation.navigate(ROUTES.ORDER_DETAIL_DRIVER_TAB, { itemId: 3 })}
+                    className="flex-col rounded-md overflow-hidden my-2"
+                >
                     <View className="p-3 bg-orange-500">
                         <Text className="text-lg text-white">Giao ngay</Text>
                     </View>
