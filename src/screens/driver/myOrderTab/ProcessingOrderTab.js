@@ -2,7 +2,7 @@ import { View, FlatList, ScrollView } from 'react-native'
 import React, { memo } from 'react'
 import OrderItem from './OrderItem';
 
-const ProcessingOrderTab = ({ title }) => {
+const ProcessingOrderTab = ({ title, index }) => {
     const DATA = [{
         id: 1, pickUp: {
             location: '5 Hẻm 891 Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Name',
@@ -38,7 +38,7 @@ const ProcessingOrderTab = ({ title }) => {
             <ScrollView
                 showsVerticalScrollIndicator={false}
             >
-                {DATA.map(item => <OrderItem key={item.id} data={item} title={'Đang xử lý'} />)}
+                {DATA.map(item => <OrderItem key={item.id} data={item} title={title} index={index} />)}
                 <View className="h-80 w-full"></View>
             </ScrollView>
         </View>

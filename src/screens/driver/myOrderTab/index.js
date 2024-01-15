@@ -10,11 +10,11 @@ import CanceledOrderTab from './CanceledOrderTab';
 
 const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
-        case '1':
+        case 1:
             return <ProcessingOrderTab title={route.title} index={route.key} />;
-        case '2':
+        case 2:
             return <CompletedOrderTab title={route.title} index={route.key} />;
-        case '3':
+        case 3:
             return <CanceledOrderTab title={route.title} index={route.key} />;
     }
 };
@@ -25,9 +25,9 @@ export default function MyOrderTab() {
 
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
-        { key: '1', title: 'Đang xử lý' },
-        { key: '2', title: 'Đã hoàn thành' },
-        { key: '3', title: 'Đã huỷ' },
+        { key: 1, title: 'Đang xử lý' },
+        { key: 2, title: 'Đã hoàn thành' },
+        { key: 3, title: 'Đã huỷ' },
     ]);
 
     return (

@@ -5,16 +5,16 @@ import { formatMomentDateToVietnamese2 } from '../../../features/ultils';
 import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../../../constants';
 
-const OrderItem = ({ data, title }) => {
+const OrderItem = ({ data, title, index }) => {
     const navigation = useNavigation()
 
     return (
         <TouchableOpacity
-            onPress={() => navigation.navigate(ROUTES.REVIEW_ORDER_DRIVER_TAB, { title: 'Nhận lúc 99:99', data: data })}
+            onPress={() => navigation.navigate(ROUTES.REVIEW_ORDER_DRIVER_TAB, { title: 'Nhận lúc 99:99', data: data, index: index })}
             className="flex-col bg-white rounded-xl overflow-hidden my-3"
         >
-            <View className={`flex-row justify-between items-center p-3 ${title === 'Đang xử lý' ? 'bg-orange-500' : 'border-gray-300 border-b'} `}>
-                <Text className={`text-lg font-semibold ${title === 'Đang xử lý' && 'text-white'}`}>{title}</Text>
+            <View className={`flex-row justify-between items-center p-3 ${index === 1 ? 'bg-orange-500' : 'border-gray-300 border-b'} `}>
+                <Text className={`text-lg font-semibold ${index === 1 && 'text-white'}`}>{title}</Text>
                 {title !== 'Đang xử lý' && <View className="flex-row items-center space-x-1">
                     <Text className="text-lg font-medium text-gray-500">{formatMomentDateToVietnamese2(data.time)}</Text>
                 </View>}
