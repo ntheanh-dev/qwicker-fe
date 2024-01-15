@@ -4,54 +4,23 @@ import { TabView, TabBar } from 'react-native-tab-view';
 import { Entypo, Feather } from '@expo/vector-icons';
 import OrderItem from './OrderItem';
 import OrderItemNotFound from './OrderItemNotFound';
-
-const DATA = [
-    {
-        id: '1',
-        title: 'First Item',
-    },
-    {
-        id: '2',
-        title: 'Second Item',
-    },
-    {
-        id: '3',
-        title: 'Third Item',
-    },
-    {
-        id: '4',
-        title: 'Third Item',
-    },
-    {
-        id: '5',
-        title: 'Third Item',
-    },
-];
+import CompletedOrderTab from './CompletedOrderTab';
 
 function FirstRoute({ index }) {
     return (
         <View style={{ flex: 1, backgroundColor: '#E5E7EB' }}>
-            {index === '1' ? (
-                <FlatList
-                    data={DATA}
-                    renderItem={({ item }) => <OrderItem />}
-                    keyExtractor={item => item.id}
-                    showsVerticalScrollIndicator={false}
-                />
-            ) : (
-                <OrderItemNotFound />
-            )}
+            <OrderItemNotFound />
         </View>
     )
 }
 
 const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
-        case '1':
+        case 1:
             return <FirstRoute index={route.key} />;
-        case '2':
-            return <FirstRoute index={route.key} />;
-        case '3':
+        case 2:
+            return <CompletedOrderTab index={route.key} />;
+        case 3:
             return <FirstRoute index={route.key} />;
     }
 };
@@ -62,9 +31,9 @@ export default function MyOrder() {
 
     const [index, setIndex] = React.useState(0);
     const [routes] = React.useState([
-        { key: '1', title: 'Đang tải' },
-        { key: '2', title: 'Đã hoàn thành' },
-        { key: '3', title: 'Đã huỷ' },
+        { key: 1, title: 'Đang tải' },
+        { key: 2, title: 'Đã hoàn thành' },
+        { key: 3, title: 'Đã huỷ' },
     ]);
 
     return (
