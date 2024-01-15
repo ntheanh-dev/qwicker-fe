@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { MaterialIcons, Entypo, Foundation, Ionicons, Octicons } from '@expo/vector-icons';
+import { MaterialIcons, Entypo, Foundation, Ionicons, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 
 const PickOrder = ({ route, navigation }) => {
     const { itemId } = route.params;
@@ -56,12 +56,19 @@ const PickOrder = ({ route, navigation }) => {
 
                         </View>
                     </View>
-                    {/* ----------Vehicel---------- */}
+                    {/* ----------Price---------- */}
                     <View className="flex-row bg-white rounded-lg border border-gray-300 p-4 mb-2 space-x-4 items-center">
                         <Ionicons name="cash-outline" size={24} color="#3422F1" />
                         <View className="flex-col">
                             <Text className="text-xl font-semibold">đ99999999</Text>
                             <Text className="text-base font-medium text-gray-400 ">Thu tiền mặt</Text>
+                        </View>
+                    </View>
+                    {/* ----------Product type---------- */}
+                    <View className="flex-row bg-white rounded-lg border border-gray-300 p-4 mb-2 space-x-4 items-center">
+                        <MaterialCommunityIcons name="format-list-bulleted-type" size={24} color="black" />
+                        <View className="flex-col">
+                            <Text className="text-xl font-semibold">Thực phẩm & đồ uống</Text>
                         </View>
                     </View>
                 </View>

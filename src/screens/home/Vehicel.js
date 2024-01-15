@@ -7,7 +7,7 @@ import { pickVehicel } from '../../redux/vehicelSilce';
 
 const Vehicel = ({ scrollY, data, selectedVehicel, setSelectedVehicel, scrollView }) => {
     const dispatch = useDispatch()
-    const { title, content, foodContent, image } = data
+    const { title, content, more, image } = data
 
     const containerHeight = scrollY.interpolate({
         inputRange: [0, 60],
@@ -43,7 +43,7 @@ const Vehicel = ({ scrollY, data, selectedVehicel, setSelectedVehicel, scrollVie
                         <View><Text className="text-gray-600">{content}</Text></View>
                         <View className="flex-row items-center">
                             <Feather name="box" size={20} color="#4B5563" />
-                            <Text className="text-gray-600">{foodContent}</Text>
+                            <Text className="text-gray-600">{more}</Text>
                         </View>
                     </Animated.View>
                 </View>

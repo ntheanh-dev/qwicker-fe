@@ -6,10 +6,8 @@ import * as ImagePicker from 'expo-image-picker';
 import Dialog from "react-native-dialog";
 import { deleteData } from '../../redux/orderDetailSlice';
 import { useDispatch } from 'react-redux';
+import { productType } from '../../data';
 
-const data = [{ id: 1, name: 'Thực phẩm & đồ uống' }, { id: 2, name: 'Văn phòng phẩm' }, { id: 3, name: 'Quần áo & Phụ kiện' },
-{ id: 4, name: 'Đồ điện tử' }, { id: 5, name: 'Nguyên liệu / Linh kiện' }, { id: 6, name: 'Đồ gia dụng / Nội thất' },
-{ id: 7, name: 'Khác' }]
 const massType = [{ id: 1, name: 'Nhẹ hơn 10 kg' }, { id: 2, name: '10 kg đến 30 kg' }, { id: 3, name: '30 kg đến 50 kg' }]
 
 const OrderDetail = ({ navigation }) => {
@@ -80,7 +78,7 @@ const OrderDetail = ({ navigation }) => {
                         <Feather name="package" size={24} color="#3422F1" />
                         <Text className="text-lg">Loại hàng vận chuyển</Text>
                     </View>
-                    {data.map(ele => (
+                    {productType.map(ele => (
                         <TouchableOpacity
                             onPress={() => setProductType(productType => productType === ele.id ? null : ele.id)}
                             key={ele.id}

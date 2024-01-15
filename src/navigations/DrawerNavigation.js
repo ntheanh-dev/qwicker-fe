@@ -4,7 +4,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer'
 import { ROUTES } from '../constants'
 import Wallet from '../screens/Wallet'
 import CommingSoon from '../screens/CommingSoon'
-import { Feather, AntDesign, MaterialIcons, EvilIcons, Fontisto, Foundation, MaterialCommunityIcons }
+import { Feather, AntDesign, MaterialIcons, EvilIcons, Fontisto, Foundation, MaterialCommunityIcons, Ionicons }
     from '@expo/vector-icons';
 import CustomDrawer from '../components/CustomDrawer'
 import Profile from '../screens/Profile'
@@ -13,6 +13,7 @@ import Notification from '../screens/Notification'
 import HomeNavigation from './HomeNavigation.js'
 import Setting from '../screens/setting/Setting.js'
 import MyOrder from '../screens/myorder/MyOrder.js'
+import ReviewOrder from '../screens/myorder/ReviewOrder.js'
 const Drawer = createDrawerNavigator()
 const DrawerNavigation = () => {
     const navigation = useNavigation()
@@ -198,6 +199,22 @@ const DrawerNavigation = () => {
                             onPress={() => navigation.goBack()}
                         >
                             <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                })}
+            />
+            <Drawer.Screen
+                name={ROUTES.REVIEW_ORDER_DRAWER}
+                component={ReviewOrder}
+                options={({ navigation }) => ({
+                    drawerItemStyle: { height: 0 },
+                    headerTitle: "",
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('Đơn hàng')}
+                            className="ml-4"
+                        >
+                            <Ionicons name="arrow-back-sharp" size={24} color="black" />
                         </TouchableOpacity>
                     ),
                 })}

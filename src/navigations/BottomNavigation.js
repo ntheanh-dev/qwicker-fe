@@ -13,7 +13,7 @@ import ReviewOrder from '../screens/driver/hideTab/ReviewOrder';
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
     return (
-        <Tab.Navigator initialRouteName={ROUTES.ORDER_DRIVER_TAB}
+        <Tab.Navigator initialRouteName={ROUTES.FIND_ORDER_DRIVER_TAB}
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarIcon: ({ color, focused, size }) => {

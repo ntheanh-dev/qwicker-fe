@@ -16,6 +16,7 @@ export default {
     ORDER_DRAWER: 'Order Drawer',
     PROFILE_DRAWER: 'Profille Drawer',
     NOTIFICATION_DRAWER: 'Notification',
+    REVIEW_ORDER_DRAWER: 'Review order drawrer',
 
     HOME_STACK: 'Home Stack',
     MAP_STACK: 'Map Stack',

@@ -2,13 +2,13 @@ import { View, Text, TouchableOpacity, Image, FlatList, TextInput, ScrollView } 
 import React, { useEffect, useRef, useState } from 'react'
 import RBSheet from "react-native-raw-bottom-sheet";
 
-import { Feather, MaterialCommunityIcons, Ionicons, Foundation, Entypo, FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons, Ionicons, Foundation, Octicons, Entypo, FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { formatMomentDateToVietnamese2 } from '../../features/ultils';
 const comments = [{ id: 1, content: 'Thái độ tốt' }, { id: 2, content: 'Tình trạng phương tiện tốt' }, { id: 3, content: 'Rất đúng giờ' }, { id: 4, content: 'Phản hồi nhanh chóng' }]
 const ReviewOrder = ({ navigation, route }) => {
     const { data } = route.params
     const refRBSheet = useRef();
-    const [isReviewed, setIsReviewed] = useState(true)
+    const [isReviewed, setIsReviewed] = useState(false)
     const [star, setStar] = useState(5)
     const [text, setText] = useState('')
     const renderStars = () => {
@@ -50,6 +50,7 @@ const ReviewOrder = ({ navigation, route }) => {
     return (
         <View className="p-2 flex-1 flex-col relative">
             <ScrollView>
+                {/* ---------Driver infor---------- */}
                 <View className="bg-white p-4 flex-col mb-4">
                     <View className="flex-row space-x-4">
                         <View className="basis-1/6 px-3">
@@ -87,8 +88,7 @@ const ReviewOrder = ({ navigation, route }) => {
                         </View>
                     </View>
                 </View>
-
-
+                {/* ---------  Price-------------- */}
                 <View className="flex-row bg-white p-4 space-x-4 items-center mb-4">
                     <Ionicons name="cash-outline" size={24} color="#3422F1" />
                     <View className="flex-col">
@@ -96,15 +96,12 @@ const ReviewOrder = ({ navigation, route }) => {
                         <Text className="text-base font-medium text-gray-400 ">Thu tiền mặt</Text>
                     </View>
                 </View>
-                <View className="flex-col bg-white p-4 ">
-                    <View className="flex-row items-center justify-between">
+                {/* -----------Location, date time, uuid----------- */}
+                <View className="flex-col bg-white p-4 mb-4">
+                    <View className="flex-row items-center justify-between pb-3">
                         <Text className="text-base text-gray-500">{formatMomentDateToVietnamese2(data.time)}</Text>
                         <Text className="text-gray-600 text-base">{`#${data.uuid}`}</Text>
                     </View>
-                    <TouchableOpacity className="bg-blue-100 rounded-md flex-row space-x-2 py-3 px-6 my-4 items-center">
-                        <Foundation name="clipboard-pencil" size={24} color="black" />
-                        <Text>Cần xác nhận giao hàng thành công tại điểm trả hàng.</Text>
-                    </TouchableOpacity>
 
                     <View className="flex-row space-x-2">
                         <View className="mt-2 relative">
@@ -136,10 +133,27 @@ const ReviewOrder = ({ navigation, route }) => {
                         </View>
                     </View>
                 </View>
+                {/* -------------Vehicel----------- */}
+                <View className="flex-col bg-white p-4 mb-4 ">
+                    <Text className="font-semibold text-xl">{data.vehicel.title}</Text>
+                    {data.comment &&
+                        <View className="flex-row items-center space-x-4 px-4 mt-2">
+                            <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
+                            <Text className="text-base text-gray-600">{data.comment}</Text>
+                        </View>
+                    }
+                </View>
+                {/* -------------ProductType----------- */}
+                <View className="flex-row bg-white p-4 mb-2 space-x-2 items-center">
+                    <MaterialCommunityIcons name="format-list-bulleted-type" size={24} color="black" />
+                    <View className="flex-col">
+                        <Text className="text-xl font-semibold">{data.product.name}</Text>
+                    </View>
+                </View>
                 <View className="h-40"></View>
             </ScrollView>
 
-
+            {/* --------------Place order again----------- */}
             <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
                 <TouchableOpacity
                     underlayColor={'rbga(0,0,0,0)'}
@@ -148,7 +162,7 @@ const ReviewOrder = ({ navigation, route }) => {
                     <Text className="text-lg font-medium text-white" >Đặt lại đơn hàng</Text>
                 </TouchableOpacity>
             </View>
-
+            {/* --------------Feadback bottom sheet---------- */}
             <RBSheet
                 ref={refRBSheet}
                 customStyles={{
