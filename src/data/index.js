@@ -38,20 +38,6 @@ export const vehicelType = [
         more: '3 x 1.6 x 1.6 Mét Lên đến 1000 kg',
         image: require('../assets/images/truck.png'),
     },
-    {
-        id: 6,
-        title: 'Xe Tải 500kg',
-        content: 'Giờ Cấm Tải 6H-9H & 16H-20H | Chở tối đa 500Kg & 1.5CBM',
-        more: '1.9 x 1.4 x 1.4 Mét Lên đến 500 kg',
-        image: require('../assets/images/truck.png'),
-    },
-    {
-        id: 7,
-        title: 'Xe Tải 1000kg',
-        content: 'Giờ Cấm Tải 6H-9H & 16H-20H | Chở tối đa 1000Kg & 5CBM',
-        more: '3 x 1.6 x 1.6 Mét Lên đến 1000 kg',
-        image: require('../assets/images/truck.png'),
-    },
 
 ]
 

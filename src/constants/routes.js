@@ -7,6 +7,7 @@ export default {
 
     BASIC_INFO_REGISTER: 'Basic info register',
     ACCOUNT_REGISTER: 'Account Register',
+    CONFIRM_OTP_REGISTER: 'Confirm otp register',
     DRIVER_INFO_REGISTER: 'Driver info register',
     AVATAR_REGISTER: 'Avatar register',
     COMPELETE_REGISTER: 'Complete register',

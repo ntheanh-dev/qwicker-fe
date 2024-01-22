@@ -21,7 +21,7 @@ const BasicInfoRegister = ({ navigation }) => {
 
     return (
         <SafeAreaView className="flex-1 flex-col px-4 py-6">
-            <Text className="text-lg font-normal">{`Bước 1/${role === ROLE.TRADITIONAL_USER ? '3' : '4'}`}</Text>
+            <Text className="text-lg font-normal">{`Bước 1/${role === ROLE.TRADITIONAL_USER ? '4' : '5'}`}</Text>
             <Text className="text-2xl font-semibold">Thông tin cơ bản</Text>
 
             <View className="flex-col space-y-3 pt-6">
