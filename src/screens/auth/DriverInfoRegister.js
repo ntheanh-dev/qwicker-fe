@@ -1,21 +1,38 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
-import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { getRole } from '../../redux/appSlice'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
-import { getVehicel } from '../../redux/vehicelSilce'
+import { getVehicle, setVehicle } from '../../redux/vehicleSilce'
 import { Dropdown } from 'react-native-element-dropdown';
-
+import API, { endpoints } from '../../configs/API'
 const DriverInfoRegister = ({ navigation }) => {
-    const vehicels = useSelector(getVehicel)
+    const initVehicles = useSelector(getVehicle)
+    const dispatch = useDispatch()
     const [cmnd, setCmnd] = useState('a')
-    const [vehicelId, setVehicelId] = useState('b')
-    const [vehicelType, setVehicelType] = useState(null)
+    const [vehicles, setVehicles] = useState(initVehicles)
+    const [vehicleId, setVehicleId] = useState('b')
+    const [vehicleType, setVehicleType] = useState(null)
     const role = useSelector(getRole)
     const isFullfil = () => {
-        return cmnd.length > 0 && vehicelId.length > 0 && vehicelType !== null
+        return cmnd.length > 0 && vehicleId.length > 0 && vehicleType !== null
     }
+
+    useEffect(() => {
+        const loadVehicles = async () => {
+            try {
+                const res = await API.get(endpoints['vehicles'])
+                setVehicles(res.data)
+                dispatch(setVehicle(res.data))
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        if (initVehicles.length === 0) {
+            loadVehicles()
+        }
+    }, [])
 
     const handleNext = () => {
         if (isFullfil()) {
@@ -34,9 +51,9 @@ const DriverInfoRegister = ({ navigation }) => {
             <View className="flex-col space-y-3 pt-6">
                 <View className="rounded-lg border-2 border-[#D1D1D1] p-4 bg-[#FFFFFF]">
                     <TextInput
-                        onChangeText={txt => setVehicelId(txt)}
+                        onChangeText={txt => setVehicleId(txt)}
                         placeholderTextColor={'#A5A5A5'} placeholder="CMND"
-                        value={vehicelId}
+                        value={vehicleId}
                     />
                 </View>
                 <View className="rounded-lg border-2 border-[#D1D1D1] p-4 bg-[#FFFFFF]">
@@ -52,16 +69,16 @@ const DriverInfoRegister = ({ navigation }) => {
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
                 selectedTextStyle={styles.selectedTextStyle}
-                data={vehicels}
+                data={vehicles}
                 maxHeight={300}
-                labelField="title"
+                labelField="name"
                 valueField="id"
                 placeholder={!isFocus ? 'Lựa chọn phương tiện của bạn' : value}
                 value={value}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 onChange={item => {
-                    setVehicelType(item.id);
+                    setVehicleType(item.id);
                     setIsFocus(false);
                 }}
             />

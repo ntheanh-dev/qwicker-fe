@@ -240,7 +240,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                                 <Text className="text-lg font-bold ml-4">Ha noi</Text>
                             </View>
                         </View>
-                        {/* ---------------Vehicel----------- */}
+                        {/* ---------------Vehicle----------- */}
                         <View className="py-4 border-b border-gray-300">
                             <View className="flex-row items-center ">
                                 <View className="flex items-center w-6"><Ionicons name="car-outline" size={25} color="#3422F1" /></View>

@@ -2,12 +2,12 @@ import { View, Text, TouchableOpacity, Animated, Image, StyleSheet } from 'react
 import React from 'react'
 import { Feather, AntDesign } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
-import { pickVehicel } from '../../redux/vehicelSilce';
+import { pickVehicle } from '../../redux/vehicleSilce';
 
 
-const Vehicel = ({ scrollY, data, selectedVehicel, setSelectedVehicel, scrollView }) => {
+const Vehicle = ({ scrollY, data, selectedVehicle, setSelectedVehicle, scrollView }) => {
     const dispatch = useDispatch()
-    const { title, content, more, image } = data
+    const { name, description, capacity, icon } = data
 
     const containerHeight = scrollY.interpolate({
         inputRange: [0, 60],
@@ -15,15 +15,15 @@ const Vehicel = ({ scrollY, data, selectedVehicel, setSelectedVehicel, scrollVie
         extrapolate: 'clamp',
     });
 
-    const isSelected = selectedVehicel !== null && selectedVehicel === data.id
+    const isSelected = selectedVehicle !== null && selectedVehicle === data.id
     const handleSelect = () => {
         if (isSelected) {
-            setSelectedVehicel(null)
-            dispatch(pickVehicel(null))
+            setSelectedVehicle(null)
+            dispatch(pickVehicle(null))
             scrollView.current.scrollTo({ x: 0, y: 0, animated: true })
         } else {
-            setSelectedVehicel(data.id)
-            dispatch(pickVehicel(data))
+            setSelectedVehicle(data.id)
+            dispatch(pickVehicle(data))
             scrollView.current.scrollTo({ x: 0, y: 300, animated: true })
         }
     }
@@ -35,15 +35,15 @@ const Vehicel = ({ scrollY, data, selectedVehicel, setSelectedVehicel, scrollVie
                 style={isSelected && style.selected}
             >
                 <View className="basis-1/5 justify-center">
-                    <Image style={{ width: 50, height: 40, resizeMode: 'contain' }} source={image} />
+                    <Image style={{ width: 50, height: 40, resizeMode: 'contain' }} source={{ uri: icon }} />
                 </View>
                 <View className="basis-4/5 flex-col pl-3 justify-center">
-                    <View><Text className="font-semibold">{title}</Text></View>
+                    <View><Text className="font-semibold">{name}</Text></View>
                     <Animated.View style={{ height: containerHeight }}>
-                        <View><Text className="text-gray-600">{content}</Text></View>
+                        <View><Text className="text-gray-600">{description}</Text></View>
                         <View className="flex-row items-center">
                             <Feather name="box" size={20} color="#4B5563" />
-                            <Text className="text-gray-600">{more}</Text>
+                            <Text className="text-gray-600">{capacity}</Text>
                         </View>
                     </Animated.View>
                 </View>
@@ -59,4 +59,4 @@ const style = StyleSheet.create({
         borderColor: '#3422F1',
     },
 });
-export default Vehicel
+export default Vehicle

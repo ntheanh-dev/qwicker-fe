@@ -41,7 +41,7 @@ const PickOrder = ({ route, navigation }) => {
                             </View>
                         </View>
                     </View>
-                    {/* ----------Vehicel---------- */}
+                    {/* ----------Vehicle---------- */}
                     <View className="flex-col bg-white rounded-lg border border-gray-300 p-4 mb-2">
                         <View className="flex-col">
                             <View className="flex-row justify-between">

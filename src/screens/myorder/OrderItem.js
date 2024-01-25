@@ -24,7 +24,7 @@ const OrderItem = ({ data }) => {
                 <Text>{data.deliveryAddress.title}</Text>
             </View>
             <View className="flex-row justify-between items-center  px-4 bg-gray-200 py-2">
-                <Text>{data.vehicel.title}</Text>
+                <Text>{data.vehicle.title}</Text>
                 <Text>{`đ${data.price.toLocaleString('en-US')}`}</Text>
             </View>
         </TouchableOpacity>

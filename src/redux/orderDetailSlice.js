@@ -5,7 +5,7 @@ const INITIAL_ORDER = {
     pickUp: null,
     deliveryAddress: null,
     dateTime: null,
-    vehicel: null,
+    vehicle: null,
     paymentMethod: null,
     comment: null,
     productType: null,

@@ -2,17 +2,36 @@ import { View, Text, Image, Animated, TouchableOpacity } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import RBSheet from "react-native-raw-bottom-sheet";
 import CustomCarousel from '../../components/CustomCarousel'
-import Vehicel from './Vehicel';
+import Vehicle from './Vehicle';
 import LocationDatePicker from './LocationDatePicker';
 import { AntDesign } from '@expo/vector-icons';
-import { useSelector } from 'react-redux';
-import { getVehicel } from '../../redux/vehicelSilce';
+import { useDispatch, useSelector } from 'react-redux';
+import { getVehicle, setVehicle } from '../../redux/vehicleSilce';
 import { isFormOrderFullFill } from '../../redux/store';
 import { ROUTES } from '../../constants';
+import API, { endpoints } from '../../configs/API';
 
 const Home = ({ navigation }) => {
-    const vehicels = useSelector(getVehicel)
-    const [selectedVehicel, setSelectedVehicel] = useState(null)
+    const dispatch = useDispatch()
+    const initVehicles = useSelector(getVehicle)
+    const [vehicles, setVehicles] = useState(initVehicles)
+
+    useEffect(() => {
+        const loadVehicles = async () => {
+            try {
+                const res = await API.get(endpoints['vehicles'])
+                setVehicles(res.data)
+                dispatch(setVehicle(res.data))
+            } catch (e) {
+                console.log(e)
+            }
+        }
+        if (initVehicles.length === 0) {
+            loadVehicles()
+        }
+    }, [])
+
+    const [selectedVehicle, setSelectedVehicle] = useState(null)
 
     const scrollY = useRef(new Animated.Value(0)).current
     const scrollView = React.createRef()
@@ -36,15 +55,15 @@ const Home = ({ navigation }) => {
                 <CustomCarousel />
                 {/* ----------Pick location and date time----- */}
                 <LocationDatePicker />
-                {/* -----------------Pick Vehicel------------- */}
+                {/* -----------------Pick Vehicle------------- */}
                 <View className="px-4 mb-8">
                     <Text className="text-base mt-6">Phương tiện có sẵn</Text>
-                    {vehicels.map(ele => <Vehicel
+                    {vehicles.map(ele => <Vehicle
                         key={ele.id}
                         scrollY={scrollY}
                         data={ele}
-                        selectedVehicel={selectedVehicel}
-                        setSelectedVehicel={setSelectedVehicel}
+                        selectedVehicle={selectedVehicle}
+                        setSelectedVehicle={setSelectedVehicle}
                         scrollView={scrollView}
                     />)}
                 </View>

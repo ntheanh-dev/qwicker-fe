@@ -70,9 +70,9 @@ const ReviewOrder = ({ navigation, route }) => {
                         </View>
                     </View>
                 </View>
-                {/* -------------Vehicel, comment----------- */}
+                {/* -------------Vehicle, comment----------- */}
                 <View className="flex-col bg-white p-4 mb-4 ">
-                    <Text className="font-semibold text-xl">{data.vehicel.title}</Text>
+                    <Text className="font-semibold text-xl">{data.vehicle.title}</Text>
                     {data.comment &&
                         <View className="flex-row items-center space-x-4 px-4 mt-2">
                             <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
