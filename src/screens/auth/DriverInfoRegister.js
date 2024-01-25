@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getRole } from '../../redux/appSlice'
@@ -6,25 +6,43 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
 import { getVehicle, setVehicle } from '../../redux/vehicleSilce'
 import { Dropdown } from 'react-native-element-dropdown';
+import { Ionicons, AntDesign } from '@expo/vector-icons';
 import API, { endpoints } from '../../configs/API'
+import * as ImagePicker from 'expo-image-picker';
+import { addAdditionalField } from '../../redux/formRegisterSlice'
+
 const DriverInfoRegister = ({ navigation }) => {
     const initVehicles = useSelector(getVehicle)
     const dispatch = useDispatch()
-    const [cmnd, setCmnd] = useState('a')
     const [vehicles, setVehicles] = useState(initVehicles)
-    const [vehicleId, setVehicleId] = useState('b')
-    const [vehicleType, setVehicleType] = useState(null)
+    const [vehicleNumber, setVehicleNumber] = useState('')
+    const [selectedVehicle, setSelectedVehicle] = useState(null)
+    const [image, setImage] = useState(null)
+    const pickImage = async () => {
+        let { status } =
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            alert("Permissions denied!");
+        } else {
+            const result =
+                await ImagePicker.launchImageLibraryAsync();
+            if (!result.canceled)
+                setImage(result.assets[0])
+        }
+    }
     const role = useSelector(getRole)
     const isFullfil = () => {
-        return cmnd.length > 0 && vehicleId.length > 0 && vehicleType !== null
+        return image !== null && vehicleNumber.length > 0 && selectedVehicle !== null
     }
 
     useEffect(() => {
         const loadVehicles = async () => {
             try {
                 const res = await API.get(endpoints['vehicles'])
-                setVehicles(res.data)
-                dispatch(setVehicle(res.data))
+                if (res.data) {
+                    setVehicles(res.data)
+                    dispatch(setVehicle(res.data))
+                }
             } catch (e) {
                 console.log(e)
             }
@@ -36,11 +54,15 @@ const DriverInfoRegister = ({ navigation }) => {
 
     const handleNext = () => {
         if (isFullfil()) {
+            dispatch(addAdditionalField({
+                cmnd: image,
+                vehicle: selectedVehicle,
+                vehicel_number: vehicleNumber
+            }))
             navigation.navigate(ROUTES.AVATAR_REGISTER)
         }
     }
 
-    const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
 
     return (
@@ -49,18 +71,43 @@ const DriverInfoRegister = ({ navigation }) => {
             <Text className="text-2xl font-semibold">Thông tin người vận chuyển</Text>
 
             <View className="flex-col space-y-3 pt-6">
-                <View className="rounded-lg border-2 border-[#D1D1D1] p-4 bg-[#FFFFFF]">
-                    <TextInput
-                        onChangeText={txt => setVehicleId(txt)}
-                        placeholderTextColor={'#A5A5A5'} placeholder="CMND"
-                        value={vehicleId}
-                    />
+                <View className="flex-col space-y-3 pt-6">
+                    <TouchableOpacity
+                        onPress={pickImage}
+                        className="flex-row  border rounded-lg items-center overflow-hidden"
+                        style={{
+                            borderColor: image ? 'rgb(34 ,197 ,94)' : ' rgb(59, 130, 246)',
+                            backgroundColor: image ? 'rgb(240, 253, 244)' : ' rgb(239, 246, 255)'
+                        }}
+                    >
+                        <View
+                            className="basis-1/6 bg-green-400 h-16 flex justify-center items-center"
+                            style={{ backgroundColor: image ? 'rgb(74, 222, 128)' : 'rgb(96, 165, 250)' }}
+                        >
+
+                            <View className="bg-white rounded-full h-10 w-10 flex justify-center items-center">
+                                {image ? <AntDesign name="check" size={22} color="rgb(22 ,163, 74)" /> :
+                                    <Ionicons name="share-outline" size={22} color="#3422F1" />}
+                            </View>
+                        </View>
+
+                        <View className="basis-5/6 pl-4">
+                            <Text
+                                className="text-lg font-semibold "
+                                style={{
+                                    color: image ? 'rgb(21 ,128 ,61)' : '#3422F1'
+                                }}
+                            >
+                                {image ? 'Đã tải' : 'Mặt trước CMND/CCCD'}
+                            </Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
                 <View className="rounded-lg border-2 border-[#D1D1D1] p-4 bg-[#FFFFFF]">
                     <TextInput
-                        onChangeText={txt => setCmnd(txt)}
+                        onChangeText={txt => setVehicleNumber(txt)}
                         placeholderTextColor={'#A5A5A5'} placeholder="Biển số xe"
-                        value={cmnd}
+                        value={vehicleNumber}
                     />
                 </View>
             </View>
@@ -73,12 +120,12 @@ const DriverInfoRegister = ({ navigation }) => {
                 maxHeight={300}
                 labelField="name"
                 valueField="id"
-                placeholder={!isFocus ? 'Lựa chọn phương tiện của bạn' : value}
-                value={value}
+                placeholder={!isFocus ? 'Lựa chọn phương tiện của bạn' : selectedVehicle}
+                value={selectedVehicle}
                 onFocus={() => setIsFocus(true)}
                 onBlur={() => setIsFocus(false)}
                 onChange={item => {
-                    setVehicleType(item.id);
+                    setSelectedVehicle(item.id);
                     setIsFocus(false);
                 }}
             />

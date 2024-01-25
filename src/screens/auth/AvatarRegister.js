@@ -1,15 +1,19 @@
 import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native'
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { getRole } from '../../redux/appSlice'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { addBasicField, getAccountInfo, getAdditionalInfo, getBasicAccountInfo } from '../../redux/formRegisterSlice'
 
 const AvatarRegister = ({ navigation }) => {
+    const basicAccountInfo = useSelector(getBasicAccountInfo)
+    const additionalInfo = useSelector(getAdditionalInfo)
     const role = useSelector(getRole)
     const [image, setImage] = useState(null)
+    const dispatch = useDispatch()
     const pickImage = async () => {
         let { status } =
             await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -28,14 +32,17 @@ const AvatarRegister = ({ navigation }) => {
 
     const handleSignUp = () => {
         if (isFullfil()) {
-            navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.HOME : ROUTES.COMPELETE_REGISTER)
+            dispatch(addBasicField({ avatar: image }))
+            console.log(basicAccountInfo)
+            console.log(additionalInfo)
+            // navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.HOME : ROUTES.COMPELETE_REGISTER)
         }
     }
 
     return (
         <SafeAreaView className="flex-1 flex-col px-4 py-6 justify-between">
             <View>
-                <Text className="text-lg font-normal">{`Bước 4/${role === ROLE.TRADITIONAL_USER ? '4' : '5'}`}</Text>
+                <Text className="text-lg font-normal">{`Bước ${role === ROLE.TRADITIONAL_USER ? '4' : '5'}/${role === ROLE.TRADITIONAL_USER ? '4' : '5'}`}</Text>
                 <Text className="text-2xl font-semibold">Ảnh đại diện</Text>
 
                 <View className="flex-col space-y-3 pt-6">

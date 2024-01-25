@@ -1,21 +1,28 @@
 import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { getRole } from '../../redux/appSlice'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
+import { addBasicField } from '../../redux/formRegisterSlice'
 
 const AccountRegister = ({ navigation }) => {
     const [username, setUsername] = useState('a')
     const [password, setPassword] = useState('c')
     const [email, setEmail] = useState('a')
     const role = useSelector(getRole)
+    const dispatch = useDispatch()
     const isFullfil = () => {
         return username.length > 0 && password.length > 0 && email.length > 0
     }
 
     const handleNext = () => {
         if (isFullfil()) {
+            dispatch(addBasicField({
+                username: username,
+                password: password,
+                email: email
+            }))
             navigation.navigate(ROUTES.CONFIRM_OTP_REGISTER)
         }
     }

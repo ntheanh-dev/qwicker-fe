@@ -6,6 +6,7 @@ import vehicleSilce, { getPickedVehicle } from "./vehicleSilce";
 import addressSlice from "./addressSlice";
 import { getPickUP, getDeliveryAddress } from "./addressSlice";
 import dateTimeSlice from "./dateTimeSlice";
+import formRegisterSlice from "./formRegisterSlice";
 export default configureStore({
     reducer: {
         orderDetail: orderDetailSlice,
@@ -13,7 +14,8 @@ export default configureStore({
         order: orderSlice,
         app: appSlice,
         vehicle: vehicleSilce,
-        datetime: dateTimeSlice
+        datetime: dateTimeSlice,
+        formRegister: formRegisterSlice
     }
 })
 

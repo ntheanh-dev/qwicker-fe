@@ -2,12 +2,14 @@ import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getRole } from '../../redux/appSlice';
+import { addBasicField } from '../../redux/formRegisterSlice';
 
 const BasicInfoRegister = ({ navigation }) => {
-    const [lastName, setLastName] = useState('a')
-    const [firstName, setFirstName] = useState('b')
+    const dispatch = useDispatch()
+    const [lastName, setLastName] = useState('')
+    const [firstName, setFirstName] = useState('')
     const role = useSelector(getRole)
     const isFullfil = () => {
         return lastName.length > 0 && firstName.length > 0
@@ -15,6 +17,10 @@ const BasicInfoRegister = ({ navigation }) => {
 
     const handleNext = () => {
         if (isFullfil()) {
+            dispatch(addBasicField({
+                first_name: firstName,
+                last_name: lastName
+            }))
             navigation.navigate(ROUTES.ACCOUNT_REGISTER)
         }
     }
