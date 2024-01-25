@@ -35,16 +35,16 @@ const AccountRegister = ({ navigation }) => {
             <View className="flex-col space-y-3 pt-6">
                 <View className="rounded-lg border-2 border-[#D1D1D1] p-4 bg-[#FFFFFF]">
                     <TextInput
-                        onChangeText={txt => setPassword(txt)}
+                        onChangeText={txt => setUsername(txt)}
                         placeholderTextColor={'#A5A5A5'} placeholder="Tài khoản"
-                        value={password}
+                        value={username}
                     />
                 </View>
                 <View className="rounded-lg border-2 border-[#D1D1D1] p-4 bg-[#FFFFFF]">
                     <TextInput
-                        onChangeText={txt => setUsername(txt)}
+                        onChangeText={txt => setPassword(txt)}
                         placeholderTextColor={'#A5A5A5'} placeholder="Mật khẩu"
-                        value={username}
+                        value={password}
                         secureTextEntry={true}
                     />
                 </View>
