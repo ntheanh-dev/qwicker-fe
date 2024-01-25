@@ -5,7 +5,8 @@ export const endpoints = {
     'product-categories': '/product-categories/',
     'vehicles': '/vehicles/',
     'basic-user-register': '/users/',
-    'shipper-register': '/shippers/'
+    'shipper-register': '/shippers/',
+    'shipper-more': '/shipper-more/'
 }
 
 export default axios.create({

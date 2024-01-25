@@ -24,10 +24,14 @@ const DriverInfoRegister = ({ navigation }) => {
         if (status !== 'granted') {
             alert("Permissions denied!");
         } else {
-            const result =
-                await ImagePicker.launchImageLibraryAsync();
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                quality: 1,
+                base64: true,
+            });
             if (!result.canceled)
-                setImage(result.assets[0])
+                setImage(result.assets[0].uri)
         }
     }
     const role = useSelector(getRole)

@@ -46,7 +46,8 @@ const AvatarRegister = ({ navigation }) => {
                     .then(res => console.log(res))
                     .catch(e => console.log(e))
             } else {
-                dispatch(Shipper.register(form))
+                const additionalForm = objectToFormData(additionalInfo)
+                dispatch(Shipper.register({ basic: form, additional: additionalForm }, 'test'))
                     .then(unwrapResult)
                     .then(res => console.log(res))
                     .catch(e => console.log(e))
