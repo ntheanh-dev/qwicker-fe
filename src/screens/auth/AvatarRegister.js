@@ -26,7 +26,6 @@ const AvatarRegister = ({ navigation }) => {
         } else {
             const result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: true,
                 quality: 1,
                 base64: true,
             });
@@ -46,8 +45,8 @@ const AvatarRegister = ({ navigation }) => {
                     .then(res => console.log(res))
                     .catch(e => console.log(e))
             } else {
-                const additionalForm = objectToFormData(additionalInfo)
-                dispatch(Shipper.register({ basic: form, additional: additionalForm }, 'test'))
+                const shipperFormData = objectToFormData({ ...basicAccountInfo, ...additionalInfo })
+                dispatch(Shipper.register(shipperFormData))
                     .then(unwrapResult)
                     .then(res => console.log(res))
                     .catch(e => console.log(e))

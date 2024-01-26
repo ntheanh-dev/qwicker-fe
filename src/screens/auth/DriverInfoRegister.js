@@ -26,7 +26,6 @@ const DriverInfoRegister = ({ navigation }) => {
         } else {
             const result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsEditing: true,
                 quality: 1,
                 base64: true,
             });
@@ -61,7 +60,7 @@ const DriverInfoRegister = ({ navigation }) => {
             dispatch(addAdditionalField({
                 cmnd: image,
                 vehicle: selectedVehicle,
-                vehicel_number: vehicleNumber
+                vehicle_number: vehicleNumber
             }))
             navigation.navigate(ROUTES.AVATAR_REGISTER)
         }

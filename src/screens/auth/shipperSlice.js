@@ -31,21 +31,12 @@ const shipperSlice = createSlice({
 
 export const register = createAsyncThunk("user,registerUser",
     async (form, { rejectWithValue }) => {
-        const { basic, additional } = form
         try {
-            let account = await API.post(endpoints['shipper-register'], basic, {
+            let account = await API.post(endpoints['shipper-register'], form, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             })
-
-            additional.append('user', account.data.id)
-            await API.post(endpoints['shipper-more'], additional, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            })
-
             return account.data
         } catch (e) {
             return rejectWithValue(e.response.data)
