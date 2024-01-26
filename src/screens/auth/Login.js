@@ -10,6 +10,8 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 import { Entypo } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
+import * as Shipper from '../../redux/shipperSlice'
+import * as BasicUser from '../../redux/basicUserSlice'
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -17,11 +19,13 @@ const Login = ({ navigation }) => {
     const [loading, setLoading] = useState(false)
     const role = useSelector(getRole)
     const dispatch = useDispatch()
+    const getDispatch = role === ROLE.TRADITIONAL_USER ? BasicUser.login({ username: username, password: password }) : Shipper.login({ username: username, password: password })
     const handleLogin = () => {
         setLoading(true)
-        dispatch(login({ username: username, password: password }))
+        dispatch(getDispatch)
             .then(unwrapResult)
             .then(res => {
+                console.log(res)
                 if (res.token) {
                     dispatch(setToken(res.token))
                     setLoading(false)

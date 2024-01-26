@@ -12,6 +12,8 @@ export const basicUserEndpoints = {
 }
 export const shipperEndpoints = {
     'shipper-register': '/shippers/',
+    'login': '/o/token/',
+    'current-user': 'shippers/current-user/'
 }
 export const authAPI = (access_token) => axios.create({
     baseURL: BASE_URL,
