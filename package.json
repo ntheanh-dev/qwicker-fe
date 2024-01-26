@@ -28,6 +28,7 @@
     "nativewind": "^2.0.11",
     "react": "18.2.0",
     "react-native": "0.72.6",
+    "react-native-alert-notification": "^0.4.0",
     "react-native-check-box": "^2.1.7",
     "react-native-dialog": "^9.3.0",
     "react-native-element-dropdown": "^2.10.1",

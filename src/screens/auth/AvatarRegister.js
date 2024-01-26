@@ -7,10 +7,11 @@ import { ROLE, ROUTES } from '../../constants';
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { addBasicField, getAccountInfo, getAdditionalInfo, getBasicAccountInfo } from '../../redux/formRegisterSlice'
-import * as Shipper from './shipperSlice'
-import * as BasicUser from './basicUserSlice'
+import * as Shipper from '../../redux/shipperSlice'
+import * as BasicUser from '../../redux/basicUserSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
 import { objectToFormData } from '../../features/ultils'
+import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 
 const AvatarRegister = ({ navigation }) => {
     const basicAccountInfo = useSelector(getBasicAccountInfo)
@@ -42,17 +43,36 @@ const AvatarRegister = ({ navigation }) => {
             if (role === ROLE.TRADITIONAL_USER) {
                 dispatch(BasicUser.register(form))
                     .then(unwrapResult)
-                    .then(res => console.log(res))
-                    .catch(e => console.log(e))
+                    .then(res =>
+                        navigation.navigate(ROUTES.HOME)
+                    )
+                    .catch(e => {
+                        if (e.username) {
+                            Toast.show({
+                                type: ALERT_TYPE.WARNING,
+                                title: "Đăng ký thất bại",
+                                textBody: "Tài khoản đã tồn tại"
+                            })
+                        }
+                    })
             } else {
                 const shipperFormData = objectToFormData({ ...basicAccountInfo, ...additionalInfo })
                 dispatch(Shipper.register(shipperFormData))
                     .then(unwrapResult)
-                    .then(res => console.log(res))
-                    .catch(e => console.log(e))
+                    .then(res =>
+                        navigation.navigate(ROUTES.COMPELETE_REGISTER)
+                    )
+                    .catch(e => {
+                        if (e.username) {
+                            Toast.show({
+                                type: ALERT_TYPE.WARNING,
+                                title: "Đăng ký thất bại",
+                                textBody: "Tài khoản đã tồn tại"
+                            })
+                        }
+                    })
             }
 
-            // navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.HOME : ROUTES.COMPELETE_REGISTER)
         }
     }
 

@@ -7,7 +7,8 @@ import addressSlice from "./addressSlice";
 import { getPickUP, getDeliveryAddress } from "./addressSlice";
 import dateTimeSlice from "./dateTimeSlice";
 import formRegisterSlice from "./formRegisterSlice";
-import basicUserSlice from "../screens/auth/basicUserSlice";
+import basicUserSlice from "./basicUserSlice";
+import shipperSlice from "./shipperSlice";
 export default configureStore({
     reducer: {
         orderDetail: orderDetailSlice,
@@ -17,7 +18,8 @@ export default configureStore({
         vehicle: vehicleSilce,
         datetime: dateTimeSlice,
         formRegister: formRegisterSlice,
-        basicUserSlice: basicUserSlice
+        basicUserSlice: basicUserSlice,
+        shipperSlice: shipperSlice
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

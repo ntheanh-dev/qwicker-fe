@@ -7,7 +7,7 @@ import { ROLE, ROUTES } from '../../constants';
 import { getVehicle, setVehicle } from '../../redux/vehicleSilce'
 import { Dropdown } from 'react-native-element-dropdown';
 import { Ionicons, AntDesign } from '@expo/vector-icons';
-import API, { endpoints } from '../../configs/API'
+import API, { baseEndpoints } from '../../configs/API'
 import * as ImagePicker from 'expo-image-picker';
 import { addAdditionalField } from '../../redux/formRegisterSlice'
 
@@ -41,7 +41,7 @@ const DriverInfoRegister = ({ navigation }) => {
     useEffect(() => {
         const loadVehicles = async () => {
             try {
-                const res = await API.get(endpoints['vehicles'])
+                const res = await API.get(baseEndpoints['vehicles'])
                 if (res.data) {
                     setVehicles(res.data)
                     dispatch(setVehicle(res.data))

@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
-import API, { endpoints } from "../../configs/API";
+import API, { basicUserEndpoints } from "../configs/API";
 
-const shipperSlice = createSlice({
-    name: 'shipperSlice',
+const basicUserSlice = createSlice({
+    name: 'basicUserSlice',
     initialState: {
         user: {},
         status: 'idle',
@@ -32,16 +32,16 @@ const shipperSlice = createSlice({
 export const register = createAsyncThunk("user,registerUser",
     async (form, { rejectWithValue }) => {
         try {
-            let account = await API.post(endpoints['shipper-register'], form, {
+            let res = await API.post(basicUserEndpoints['basic-user-register'], form, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            return account.data
+            return res.data
         } catch (e) {
             return rejectWithValue(e.response.data)
         }
     }
 )
 
-export default shipperSlice.reducer
+export default basicUserSlice.reducer

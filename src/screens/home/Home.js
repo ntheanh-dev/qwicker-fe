@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getVehicle, setVehicle } from '../../redux/vehicleSilce';
 import { isFormOrderFullFill } from '../../redux/store';
 import { ROUTES } from '../../constants';
-import API, { endpoints } from '../../configs/API';
+import API, { baseEndpoints } from '../../configs/API';
 
 const Home = ({ navigation }) => {
     const dispatch = useDispatch()
@@ -19,7 +19,7 @@ const Home = ({ navigation }) => {
     useEffect(() => {
         const loadVehicles = async () => {
             try {
-                const res = await API.get(endpoints['vehicles'])
+                const res = await API.get(baseEndpoints['vehicles'])
                 setVehicles(res.data)
                 dispatch(setVehicle(res.data))
             } catch (e) {
