@@ -5,11 +5,14 @@ import { getRole } from '../../redux/appSlice'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
 import { addBasicField } from '../../redux/formRegisterSlice'
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const AccountRegister = ({ navigation }) => {
     const [username, setUsername] = useState('a')
     const [password, setPassword] = useState('c')
     const [email, setEmail] = useState('a')
+    const [loading, setLoading] = useState(false)
+
     const role = useSelector(getRole)
     const dispatch = useDispatch()
     const isFullfil = () => {
@@ -29,6 +32,7 @@ const AccountRegister = ({ navigation }) => {
 
     return (
         <SafeAreaView className="flex-1 flex-col px-4 py-6">
+            <Spinner visible={loading} size='large' animation='fade' />
             <Text className="text-lg font-normal">{`Bước 2/${role === ROLE.TRADITIONAL_USER ? '4' : '5'}`}</Text>
             <Text className="text-2xl font-semibold">Thông tin tài khoản</Text>
 

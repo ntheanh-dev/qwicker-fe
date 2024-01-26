@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getRole } from '../../redux/appSlice'
@@ -6,18 +6,21 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { addBasicField, getAccountInfo, getAdditionalInfo, getBasicAccountInfo } from '../../redux/formRegisterSlice'
+import { addBasicField, getAdditionalInfo, getBasicAccountInfo } from '../../redux/formRegisterSlice'
 import * as Shipper from '../../redux/shipperSlice'
 import * as BasicUser from '../../redux/basicUserSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
 import { objectToFormData } from '../../features/ultils'
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
+import Spinner from 'react-native-loading-spinner-overlay'
 
 const AvatarRegister = ({ navigation }) => {
     const basicAccountInfo = useSelector(getBasicAccountInfo)
     const additionalInfo = useSelector(getAdditionalInfo)
-    const role = useSelector(getRole)
     const [image, setImage] = useState(null)
+    const [loading, setLoading] = useState(false)
+
+    const role = useSelector(getRole)
     const dispatch = useDispatch()
     const pickImage = async () => {
         let { status } =
@@ -38,15 +41,19 @@ const AvatarRegister = ({ navigation }) => {
 
     const handleSignUp = () => {
         if (image) {
+            setLoading(true)
             dispatch(addBasicField({ avatar: image }))
             const form = objectToFormData(basicAccountInfo)
             if (role === ROLE.TRADITIONAL_USER) {
                 dispatch(BasicUser.register(form))
                     .then(unwrapResult)
-                    .then(res =>
+                    .then(res => {
+                        setLoading(false)
                         navigation.navigate(ROUTES.HOME)
+                    }
                     )
                     .catch(e => {
+                        setLoading(false)
                         if (e.username) {
                             Toast.show({
                                 type: ALERT_TYPE.WARNING,
@@ -59,10 +66,13 @@ const AvatarRegister = ({ navigation }) => {
                 const shipperFormData = objectToFormData({ ...basicAccountInfo, ...additionalInfo })
                 dispatch(Shipper.register(shipperFormData))
                     .then(unwrapResult)
-                    .then(res =>
+                    .then(res => {
+                        setLoading(false)
                         navigation.navigate(ROUTES.COMPELETE_REGISTER)
+                    }
                     )
                     .catch(e => {
+                        setLoading(false)
                         if (e.username) {
                             Toast.show({
                                 type: ALERT_TYPE.WARNING,
@@ -78,6 +88,7 @@ const AvatarRegister = ({ navigation }) => {
 
     return (
         <SafeAreaView className="flex-1 flex-col px-4 py-6 justify-between">
+            <Spinner visible={loading} size='large' animation='fade' />
             <View>
                 <Text className="text-lg font-normal">{`Bước ${role === ROLE.TRADITIONAL_USER ? '4' : '5'}/${role === ROLE.TRADITIONAL_USER ? '4' : '5'}`}</Text>
                 <Text className="text-2xl font-semibold">Ảnh đại diện</Text>
