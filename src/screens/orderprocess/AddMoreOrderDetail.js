@@ -6,15 +6,20 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPaymentMethods, getPaymentMethods } from '../../redux/appSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { INIT_PAYMENT, addPayment, getPayment } from '../../redux/paymentSlice';
+import { getIsFulFill } from '../../redux/productSlice';
 
 const AddMoreOrderDetail = ({ navigation }) => {
     const dispatch = useDispatch()
+    const payment = useSelector(getPayment)
+    // Product
+    const isProductFormFulFill = useSelector(getIsFulFill)
     // Payment method
     const paymentMethodBTS = useRef();
     const initPaymentMethod = useSelector(getPaymentMethods)
     const [paymentMethod, setPaymentMethod] = useState(initPaymentMethod)
     const [showPayer, setShowPayer] = useState(false)
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(-1)
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(0)
     // -1: init , 0: Momo, 1.1 sender, 1.2: receiver
     const getPaymentMethodUI = (selectedPaymentMethod) => {
         result = {}
@@ -45,6 +50,25 @@ const AddMoreOrderDetail = ({ navigation }) => {
         setSelectedPaymentMethod(type)
         paymentMethodBTS.current.close()
     }
+    const getDisPatchShipmentData = () => {
+        let data = { ...INIT_PAYMENT }
+        switch (selectedPaymentMethod) {
+            case 0:
+                const a = paymentMethod.find(ele => ele.name === "Momo")
+                data.method = a.id
+                break
+            case 1.1:
+                let b = paymentMethod.find(ele => ele.name === "Tiền mặt")
+                data.method = b.id
+                break
+            case 1.2:
+                let c = paymentMethod.find(ele => ele.name === "Tiền mặt")
+                data.method = c.id
+                data.is_poster_pay = false
+                break
+        }
+        return data
+    }
     // Place order
     const placeOrderBTS = useRef()
 
@@ -57,10 +81,10 @@ const AddMoreOrderDetail = ({ navigation }) => {
 
     useEffect(() => {
         // Fetch payment method 
-        if (paymentMethod.lengh === 0) {
+        if (paymentMethod.length === 0) {
             dispatch(fetchPaymentMethods())
                 .then(unwrapResult)
-                .then(res => setPaymentMethod(res))
+                .then(res => { setPaymentMethod(res) })
                 .catch(e => console.log(e))
         }
 
@@ -78,6 +102,13 @@ const AddMoreOrderDetail = ({ navigation }) => {
             ),
         });
     }, [])
+
+    const handleReviewOrder = () => {
+        const data = getDisPatchShipmentData()
+        console.log(data)
+        dispatch(addPayment(data))
+        // placeOrderBTS.current.open()
+    }
 
     const handlePlaceOrder = () => {
         placeOrderBTS.current.close()
@@ -282,7 +313,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                 </RBSheet>
             </View>
             {/* ----------Comfirm review order bottom sheet ------*/}
-            <View
+            {isProductFormFulFill && <View
                 className="h-36 w-full px-4 pt-5 pb-8 flex justify-center items-center absolute bottom-0 left-0 right-0 rounded-2xl"
                 style={{ backgroundColor: 'rgba(209, 213, 219, 0.4)' }}
             >
@@ -296,13 +327,13 @@ const AddMoreOrderDetail = ({ navigation }) => {
 
                     </View>
                     <TouchableOpacity
-                        onPress={() => placeOrderBTS.current.open()}
+                        onPress={handleReviewOrder}
                         className="flex justify-center items-center bg-[#3422F1] py-3 rounded-lg"
                     >
                         <Text className="text-lg font-bold text-white">Xem lại đơn hàng</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
+            </View>}
         </View>
     )
 }

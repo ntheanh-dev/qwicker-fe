@@ -128,7 +128,7 @@ const OrderDetail = ({ navigation }) => {
                         className="text-xl font-semibold px-3 py-[-12]"
                         keyboardType='numeric'
                         defaultValue='1'
-                        value={quantity}
+                        value={String(quantity)}
                         onChangeText={txt => setQuantity(txt)}
                         ref={inputRef}
                     />

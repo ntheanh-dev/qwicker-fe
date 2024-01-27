@@ -9,6 +9,7 @@ import formRegisterSlice from "./formRegisterSlice";
 import basicUserSlice from "./basicUserSlice";
 import shipperSlice from "./shipperSlice";
 import productSlice from "./productSlice";
+import paymentSlice from "./paymentSlice";
 export default configureStore({
     reducer: {
         orderDetail: orderDetailSlice,
@@ -19,7 +20,8 @@ export default configureStore({
         formRegister: formRegisterSlice,
         basicUserSlice: basicUserSlice,
         shipperSlice: shipperSlice,
-        productSlice: productSlice
+        productSlice: productSlice,
+        paymentSlice: paymentSlice
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
