@@ -5,13 +5,18 @@ import CheckBox from 'react-native-check-box'
 import * as ImagePicker from 'expo-image-picker';
 import Dialog from "react-native-dialog";
 import { deleteData } from '../../redux/orderDetailSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { productType } from '../../data';
+import { fetchProductCategories, getCategories } from '../../redux/appSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const massType = [{ id: 1, name: 'Nhẹ hơn 10 kg' }, { id: 2, name: '10 kg đến 30 kg' }, { id: 3, name: '30 kg đến 50 kg' }]
 
 const OrderDetail = ({ navigation }) => {
-    const [productType, setProductType] = useState(null)
+
+    const initCategories = useSelector(getCategories)
+    const [categories, setCategories] = useState(initCategories)
+    const [selectedCategory, setSelectedCategory] = useState(null)
     const [checkedMass, setCheckedMass] = useState(null)
     // true only as order detail full fill
     const fullfilled = false
@@ -22,7 +27,7 @@ const OrderDetail = ({ navigation }) => {
 
     const handleDelete = () => {
         setVisible(false);
-        setProductType(null)
+        setSelectedCategory(null)
         setCheckedMass(null)
         dispath(deleteData())
         navigation.goBack()
@@ -49,8 +54,16 @@ const OrderDetail = ({ navigation }) => {
         }
     }
     useEffect(() => {
-        navigation.setOptions({
+        //Fetch Product Categories
+        if (categories.length === 0) {
+            dispath(fetchProductCategories())
+                .then(unwrapResult)
+                .then(res => setCategories(res))
+                .catch(e => console.log(e))
+        }
 
+        // Header option
+        navigation.setOptions({
             headerLeft: () => (
                 <TouchableOpacity
                     onPress={handleBack}
@@ -61,7 +74,7 @@ const OrderDetail = ({ navigation }) => {
         });
     }, [])
     const isFullField = () => {
-        return productType || checkedMass || image
+        return selectedCategory || checkedMass || image
     }
     const handleSave = () => {
         if (isFullField() !== null) {
@@ -78,9 +91,9 @@ const OrderDetail = ({ navigation }) => {
                         <Feather name="package" size={24} color="#3422F1" />
                         <Text className="text-lg">Loại hàng vận chuyển</Text>
                     </View>
-                    {productType.map(ele => (
+                    {categories.map(ele => (
                         <TouchableOpacity
-                            onPress={() => setProductType(productType => productType === ele.id ? null : ele.id)}
+                            onPress={() => setSelectedCategory(cateId => cateId === ele.id ? null : ele.id)}
                             key={ele.id}
                             className="flex-row justify-between items-center pl-10"
                         >
@@ -88,7 +101,7 @@ const OrderDetail = ({ navigation }) => {
                             <View>
                                 <CheckBox
                                     style={{ flex: 1, padding: 10 }}
-                                    onClick={() => setProductType(productType => productType === ele.id ? null : ele.id)}
+                                    onClick={() => setSelectedCategory(cateId => cateId === ele.id ? null : ele.id)}
                                     checkedCheckBoxColor='#3422F1'
                                     isChecked={productType === ele.id}
                                 />
