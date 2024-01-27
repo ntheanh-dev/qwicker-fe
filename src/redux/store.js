@@ -8,6 +8,7 @@ import dateTimeSlice from "./dateTimeSlice";
 import formRegisterSlice from "./formRegisterSlice";
 import basicUserSlice from "./basicUserSlice";
 import shipperSlice from "./shipperSlice";
+import productSlice from "./productSlice";
 export default configureStore({
     reducer: {
         orderDetail: orderDetailSlice,
@@ -17,7 +18,8 @@ export default configureStore({
         datetime: dateTimeSlice,
         formRegister: formRegisterSlice,
         basicUserSlice: basicUserSlice,
-        shipperSlice: shipperSlice
+        shipperSlice: shipperSlice,
+        productSlice: productSlice
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

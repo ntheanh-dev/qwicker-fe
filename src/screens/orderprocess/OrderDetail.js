@@ -4,32 +4,30 @@ import { Feather, AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome } fro
 import CheckBox from 'react-native-check-box'
 import * as ImagePicker from 'expo-image-picker';
 import Dialog from "react-native-dialog";
-import { deleteData } from '../../redux/orderDetailSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { productType } from '../../data';
 import { fetchProductCategories, getCategories } from '../../redux/appSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { addCategory, addImage, addQuantity } from '../../redux/productSlice';
 
 const massType = [{ id: 1, name: 'Nhẹ hơn 10 kg' }, { id: 2, name: '10 kg đến 30 kg' }, { id: 3, name: '30 kg đến 50 kg' }]
 
 const OrderDetail = ({ navigation }) => {
-
+    const dispatch = useDispatch()
     const initCategories = useSelector(getCategories)
     const [categories, setCategories] = useState(initCategories)
+
     const [selectedCategory, setSelectedCategory] = useState(null)
     const [checkedMass, setCheckedMass] = useState(null)
-    // true only as order detail full fill
-    const fullfilled = false
+    const [quantity, setQuantity] = useState(1)
     const [image, setImage] = useState(null)
     const inputRef = useRef()
     const [visible, setVisible] = useState(false);
-    const dispath = useDispatch()
 
     const handleDelete = () => {
         setVisible(false);
         setSelectedCategory(null)
         setCheckedMass(null)
-        dispath(deleteData())
+        setQuantity(1)
         navigation.goBack()
     };
 
@@ -39,15 +37,21 @@ const OrderDetail = ({ navigation }) => {
         if (status !== 'granted') {
             alert("Permissions denied!");
         } else {
-            const result =
-                await ImagePicker.launchImageLibraryAsync();
-            if (!result.canceled)
-                setImage(result.assets[0])
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                quality: 1,
+                base64: true,
+            });
+            if (!result.canceled) {
+                setImage(result.assets[0].uri)
+            }
         }
     }
-
+    const isFullField = () => {
+        return selectedCategory && checkedMass && image && Number(quantity) > 0
+    }
     const handleBack = () => {
-        if (isFullField() !== null) {
+        if (isFullField()) {
             setVisible(true)
         } else {
             navigation.goBack()
@@ -56,7 +60,7 @@ const OrderDetail = ({ navigation }) => {
     useEffect(() => {
         //Fetch Product Categories
         if (categories.length === 0) {
-            dispath(fetchProductCategories())
+            dispatch(fetchProductCategories())
                 .then(unwrapResult)
                 .then(res => setCategories(res))
                 .catch(e => console.log(e))
@@ -73,18 +77,20 @@ const OrderDetail = ({ navigation }) => {
             ),
         });
     }, [])
-    const isFullField = () => {
-        return selectedCategory || checkedMass || image
-    }
+
+
     const handleSave = () => {
-        if (isFullField() !== null) {
+        if (isFullField()) {
+            dispatch(addCategory(selectedCategory))
+            dispatch(addQuantity(quantity))
+            dispatch(addImage(image))
             navigation.goBack()
         }
     }
 
     return (
         <View className="flex-1 bg-white">
-            <ScrollView className="flex-1 bg-white py-4 px-4">
+            <ScrollView className="flex-1 bg-white py-4 px-4" showsVerticalScrollIndicator={false}>
                 {/*----------------- Product type -----------------*/}
                 <View className="flex-col py-3 border-b border-gray-200">
                     <View className="flex-row space-x-3 items-center mb-4">
@@ -103,7 +109,7 @@ const OrderDetail = ({ navigation }) => {
                                     style={{ flex: 1, padding: 10 }}
                                     onClick={() => setSelectedCategory(cateId => cateId === ele.id ? null : ele.id)}
                                     checkedCheckBoxColor='#3422F1'
-                                    isChecked={productType === ele.id}
+                                    isChecked={selectedCategory === ele.id}
                                 />
                             </View>
                         </TouchableOpacity>
@@ -122,6 +128,8 @@ const OrderDetail = ({ navigation }) => {
                         className="text-xl font-semibold px-3 py-[-12]"
                         keyboardType='numeric'
                         defaultValue='1'
+                        value={quantity}
+                        onChangeText={txt => setQuantity(txt)}
                         ref={inputRef}
                     />
                 </TouchableOpacity>
@@ -220,9 +228,9 @@ const OrderDetail = ({ navigation }) => {
                     activeOpacity={1}
                     onPress={handleSave}
                     className="bg-white rounded-lg h-full w-full flex justify-center items-center"
-                    style={isFullField() !== null && { backgroundColor: '#3422F1' }}
+                    style={isFullField() && { backgroundColor: '#3422F1' }}
                 >
-                    <Text className="text-lg font-medium" style={isFullField() !== null && { color: 'white' }}>Lưu</Text>
+                    <Text className="text-lg font-medium" style={isFullField() && { color: 'white' }}>Lưu</Text>
                 </TouchableOpacity>
             </View>
         </View>
