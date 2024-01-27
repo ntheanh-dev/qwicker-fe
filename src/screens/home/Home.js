@@ -1,24 +1,23 @@
 import { View, Text, Image, Animated, TouchableOpacity } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import RBSheet from "react-native-raw-bottom-sheet";
 import CustomCarousel from '../../components/CustomCarousel'
 import Vehicle from './Vehicle';
 import LocationDatePicker from './LocationDatePicker';
 import { AntDesign } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchVehicle, getVehicle, setVehicle } from '../../redux/vehicleSilce';
+import { fetchVehicles, getVehicles } from '../../redux/appSlice'
 import { isFormOrderFullFill } from '../../redux/store';
 import { ROUTES } from '../../constants';
 import { unwrapResult } from '@reduxjs/toolkit';
 
 const Home = ({ navigation }) => {
     const dispatch = useDispatch()
-    const initVehicles = useSelector(getVehicle)
+    const initVehicles = useSelector(getVehicles)
     const [vehicles, setVehicles] = useState(initVehicles)
 
     useEffect(() => {
-        if (vehicles.length > 0) {
-            dispatch(fetchVehicle())
+        if (vehicles.length === 0) {
+            dispatch(fetchVehicles())
                 .then(unwrapResult)
                 .then(res => setVehicles(res))
                 .catch(e => console.log(e))

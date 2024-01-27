@@ -1,10 +1,9 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getRole } from '../../redux/appSlice'
+import { fetchVehicles, getRole, getVehicles } from '../../redux/appSlice'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
-import { fetchVehicle, getVehicle, setVehicle } from '../../redux/vehicleSilce'
 import { Dropdown } from 'react-native-element-dropdown';
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,7 +11,7 @@ import { addAdditionalField } from '../../redux/formRegisterSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
 
 const DriverInfoRegister = ({ navigation }) => {
-    const initVehicles = useSelector(getVehicle)
+    const initVehicles = useSelector(getVehicles)
     const dispatch = useDispatch()
     const [vehicles, setVehicles] = useState(initVehicles)
     const [vehicleNumber, setVehicleNumber] = useState('')
@@ -37,10 +36,9 @@ const DriverInfoRegister = ({ navigation }) => {
     const isFullfil = () => {
         return image !== null && vehicleNumber.length > 0 && selectedVehicle !== null
     }
-
     useEffect(() => {
-        if (vehicles.length > 0) {
-            dispatch(fetchVehicle())
+        if (vehicles.length === 0) {
+            dispatch(fetchVehicles())
                 .then(unwrapResult)
                 .then(res => setVehicles(res))
                 .catch(e => console.log(e))

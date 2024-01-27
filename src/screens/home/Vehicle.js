@@ -2,12 +2,12 @@ import { View, Text, TouchableOpacity, Animated, Image, StyleSheet } from 'react
 import React from 'react'
 import { Feather, AntDesign } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
-import { pickVehicle } from '../../redux/vehicleSilce';
+import { addVehicle } from '../../redux/orderDetailSlice';
 
 
 const Vehicle = ({ scrollY, data, selectedVehicle, setSelectedVehicle, scrollView }) => {
     const dispatch = useDispatch()
-    const { name, description, capacity, icon } = data
+    const { name, description, capacity, icon, id } = data
 
     const containerHeight = scrollY.interpolate({
         inputRange: [0, 60],
@@ -15,15 +15,15 @@ const Vehicle = ({ scrollY, data, selectedVehicle, setSelectedVehicle, scrollVie
         extrapolate: 'clamp',
     });
 
-    const isSelected = selectedVehicle !== null && selectedVehicle === data.id
+    const isSelected = selectedVehicle !== null && selectedVehicle === id
     const handleSelect = () => {
         if (isSelected) {
             setSelectedVehicle(null)
-            dispatch(pickVehicle(null))
+            dispatch(addVehicle(null))
             scrollView.current.scrollTo({ x: 0, y: 0, animated: true })
         } else {
-            setSelectedVehicle(data.id)
-            dispatch(pickVehicle(data))
+            setSelectedVehicle(id)
+            dispatch(addVehicle(id))
             scrollView.current.scrollTo({ x: 0, y: 300, animated: true })
         }
     }

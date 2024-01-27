@@ -1,5 +1,5 @@
-import { createSlice } from "@reduxjs/toolkit";
-import API, { basicUserEndpoints } from "../configs/API";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import API, { baseEndpoints } from "../configs/API";
 
 const appSlice = createSlice({
     name: 'app',
@@ -7,6 +7,7 @@ const appSlice = createSlice({
         isUseAppBefore: false,
         role: 2, // 1:user, 2:shipper,
         typeChoosingLocation: 1, // 1: pick up, 2:deliver address,
+        vehicles: [],
     },
     reducers: {
         setRole: (state, action) => {
@@ -15,11 +16,35 @@ const appSlice = createSlice({
         setTypeChoosingLocation: (state, action) => {
             state.typeChoosingLocation = action.payload;
         },
+    },
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchVehicles.pending, (state) => {
+                state.status = 'pending'
+            })
+            .addCase(fetchVehicles.fulfilled, (state, action) => {
+                state.vehicles = action.payload
+                state.status = 'idle'
+            })
+            .addCase(fetchVehicles.rejected, (state, action) => {
+                state.status = 'idle'
+            })
     }
 })
 
+export const fetchVehicles = createAsyncThunk("vehicles,getVehicles",
+    async (form, { rejectWithValue }) => {
+        try {
+            const res = await API.get(baseEndpoints['vehicles'])
+            return res.data
+        } catch (e) {
+            return rejectWithValue(e.response.data)
+        }
+    }
+)
 
 
+export const getVehicles = (state) => state.app.vehicles
 export const getRole = (state) => state.app.role
 export const getIsUseAppBefore = (state) => state.app.isUseAppBefore
 export const getTypeChoosingLocation = state => state.app.typeChoosingLocation
