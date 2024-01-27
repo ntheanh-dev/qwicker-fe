@@ -6,11 +6,15 @@ const basicUserSlice = createSlice({
     initialState: {
         user: {},
         status: 'idle',
+        token: null
     },
     reducers: {
         setUserInfo: (state, action) => {
             state.user = action.payload
         },
+        setToken: (state, action) => {
+            state.token = action.payload
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -80,5 +84,7 @@ export const login = createAsyncThunk('user,loginUser',
         }
     }
 )
+export const getBasicUserToken = state => state.basicUserSlice.token
 export const getBasicUserStatus = state => state.basicUserSlice.status
+export const { setToken } = basicUserSlice.actions
 export default basicUserSlice.reducer

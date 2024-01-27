@@ -6,11 +6,15 @@ const shipperSlice = createSlice({
     initialState: {
         user: {},
         status: 'idle',
+        token: null,
     },
     reducers: {
         setUserInfo: (state, action) => {
             state.user = action.payload
         },
+        setToken: (state, action) => {
+            state.token = action.payload
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -81,4 +85,5 @@ export const login = createAsyncThunk('user,loginUser',
         }
     }
 )
+export const { setToken } = shipperSlice.actions
 export default shipperSlice.reducer
