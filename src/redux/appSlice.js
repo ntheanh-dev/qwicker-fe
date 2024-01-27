@@ -8,7 +8,8 @@ const appSlice = createSlice({
         role: 1, // 1:user, 2:shipper,
         typeChoosingLocation: 1, // 1: pick up, 2:deliver address,
         vehicles: [],
-        productcategories: []
+        productcategories: [],
+        paymentMethods: []
     },
     reducers: {
         setRole: (state, action) => {
@@ -41,6 +42,17 @@ const appSlice = createSlice({
             .addCase(fetchProductCategories.rejected, (state, action) => {
                 state.status = 'idle'
             })
+
+            .addCase(fetchPaymentMethods.pending, (state) => {
+                state.status = 'pending'
+            })
+            .addCase(fetchPaymentMethods.fulfilled, (state, action) => {
+                state.paymentMethods = action.payload
+                state.status = 'idle'
+            })
+            .addCase(fetchPaymentMethods.rejected, (state, action) => {
+                state.status = 'idle'
+            })
     }
 })
 
@@ -66,6 +78,18 @@ export const fetchProductCategories = createAsyncThunk("categories,getCategories
     }
 )
 
+export const fetchPaymentMethods = createAsyncThunk("paymentMethods,getPaymentMethods",
+    async (form, { rejectWithValue }) => {
+        try {
+            const res = await API.get(baseEndpoints['payment-method'])
+            return res.data
+        } catch (e) {
+            return rejectWithValue(e.response.data)
+        }
+    }
+)
+
+export const getPaymentMethods = (state) => state.app.paymentMethods
 export const getCategories = (state) => state.app.productcategories
 export const getVehicles = (state) => state.app.vehicles
 export const getRole = (state) => state.app.role

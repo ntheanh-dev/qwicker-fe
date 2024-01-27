@@ -4,7 +4,8 @@ const BASE_URL = "http://10.0.2.2:8000/"
 export const baseEndpoints = {
     'product-categories': '/product-categories/',
     'vehicles': '/vehicles/',
-    'product-categories': '/product-categories/'
+    'product-categories': '/product-categories/',
+    'payment-method': '/payment-method/'
 }
 export const basicUserEndpoints = {
     'basic-user-register': '/users/',

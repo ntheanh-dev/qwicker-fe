@@ -3,10 +3,16 @@ import React, { useEffect, useRef, useState } from 'react'
 import { MaterialIcons, Feather, AntDesign, MaterialCommunityIcons, Ionicons, Entypo, Foundation } from '@expo/vector-icons';
 import { ROUTES } from '../../constants';
 import RBSheet from "react-native-raw-bottom-sheet";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchPaymentMethods, getPaymentMethods } from '../../redux/appSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const AddMoreOrderDetail = ({ navigation }) => {
+    const dispatch = useDispatch()
     // Payment method
     const paymentMethodBTS = useRef();
+    const initPaymentMethod = useSelector(getPaymentMethods)
+    const [paymentMethod, setPaymentMethod] = useState(initPaymentMethod)
     const [showPayer, setShowPayer] = useState(false)
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(-1)
     // -1: init , 0: Momo, 1.1 sender, 1.2: receiver
@@ -50,6 +56,15 @@ const AddMoreOrderDetail = ({ navigation }) => {
     }
 
     useEffect(() => {
+        // Fetch payment method 
+        if (paymentMethod.lengh === 0) {
+            dispatch(fetchPaymentMethods())
+                .then(unwrapResult)
+                .then(res => setPaymentMethod(res))
+                .catch(e => console.log(e))
+        }
+
+        // Set header option
         navigation.getParent().setOptions({
             headerShown: false,
         });
