@@ -1,11 +1,10 @@
-import { View, Text, Image, TextInput, Button, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants'
 import { AntDesign, EvilIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { getRole, setToken } from '../../redux/appSlice';
-import { login } from '../../redux/basicUserSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 import { Entypo } from '@expo/vector-icons';

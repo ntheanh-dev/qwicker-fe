@@ -4,12 +4,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getRole } from '../../redux/appSlice'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
-import { getVehicle, setVehicle } from '../../redux/vehicleSilce'
+import { fetchVehicle, getVehicle, setVehicle } from '../../redux/vehicleSilce'
 import { Dropdown } from 'react-native-element-dropdown';
 import { Ionicons, AntDesign } from '@expo/vector-icons';
-import API, { baseEndpoints } from '../../configs/API'
 import * as ImagePicker from 'expo-image-picker';
 import { addAdditionalField } from '../../redux/formRegisterSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
 
 const DriverInfoRegister = ({ navigation }) => {
     const initVehicles = useSelector(getVehicle)
@@ -39,19 +39,11 @@ const DriverInfoRegister = ({ navigation }) => {
     }
 
     useEffect(() => {
-        const loadVehicles = async () => {
-            try {
-                const res = await API.get(baseEndpoints['vehicles'])
-                if (res.data) {
-                    setVehicles(res.data)
-                    dispatch(setVehicle(res.data))
-                }
-            } catch (e) {
-                console.log(e)
-            }
-        }
-        if (initVehicles.length === 0) {
-            loadVehicles()
+        if (vehicles.length > 0) {
+            dispatch(fetchVehicle())
+                .then(unwrapResult)
+                .then(res => setVehicles(res))
+                .catch(e => console.log(e))
         }
     }, [])
 

@@ -6,10 +6,10 @@ import Vehicle from './Vehicle';
 import LocationDatePicker from './LocationDatePicker';
 import { AntDesign } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { getVehicle, setVehicle } from '../../redux/vehicleSilce';
+import { fetchVehicle, getVehicle, setVehicle } from '../../redux/vehicleSilce';
 import { isFormOrderFullFill } from '../../redux/store';
 import { ROUTES } from '../../constants';
-import API, { baseEndpoints } from '../../configs/API';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const Home = ({ navigation }) => {
     const dispatch = useDispatch()
@@ -17,17 +17,11 @@ const Home = ({ navigation }) => {
     const [vehicles, setVehicles] = useState(initVehicles)
 
     useEffect(() => {
-        const loadVehicles = async () => {
-            try {
-                const res = await API.get(baseEndpoints['vehicles'])
-                setVehicles(res.data)
-                dispatch(setVehicle(res.data))
-            } catch (e) {
-                console.log(e)
-            }
-        }
-        if (initVehicles.length === 0) {
-            loadVehicles()
+        if (vehicles.length > 0) {
+            dispatch(fetchVehicle())
+                .then(unwrapResult)
+                .then(res => setVehicles(res))
+                .catch(e => console.log(e))
         }
     }, [])
 
