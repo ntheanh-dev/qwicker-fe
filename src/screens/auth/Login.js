@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants'
 import { AntDesign, EvilIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { getRole, setToken } from '../../redux/appSlice';
+import { getRole } from '../../redux/appSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 import { Entypo } from '@expo/vector-icons';
@@ -18,15 +18,19 @@ const Login = ({ navigation }) => {
     const [loading, setLoading] = useState(false)
     const role = useSelector(getRole)
     const dispatch = useDispatch()
-    const getDispatch = role === ROLE.TRADITIONAL_USER ? BasicUser.login({ username: username, password: password }) : Shipper.login({ username: username, password: password })
+    const getLoginAction = role === ROLE.TRADITIONAL_USER ? BasicUser.login({ username: username, password: password }) : Shipper.login({ username: username, password: password })
     const handleLogin = () => {
         setLoading(true)
-        dispatch(getDispatch)
+        dispatch(getLoginAction)
             .then(unwrapResult)
             .then(res => {
                 console.log(res)
                 if (res.token) {
-                    dispatch(setToken(res.token))
+                    if (role === ROLE.TRADITIONAL_USER) {
+                        dispatch(BasicUser.setToken(res.token))
+                    } else {
+                        dispatch(Shipper.setToken(res.token))
+                    }
                     setLoading(false)
                     navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.HOME : ROUTES.DRIVER_NAVIGATION)
                 }

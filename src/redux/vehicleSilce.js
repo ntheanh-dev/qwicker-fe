@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { vehicleType } from "../data";
 import API, { baseEndpoints } from "../configs/API";
 
