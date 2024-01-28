@@ -6,7 +6,7 @@ import { LOCATION, ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTypeChoosingLocation } from '../../redux/appSlice';
 import { addAdditionalDeliveryAddressInfo, addAdditionalPickUpInfo, getDeliveryAddress, getPickUP, } from '../../redux/shipmentSlice';
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Feather } from '@expo/vector-icons';
 import RBSheet from "react-native-raw-bottom-sheet";
 import Dialog from "react-native-dialog";
 
@@ -52,7 +52,6 @@ const Map = ({ navigation }) => {
 
     const handleConfirm = () => {
         if (isFullfil()) {
-            setShowHeader(true)
             if (type === LOCATION.PICK_UP) {
                 dispatch(addAdditionalPickUpInfo({
                     contact: data.contactName,
@@ -64,12 +63,19 @@ const Map = ({ navigation }) => {
                     phone_number: data.phoneNumber
                 }))
             }
-            navigation.navigate(ROUTES.HOME_STACK)
+            goBack()
         }
     }
 
-    const handleConfirmGoBack = () => {
+    const handleBack = () => {
+        if (isFullfil()) {
+            goBack()
+        } else {
+            updateData({
+                showDialog: true
+            })
 
+        }
     }
 
     const handleShowBottomSheet = () => {
@@ -94,7 +100,7 @@ const Map = ({ navigation }) => {
             <View className="flex-row py-2 px-4 absolute top-12 left-5 right-5 bg-white border border-gray-200 rounded-xl" >
                 <TouchableOpacity
                     className="basis-1/12 justify-center"
-                    onPress={goBack}
+                    onPress={handleBack}
                 >
                     <MaterialIcons name="keyboard-arrow-left" size={30} color="black" />
                 </TouchableOpacity>
@@ -177,25 +183,19 @@ const Map = ({ navigation }) => {
                 </View>
             </RBSheet>
             {/* -------------------Dialog----------------- */}
-            <Dialog.Container visible={showDialog} className="rounded-3xl relative">
+            <Dialog.Container visible={data.showDialog} className="rounded-3xl relative">
                 <Dialog.Title>
-                    <Text className="text-2xl">Bỏ thay đổi?</Text>
+                    <Text className="">Quay trở lại?</Text>
                 </Dialog.Title>
                 <Dialog.Description>
-                    Thay đổi của bạn sẽ không được lưu.
+                    Địa chỉ bạn đã chọn sẽ không được lưu.
                 </Dialog.Description>
                 <View className="px-3 mt-2">
                     <TouchableOpacity
-                        onPress={handleConfirmGoBack}
+                        onPress={goBack}
                         className="w-full bg-[#3422F1] rounded-xl py-2 flex-row justify-center "
                     >
-                        <Text className="text-lg font-semibold text-white">Xoá bỏ</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={() => updateData({ showDialog: false })}
-                        className="w-full flex-row justify-center py-4"
-                    >
-                        <Text className="text-lg font-semibold text-[#3422F1]">Tiếp tục chỉnh sửa</Text>
+                        <Text className="text-lg font-semibold text-white">Trở lại</Text>
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity
