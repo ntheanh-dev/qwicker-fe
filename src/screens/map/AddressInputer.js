@@ -6,27 +6,34 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addDeliveryAddress, addPickUp, getDeliveryAddress, getPickUP } from '../../redux/addressSlice';
 import { getTypeChoosingLocation } from '../../redux/appSlice';
 import { LOCATION, ROUTES } from '../../constants';
-
-const data = [{ id: 1, title: '5, Hẻm 89', location: '5 Hẻm 891 Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Name' },
-{ id: 2, title: '5, Hẻm 89', location: '5 Hẻm 891 Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Name' },
-{ id: 3, title: '5, Hẻm 89', location: '5 Hẻm 891 Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Name' },
-{ id: 4, title: '5, Hẻm 89', location: '5 Hẻm 891 Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Name' },
-{ id: 5, title: '5, Hẻm 89', location: '5 Hẻm 891 Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Name' },
-{ id: 6, title: '5, Hẻm 89', location: '5 Hẻm 891 Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Name' }]
+import { fakeAddress } from '../../data';
+const fakePickUpData = [...Array(6)].map((ele, index) => Object.assign({}, { ...fakeAddress[0], id: index }))
+const fakeDeliveryAddressData = [...Array(6)].map((ele, index) => Object.assign({}, { ...fakeAddress[1], id: index }))
 
 const AddressInputer = ({ navigation }) => {
     const dispatch = useDispatch()
     const type = useSelector(getTypeChoosingLocation)
     const pickUp = useSelector(getPickUP)
     const deliveryAddress = useSelector(getDeliveryAddress)
-    useEffect(() => {
-        navigation.getParent().setOptions({
-            headerShown: false
-        });
-    }, [])
+    const initShortNameAddress = type === LOCATION.PICK_UP ? pickUp.short_name : deliveryAddress.short_name
 
+    const [address, setAddress] = useState([])
+    const [txt, setTxt] = useState(initShortNameAddress)
+    const handleChangeText = (text) => {
+        setTxt(text)
+        // using Google API Place here if possible
+        if (type === LOCATION.PICK_UP) {
+            setAddress(fakePickUpData)
+        } else {
+            setAddress(fakeDeliveryAddressData)
+        }
+    }
+    const handleClearText = () => {
+        setTxt('')
+        setAddress([])
+    }
     const handleBack = () => {
-        if (pickUp?.location === null || addDeliveryAddress?.location === null) {
+        if (pickUp.short_name === null || deliveryAddress.short_name === null) {
             navigation.getParent().setOptions({
                 headerShown: true
             });
@@ -44,8 +51,18 @@ const AddressInputer = ({ navigation }) => {
         }
         navigation.navigate(ROUTES.MAP_STACK)
     }
-    const [txt, setTxt] = useState(type === LOCATION.PICK_UP ? (pickUp.location ? pickUp.location : "")
-        : (deliveryAddress.location ? deliveryAddress.location : ""))
+    useEffect(() => {
+        navigation.getParent().setOptions({
+            headerShown: false
+        });
+        if (txt !== '') {
+            if (type === LOCATION.PICK_UP) {
+                setAddress(fakePickUpData)
+            } else {
+                setAddress(fakeDeliveryAddressData)
+            }
+        }
+    }, [])
     return (
         <SafeAreaView className="relative bg-white flex-1">
             <View
@@ -64,18 +81,18 @@ const AddressInputer = ({ navigation }) => {
                     className="text-lg mr-[-18] basis-10/12 pr-8 flex-shrink-0 pl-2"
                     defaultValue={txt}
                     value={txt}
-                    onChangeText={setTxt}
+                    onChangeText={c => handleChangeText(c)}
                     placeholder={type === LOCATION.PICK_UP ? "Địa điểm lấy hàng" : "Địa chỉ trả hàng"}
                     autoFocus={true}
                 />
-                <TouchableOpacity onPress={() => setTxt('')}>
+                <TouchableOpacity onPress={handleClearText}>
                     <Feather name="x" size={22} color="gray" />
                 </TouchableOpacity>
             </View>
-            {txt.length > 0 && (
+            {address !== '' && (
                 <FlatList
                     className="px-4 absolute top-28 left-5 right-5"
-                    data={data}
+                    data={address}
                     renderItem={({ item }) => (
                         <TouchableOpacity
                             onPress={() => handleChooseLocation(item)}
@@ -85,8 +102,8 @@ const AddressInputer = ({ navigation }) => {
                                 <Foundation name="marker" size={24} color="black" />
                             </View>
                             <View className="basis-7/8 pl-4 flex-col flex-shrink-0">
-                                <Text className="text-lg font-semibold">{item.title}</Text>
-                                <Text className="text-gray-600">{item.location}</Text>
+                                <Text className="text-lg font-semibold">{item.short_name}</Text>
+                                <Text className="text-gray-600">{item.long_name}</Text>
                             </View>
                         </TouchableOpacity>
                     )}

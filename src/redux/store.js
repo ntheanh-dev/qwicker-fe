@@ -34,7 +34,7 @@ export const isFormOrderFullFill = createSelector(
     getPickUP, getDeliveryAddress, getSelectedVehicle,
     (pickUp, deliveryAddress, vehicle) => {
         // console.log(pickUp, deliveryAddress, vehicle)
-        if (pickUp.location !== null && deliveryAddress.location !== null && vehicle !== null) {
+        if (pickUp.short_name !== null && deliveryAddress.short_name !== null && vehicle !== null) {
             return true
         } else {
             return false

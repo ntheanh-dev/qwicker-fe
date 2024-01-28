@@ -1,29 +1,30 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { memo, useEffect, useRef, useState } from 'react'
+import React, { memo, useRef, useState } from 'react'
 import { Foundation, Entypo, MaterialIcons, AntDesign, Ionicons } from '@expo/vector-icons';
 import RBSheet from "react-native-raw-bottom-sheet";
 import DatePicker from 'react-native-modern-datepicker';
 
-import { formatDate, formatDateToVietnamese, getCurrentDate } from '../../features/ultils';
+import { formatDateToVietnamese, getCurrentDate } from '../../features/ultils';
 import { LOCATION, ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDeliveryAddress, getPickUP } from '../../redux/addressSlice';
 import { setTypeChoosingLocation } from '../../redux/appSlice';
 import { addDate, addTime, getDate, getIsDateTimeFullFill, getTime } from '../../redux/dateTimeSlice';
+import { useNavigation } from '@react-navigation/native';
 
-const LocationDatePicker = ({ navigation }) => {
+const LocationDatePicker = () => {
     const dispath = useDispatch()
-
+    const navigation = useNavigation()
     const pickUp = useSelector(getPickUP)
     const deliveryAddress = useSelector(getDeliveryAddress)
     const handleChooseLocation = (type) => {
         dispath(setTypeChoosingLocation(type))
         switch (type) {
             case LOCATION.PICK_UP:
-                navigation.navigate(pickUp.location ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK)
+                navigation.navigate(pickUp.short_name ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK, type = type)
                 break
             case LOCATION.DELIVERY_ADDRESS:
-                navigation.navigate(deliveryAddress.location ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK)
+                navigation.navigate(deliveryAddress.short_name ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK, type = type)
                 break
         }
     }
@@ -93,8 +94,8 @@ const LocationDatePicker = ({ navigation }) => {
                             <TouchableOpacity
                                 onPress={() => handleChooseLocation(LOCATION.PICK_UP)}
                             >
-                                {pickUp?.location ? (
-                                    <Text className="font-medium text-sm">{pickUp?.title}</Text>
+                                {pickUp?.short_name ? (
+                                    <Text className="font-medium text-sm">{pickUp?.short_name}</Text>
                                 ) : (
                                     <Text className="font-medium text-sm text-gray-600">Địa điểm lấy hàng</Text>
                                 )}
@@ -111,8 +112,8 @@ const LocationDatePicker = ({ navigation }) => {
                             onPress={() => handleChooseLocation(LOCATION.DELIVERY_ADDRESS)}
                             className="py-2 flex-row justify-between items-center "
                         >
-                            {deliveryAddress?.location ? (
-                                <Text className="font-medium text-sm">{deliveryAddress?.title}</Text>
+                            {deliveryAddress?.short_name ? (
+                                <Text className="font-medium text-sm">{deliveryAddress?.short_name}</Text>
                             ) : (
                                 <Text className="font-medium text-sm text-gray-600">Địa điểm trả hàng</Text>
                             )}
@@ -159,7 +160,6 @@ const LocationDatePicker = ({ navigation }) => {
                         className="flex-row items-center space-x-3 py-3 relative"
                         onPress={openDateTimePicker}
                     >
-
                         <View className="flex-row space-x-3 items-center">
                             <AntDesign name="calendar" size={24} color="black" />
                             <Text className="text-lg">{isDateTimeFullFill ? formatDateToVietnamese(date) : 'Đặt lịch giao và nhận hàng'}</Text>

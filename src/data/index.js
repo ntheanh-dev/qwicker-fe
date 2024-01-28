@@ -81,3 +81,27 @@ export const fakeOrders = [
             title: '5, Hẻm 89',
         }, price: 123000, distance: 19.234, uuid: '12892348573', time: "2024-01-17 20:00:00"
     },]
+
+export const fakeAddress = [{
+    id: 1,
+    latitude: 10.675722582973437,
+    longitude: 106.69072404201398,
+    contry: 'Việt Nam',
+    city: 'Hồ Chí Minh',
+    district: 'Phường 3, Gò Vấp',
+    street: 'Nguyễn Kiệm',
+    home_number: '371',
+    short_name: '371 Đ. Nguyễn Kiệm',
+    long_name: '371 Đ. Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Nam'
+}, {
+    id: 2,
+    latitude: 10.675584891564835,
+    longitude: 106.69065525750209,
+    contry: 'Việt Nam',
+    city: 'Hồ Chí Minh',
+    district: 'Nhơn Đức, Nhà Bè',
+    street: '',
+    home_number: '',
+    short_name: 'Nhơn Đức, Nhà Bè',
+    long_name: 'Nhơn Đức, Nhà Bè, Thành phố Hồ Chí Minh, Việt Nam'
+}]
