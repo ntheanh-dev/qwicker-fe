@@ -5,7 +5,7 @@ import { MaterialIcons, Entypo } from '@expo/vector-icons';
 import { LOCATION, ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTypeChoosingLocation } from '../../redux/appSlice';
-import { addAdditionalDeliveryAddressInfo, addAdditionalPickUpInfo, getDeliveryAddress, getPickUP, } from '../../redux/shipmentSlice';
+import { INITIAL_ADDRESS, addAdditionalDeliveryAddressInfo, addAdditionalPickUpInfo, addDeliveryAddress, addPickUp, getDeliveryAddress, getPickUP, } from '../../redux/shipmentSlice';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import RBSheet from "react-native-raw-bottom-sheet";
 import Dialog from "react-native-dialog";
@@ -50,6 +50,16 @@ const Map = ({ navigation }) => {
 
     }
 
+    const handleBack = () => {
+        if (isFullfil()) {
+            goBack()
+        } else {
+            updateData({
+                showDialog: true
+            })
+        }
+    }
+
     const handleConfirm = () => {
         if (isFullfil()) {
             if (type === LOCATION.PICK_UP) {
@@ -67,15 +77,13 @@ const Map = ({ navigation }) => {
         }
     }
 
-    const handleBack = () => {
-        if (isFullfil()) {
-            goBack()
+    const handleConfirmGoback = () => {
+        if (type === LOCATION.PICK_UP) {
+            dispatch(addPickUp(INITIAL_ADDRESS))
         } else {
-            updateData({
-                showDialog: true
-            })
-
+            dispatch(addDeliveryAddress(INITIAL_ADDRESS))
         }
+        goBack()
     }
 
     const handleShowBottomSheet = () => {
@@ -192,7 +200,7 @@ const Map = ({ navigation }) => {
                 </Dialog.Description>
                 <View className="px-3 mt-2">
                     <TouchableOpacity
-                        onPress={goBack}
+                        onPress={handleConfirmGoback}
                         className="w-full bg-[#3422F1] rounded-xl py-2 flex-row justify-center "
                     >
                         <Text className="text-lg font-semibold text-white">Trở lại</Text>

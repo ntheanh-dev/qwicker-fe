@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const INITIAL_ADDRESS = {
+export const INITIAL_ADDRESS = {
     contact: '',
     phone_number: '',
     contry: '',
