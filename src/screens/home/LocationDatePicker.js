@@ -7,10 +7,10 @@ import DatePicker from 'react-native-modern-datepicker';
 import { formatDateToVietnamese, getCurrentDate } from '../../features/ultils';
 import { LOCATION, ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
-import { getDeliveryAddress, getPickUP } from '../../redux/addressSlice';
 import { setTypeChoosingLocation } from '../../redux/appSlice';
 import { addDate, addTime, getDate, getIsDateTimeFullFill, getTime } from '../../redux/dateTimeSlice';
 import { useNavigation } from '@react-navigation/native';
+import { getDeliveryAddress, getPickUP } from '../../redux/shipmentSlice';
 
 const LocationDatePicker = () => {
     const dispath = useDispatch()

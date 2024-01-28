@@ -14,8 +14,8 @@ const INITIAL_ADDRESS = {
     longitude: '',
 }
 
-const addressSlice = createSlice({
-    name: 'address',
+const shipmentSlice = createSlice({
+    name: 'shipment',
     initialState: {
         pick_up: INITIAL_ADDRESS,
         delivery_address: INITIAL_ADDRESS,
@@ -47,7 +47,7 @@ const addressSlice = createSlice({
     }
 })
 
-export const { addPickUp, addDeliveryAddress, addAdditionalPickUpInfo, addAdditionalDeliveryAddressInfo } = addressSlice.actions
-export const getPickUP = state => state.address.pick_up
-export const getDeliveryAddress = state => state.address.delivery_address
-export default addressSlice.reducer
+export const { addPickUp, addDeliveryAddress, addAdditionalPickUpInfo, addAdditionalDeliveryAddressInfo } = shipmentSlice.actions
+export const getPickUP = state => state.shipment.pick_up
+export const getDeliveryAddress = state => state.shipment.delivery_address
+export default shipmentSlice.reducer

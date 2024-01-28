@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { MaterialIcons, Entypo, Feather, Foundation } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { addDeliveryAddress, addPickUp, getDeliveryAddress, getPickUP } from '../../redux/addressSlice';
+import { addDeliveryAddress, addPickUp, getDeliveryAddress, getPickUP } from '../../redux/shipmentSlice';
 import { getTypeChoosingLocation } from '../../redux/appSlice';
 import { LOCATION, ROUTES } from '../../constants';
 import { fakeAddress } from '../../data';

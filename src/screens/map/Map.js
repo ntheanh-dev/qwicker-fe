@@ -5,9 +5,10 @@ import { MaterialIcons, Entypo } from '@expo/vector-icons';
 import { LOCATION, ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { getTypeChoosingLocation } from '../../redux/appSlice';
-import { addAdditionalDeliveryAddressInfo, addAdditionalPickUpInfo, getDeliveryAddress, getPickUP } from '../../redux/addressSlice';
+import { addAdditionalDeliveryAddressInfo, addAdditionalPickUpInfo, getDeliveryAddress, getPickUP, } from '../../redux/shipmentSlice';
 import { AntDesign } from '@expo/vector-icons';
 import RBSheet from "react-native-raw-bottom-sheet";
+import Dialog from "react-native-dialog";
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -28,6 +29,7 @@ const Map = ({ navigation }) => {
         ...prev, ...next
     }), {
         showBottomSheet: true,
+        showDialog: false,
         phoneNumber: phone_number,
         contactName: contact,
         apartmentNumber: ''
@@ -45,6 +47,7 @@ const Map = ({ navigation }) => {
     const goBack = () => {
         setShowHeader(true)
         navigation.navigate(ROUTES.HOME_STACK)
+
     }
 
     const handleConfirm = () => {
@@ -63,6 +66,10 @@ const Map = ({ navigation }) => {
             }
             navigation.navigate(ROUTES.HOME_STACK)
         }
+    }
+
+    const handleConfirmGoBack = () => {
+
     }
 
     const handleShowBottomSheet = () => {
@@ -169,6 +176,36 @@ const Map = ({ navigation }) => {
                     </View>
                 </View>
             </RBSheet>
+            {/* -------------------Dialog----------------- */}
+            <Dialog.Container visible={showDialog} className="rounded-3xl relative">
+                <Dialog.Title>
+                    <Text className="text-2xl">Bỏ thay đổi?</Text>
+                </Dialog.Title>
+                <Dialog.Description>
+                    Thay đổi của bạn sẽ không được lưu.
+                </Dialog.Description>
+                <View className="px-3 mt-2">
+                    <TouchableOpacity
+                        onPress={handleConfirmGoBack}
+                        className="w-full bg-[#3422F1] rounded-xl py-2 flex-row justify-center "
+                    >
+                        <Text className="text-lg font-semibold text-white">Xoá bỏ</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => updateData({ showDialog: false })}
+                        className="w-full flex-row justify-center py-4"
+                    >
+                        <Text className="text-lg font-semibold text-[#3422F1]">Tiếp tục chỉnh sửa</Text>
+                    </TouchableOpacity>
+                </View>
+                <TouchableOpacity
+                    activeOpacity={1}
+                    onPress={() => updateData({ showDialog: false })}
+                    className="absolute right-3 top-3"
+                >
+                    <Feather name="x" size={30} color="#D1D5DB" />
+                </TouchableOpacity>
+            </Dialog.Container>
         </View>
     )
 }

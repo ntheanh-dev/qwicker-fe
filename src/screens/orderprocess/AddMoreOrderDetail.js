@@ -107,7 +107,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
         const data = getDisPatchShipmentData()
         console.log(data)
         dispatch(addPayment(data))
-        // placeOrderBTS.current.open()
+        placeOrderBTS.current.open()
     }
 
     const handlePlaceOrder = () => {
