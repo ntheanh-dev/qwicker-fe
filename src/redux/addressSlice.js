@@ -23,18 +23,26 @@ const addressSlice = createSlice({
     },
     reducers: {
         addPickUp: (state, action) => {
-            state.pick_up = action.payload
+            for (var key in action.payload) {
+                if (state.pick_up.hasOwnProperty(key)) {
+                    state.pick_up[key] = action.payload[key]
+                }
+            }
         },
         addDeliveryAddress: (state, action) => {
-            state.delivery_address = action.payload
+            for (var key in action.payload) {
+                if (state.delivery_address.hasOwnProperty(key)) {
+                    state.delivery_address[key] = action.payload[key]
+                }
+            }
         },
         addAdditionalPickUpInfo: (state, action) => {
-            state.pick_up.contact = action.contact
-            state.pick_up.phone_number = action.phone_number
+            state.pick_up.contact = action.payload.contact
+            state.pick_up.phone_number = action.payload.phone_number
         },
         addAdditionalDeliveryAddressInfo: (state, action) => {
-            state.pick_up.contact = action.contact
-            state.pick_up.phone_number = action.phone_number
+            state.delivery_address.contact = action.payload.contact
+            state.delivery_address.phone_number = action.payload.phone_number
         }
     }
 })

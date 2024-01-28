@@ -21,10 +21,10 @@ const LocationDatePicker = () => {
         dispath(setTypeChoosingLocation(type))
         switch (type) {
             case LOCATION.PICK_UP:
-                navigation.navigate(pickUp.short_name ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK, type = type)
+                navigation.navigate(pickUp.short_name ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK)
                 break
             case LOCATION.DELIVERY_ADDRESS:
-                navigation.navigate(deliveryAddress.short_name ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK, type = type)
+                navigation.navigate(deliveryAddress.short_name ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK)
                 break
         }
     }

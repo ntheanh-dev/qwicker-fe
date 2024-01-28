@@ -84,8 +84,8 @@ export const fakeOrders = [
 
 export const fakeAddress = [{
     id: 1,
-    latitude: 10.675722582973437,
-    longitude: 106.69072404201398,
+    latitude: 10.816674118627507,
+    longitude: 106.67741941096348,
     contry: 'Việt Nam',
     city: 'Hồ Chí Minh',
     district: 'Phường 3, Gò Vấp',

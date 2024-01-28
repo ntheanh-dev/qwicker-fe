@@ -1,17 +1,17 @@
 import { View, Text, Dimensions, TouchableOpacity, TextInput } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useReducer, useRef, useState } from 'react'
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { MaterialIcons, Entypo } from '@expo/vector-icons';
 import { LOCATION, ROUTES } from '../../constants';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getTypeChoosingLocation } from '../../redux/appSlice';
-import { getDeliveryAddress, getPickUP } from '../../redux/addressSlice';
+import { addAdditionalDeliveryAddressInfo, addAdditionalPickUpInfo, getDeliveryAddress, getPickUP } from '../../redux/addressSlice';
 import { AntDesign } from '@expo/vector-icons';
 import RBSheet from "react-native-raw-bottom-sheet";
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.08;
+const LATITUDE_DELTA = 0.09;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const INIT_REGION = {
     latitude: 10.678650548923207,
@@ -20,13 +20,18 @@ const INIT_REGION = {
     longitudeDelta: LONGITUDE_DELTA,
 }
 const Map = ({ navigation }) => {
+    const dispatch = useDispatch()
     const refRBSheet = useRef();
-    const [showBottomSheet, setShowBottomSheet] = useState(true)
     const type = useSelector(getTypeChoosingLocation)
-    const [phoneNumber, setPhoneNumber] = useState('')
-    const [contact, setContact] = useState('')
-    const [apartmentNumber, setApartmentNumber] = useState('')
-    const { short_name, long_name, latitude, longitude } = useSelector(type === LOCATION.PICK_UP ? getPickUP : getDeliveryAddress)
+    const { short_name, long_name, latitude, longitude, contact, phone_number } = useSelector(type === LOCATION.PICK_UP ? getPickUP : getDeliveryAddress)
+    const [data, updateData] = useReducer((prev, next) => ({
+        ...prev, ...next
+    }), {
+        showBottomSheet: true,
+        phoneNumber: phone_number,
+        contactName: contact,
+        apartmentNumber: ''
+    })
     const setShowHeader = (show) => {
         navigation.getParent().setOptions({
             headerShown: show
@@ -35,7 +40,6 @@ const Map = ({ navigation }) => {
     useEffect(() => {
         setShowHeader(false)
         refRBSheet.current.open()
-
     }, [])
 
     const goBack = () => {
@@ -44,33 +48,43 @@ const Map = ({ navigation }) => {
     }
 
     const handleConfirm = () => {
-        setShowHeader(true)
-        navigation.goBack()
+        if (isFullfil()) {
+            setShowHeader(true)
+            if (type === LOCATION.PICK_UP) {
+                dispatch(addAdditionalPickUpInfo({
+                    contact: data.contactName,
+                    phone_number: data.phoneNumber
+                }))
+            } else {
+                dispatch(addAdditionalDeliveryAddressInfo({
+                    contact: data.contactName,
+                    phone_number: data.phoneNumber
+                }))
+            }
+            navigation.navigate(ROUTES.HOME_STACK)
+        }
     }
 
     const handleShowBottomSheet = () => {
-        if (showBottomSheet) {
+        if (data.showBottomSheet) {
             refRBSheet.current.close()
         } else {
             refRBSheet.current.open()
         }
-        setShowBottomSheet(!showBottomSheet)
+        updateData({ showBottomSheet: !data.showBottomSheet })
     }
 
     const isFullfil = () => {
-        return phoneNumber !== '' && contact !== '' && apartmentNumber !== ''
+        const { phoneNumber, contactName, apartmentNumber } = data
+        return phoneNumber !== '' && contactName !== '' && apartmentNumber !== ''
     }
     return (
         <View className="flex-1 relative">
-            <MapView initialRegion={INIT_REGION} className="w-full h-full">
-                <Marker coordinate={{
-                    ...INIT_REGION,
-                    latitude: latitude,
-                    longitude: longitude
-                }} />
+            <MapView initialRegion={{ ...INIT_REGION, latitude: latitude, longitude: longitude }} className="w-full h-full">
+                <Marker coordinate={{ ...INIT_REGION, latitude: latitude, longitude: longitude }} />
             </MapView>
 
-            <View className="flex-row py-2 px-4 absolute top-20 left-5 right-5 bg-white border border-gray-200 rounded-xl" >
+            <View className="flex-row py-2 px-4 absolute top-12 left-5 right-5 bg-white border border-gray-200 rounded-xl" >
                 <TouchableOpacity
                     className="basis-1/12 justify-center"
                     onPress={goBack}
@@ -90,10 +104,10 @@ const Map = ({ navigation }) => {
             <TouchableOpacity
                 onPress={handleShowBottomSheet}
                 className={`absolute right-4 bg-white rounded-lg p-4 flex justify-center items-center`}
-                style={{ bottom: showBottomSheet ? 370 : 36 }}
+                style={{ bottom: data.showBottomSheet ? 370 : 36 }}
             >
 
-                {showBottomSheet ? (
+                {data.showBottomSheet ? (
                     <AntDesign name="up" size={24} color="black" />
                 ) : (
                     <AntDesign name="down" size={24} color="black" />
@@ -116,7 +130,7 @@ const Map = ({ navigation }) => {
                     }
                 }}
                 height={360}
-                onClose={() => setShowBottomSheet(false)}
+                onClose={() => updateData({ showBottomSheet: false })}
             >
                 <View className="h-full w-full px-4 pt-5 pb-8 flex-col">
                     <View>
@@ -127,23 +141,23 @@ const Map = ({ navigation }) => {
                             placeholder='Số tầng hoặc số phòng'
                             placeholderTextColor={'#4B5563'}
                             className="p-3 rounded-md border border-gray-300"
-                            value={apartmentNumber}
-                            onChangeText={t => setApartmentNumber(t)}
+                            value={data.apartmentNumber}
+                            onChangeText={t => updateData({ apartmentNumber: t })}
                         />
                         <TextInput
                             placeholder='Số di động'
                             placeholderTextColor={'#4B5563'}
                             className="p-3 rounded-md border border-gray-300 mt-4"
                             keyboardType='numeric'
-                            value={String(phoneNumber)}
-                            onChangeText={t => setPhoneNumber(t)}
+                            value={data.phoneNumber === '' ? '' : String(data.phoneNumber)}
+                            onChangeText={t => updateData({ phoneNumber: t })}
                         />
                         <TextInput
                             placeholder='Tên liên lạc'
                             placeholderTextColor={'#4B5563'}
                             className="p-3 rounded-md border border-gray-300 mt-4"
-                            value={contact}
-                            onChangeText={t => setContact(t)}
+                            value={data.contactName}
+                            onChangeText={t => updateData({ contactName: t })}
                         />
                         <TouchableOpacity
                             onPress={handleConfirm}
