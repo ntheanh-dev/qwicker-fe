@@ -1,6 +1,5 @@
 import { configureStore, createSelector } from "@reduxjs/toolkit";
 import orderDetailSlice, { getSelectedVehicle } from "./orderDetailSlice";
-import orderSlice from "./orderSlice";
 import appSlice from "./appSlice";
 import dateTimeSlice from "./dateTimeSlice";
 import formRegisterSlice from "./formRegisterSlice";
@@ -13,7 +12,6 @@ export default configureStore({
     reducer: {
         orderDetail: orderDetailSlice,
         shipment: shipmentSlice,
-        order: orderSlice,
         app: appSlice,
         datetime: dateTimeSlice,
         formRegister: formRegisterSlice,
@@ -29,11 +27,10 @@ export default configureStore({
 })
 
 
-export const isFormOrderFullFill = createSelector(
+export const isLocationAndShipmentFulfill = createSelector(
     getPickUP, getDeliveryAddress, getSelectedVehicle,
     (pickUp, deliveryAddress, vehicle) => {
-        // console.log(pickUp, deliveryAddress, vehicle)
-        if (pickUp.short_name !== null && deliveryAddress.short_name !== null && vehicle !== null) {
+        if (pickUp.short_name && deliveryAddress.short_name && vehicle !== null) {
             return true
         } else {
             return false

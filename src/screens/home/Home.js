@@ -6,7 +6,7 @@ import LocationDatePicker from './LocationDatePicker';
 import { AntDesign } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchVehicles, getVehicles } from '../../redux/appSlice'
-import { isFormOrderFullFill } from '../../redux/store';
+import { isLocationAndShipmentFulfill } from '../../redux/store';
 import { ROUTES } from '../../constants';
 import { unwrapResult } from '@reduxjs/toolkit';
 
@@ -32,7 +32,7 @@ const Home = ({ navigation }) => {
     const handleNextStep = () => {
         navigation.navigate(ROUTES.MORE_ORDER_DETAIL_STACK)
     }
-    const isFullFill = useSelector(isFormOrderFullFill)
+    const isFulfill = useSelector(isLocationAndShipmentFulfill)
     return (
         <View className="flex-1 relative">
             <Animated.ScrollView
@@ -62,7 +62,7 @@ const Home = ({ navigation }) => {
                 </View>
             </Animated.ScrollView>
             {/*-------------Comfirm botton btn-------------  */}
-            {isFullFill && <View className="h-44 px-4 py-9 flex-col justify-between absolute bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 rounded-l-lg rounded-r-lg">
+            {isFulfill && <View className="h-44 px-4 py-9 flex-col justify-between absolute bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 rounded-l-lg rounded-r-lg">
                 <View className="flex-row justify-between items-center">
                     <Text className="text-base font-semibold text-gray-600">Tổng cộng</Text>
                     <View className="flex-row space-x-2 items-center">

@@ -25,9 +25,12 @@ const orderDetailSlice = createSlice({
         },
         addVehicle: (state, action) => {
             state.vehicle = action.payload
-        }
+        },
+        addComment: (state, action) => {
+            state.comment = action.payload
+        },
     }
 })
 export const getSelectedVehicle = state => state.orderDetail.vehicle
-export const { addPickUp, addVehicle } = orderDetailSlice.actions
+export const { addPickUp, addVehicle, addComment } = orderDetailSlice.actions
 export default orderDetailSlice.reducer

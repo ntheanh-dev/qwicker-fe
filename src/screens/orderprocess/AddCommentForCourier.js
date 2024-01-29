@@ -1,10 +1,13 @@
 import { View, Text, TouchableOpacity, TextInput, TouchableHighlight } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Feather, AntDesign } from '@expo/vector-icons';
+import { useDispatch } from 'react-redux';
+import { addComment } from '../../redux/orderDetailSlice';
 
 const AddCommentForCourier = ({ navigation }) => {
     const [word, setWord] = useState(500)
     const [txt, setText] = useState('')
+    const dispatch = useDispatch()
     // useEffect(() => {
 
     // }, [])
@@ -13,7 +16,10 @@ const AddCommentForCourier = ({ navigation }) => {
         setWord(word => word -= 1)
     }
     const handleSubmit = () => {
-        navigation.goBack()
+        if (txt.length > 0) {
+            dispatch(addComment(txt))
+            navigation.goBack()
+        }
     }
     return (
         <View className="flex-1 py-20 px-4">
