@@ -1,16 +1,15 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React, { memo, useRef, useState } from 'react'
+import React, { memo, useReducer, useRef, useState } from 'react'
 import { Foundation, Entypo, MaterialIcons, AntDesign, Ionicons } from '@expo/vector-icons';
 import RBSheet from "react-native-raw-bottom-sheet";
 import DatePicker from 'react-native-modern-datepicker';
 
 import { formatDateToVietnamese, getCurrentDate } from '../../features/ultils';
-import { LOCATION, ROUTES } from '../../constants';
+import { LOCATION, ROUTES, SHIPMENTYPE } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTypeChoosingLocation } from '../../redux/appSlice';
-import { addDate, addTime, getDate, getIsDateTimeFullFill, getTime } from '../../redux/dateTimeSlice';
+import { addDate, addTime, getDate, getDeliveryAddress, getPickUP, getShipmentType, getTime, isDateTimeFulFill, setShipmentTypeToNow } from '../../redux/shipmentSlice';
 import { useNavigation } from '@react-navigation/native';
-import { getDeliveryAddress, getPickUP } from '../../redux/shipmentSlice';
 
 const LocationDatePicker = () => {
     const dispath = useDispatch()
@@ -30,43 +29,35 @@ const LocationDatePicker = () => {
     }
     //    Date time
     const refRBSheet = useRef();
-    const date = useSelector(getDate)
-    const time = useSelector(getTime)
-    const isDateTimeFullFill = useSelector(getIsDateTimeFullFill)
-    const [showDateTimePicker, setShowDateTimePicker] = useState(false)
+    const [data, updateData] = useReducer((prev, next) => ({
+        ...prev, ...next
+    }), {
+        date: useSelector(getDate),
+        time: useSelector(getTime),
+        shipmentType: useSelector(getShipmentType),
+        showDateTimePicker: isDateTimeFulFill
+    })
+    let isDateTimeFullFill = data.date !== null && data.time !== null
     const openButtonSheet = () => {
         refRBSheet.current.open()
     }
-    const openDateTimePicker = () => {
-        setShowDateTimePicker(true)
-    }
-    const onChange = (type, value) => {
-        switch (type) {
-            case 'TIME':
-                dispath(addTime(value))
-                break;
-            case 'DATE':
-                dispath(addDate(value))
-                break;
-        }
-        console.log(value)
-    }
     const pickCurrentDate = () => {
-        dispath(addDate(null))
-        dispath(addTime(null))
-        setShowDateTimePicker(false)
+        dispath(setShipmentTypeToNow())
+        updateData({ showDateTimePicker: false, shipmentType: SHIPMENTYPE.NOW, date: null, time: null })
         refRBSheet.current.close()
     }
     const handleSetDateTime = () => {
         //Check when datetimepicker opened but datetime is not picked
-        if (time === null) {
+        if (data.time === null) {
+            updateData({ time: '00:00' })
             dispath(addTime('00:00'))
         }
-        if (date === null) {
+        if (data.date === null) {
             const currentDate = getCurrentDate()
+            updateData({ date: currentDate })
             dispath(addDate(currentDate))
         }
-        setShowDateTimePicker(false)
+        updateData({ showDateTimePicker: false, shipmentType: SHIPMENTYPE.LATTER })
         refRBSheet.current.close()
     }
     return (
@@ -81,7 +72,7 @@ const LocationDatePicker = () => {
                         onPress={openButtonSheet}
                     >
                         <AntDesign name="calendar" size={24} color="black" />
-                        <Text className="font-bold">{`Lấy hàng ${formatDateToVietnamese(date)}`}</Text>
+                        <Text className="font-bold">{`Lấy hàng ${formatDateToVietnamese(data.date)}`}</Text>
                     </TouchableOpacity>
                 )}
                 <View className="flex-row px-4 pt-2">
@@ -135,8 +126,13 @@ const LocationDatePicker = () => {
                         borderTopLeftRadius: 20,
                         borderTopRightRadius: 20,
                         overflow: 'hidden',
-                        height: showDateTimePicker ? 650 : 190
-
+                        height: data.showDateTimePicker ? 650 : 190
+                    }
+                }}
+                onClose={() => {
+                    if (!isDateTimeFulFill) {
+                        dispath(setShipmentTypeToNow())
+                        updateData({ showDateTimePicker: false, shipmentType: SHIPMENTYPE.NOW })
                     }
                 }}
             >
@@ -152,31 +148,32 @@ const LocationDatePicker = () => {
                             <Ionicons name="alarm-outline" size={24} color="black" />
                             <Text className="text-lg">Ngay bây giờ</Text>
                         </View>
-                        {!showDateTimePicker && <View className="absolute right-0" >
-                            <AntDesign name="checkcircle" size={26} color="#3422F1" />
-                        </View>}
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        className="flex-row items-center space-x-3 py-3 relative"
-                        onPress={openDateTimePicker}
-                    >
-                        <View className="flex-row space-x-3 items-center">
-                            <AntDesign name="calendar" size={24} color="black" />
-                            <Text className="text-lg">{isDateTimeFullFill ? formatDateToVietnamese(date) : 'Đặt lịch giao và nhận hàng'}</Text>
-                        </View>
-                        {showDateTimePicker && <View className="absolute right-0" >
+                        {data.shipmentType === SHIPMENTYPE.NOW && <View className="absolute right-0" >
                             <AntDesign name="checkcircle" size={26} color="#3422F1" />
                         </View>}
                     </TouchableOpacity>
 
-                    {showDateTimePicker && (
+                    <TouchableOpacity
+                        className="flex-row items-center space-x-3 py-3 relative"
+                        onPress={() => updateData({ showDateTimePicker: true, shipmentType: SHIPMENTYPE.LATTER })}
+                    >
+                        <View className="flex-row space-x-3 items-center">
+                            <AntDesign name="calendar" size={24} color="black" />
+                            <Text className="text-lg">{isDateTimeFullFill ? formatDateToVietnamese(data.date) : 'Đặt lịch giao và nhận hàng'}</Text>
+                        </View>
+                        {data.shipmentType === SHIPMENTYPE.LATTER && <View className="absolute right-0" >
+                            <AntDesign name="checkcircle" size={26} color="#3422F1" />
+                        </View>}
+                    </TouchableOpacity>
+
+                    {data.showDateTimePicker && (
                         <>
                             <DatePicker
                                 className="rounded-lg py-2"
                                 minuteInterval={5}
                                 current={getCurrentDate()}
-                                onTimeChange={selectedTime => onChange('TIME', selectedTime)}
-                                onDateChange={selectedDate => onChange('DATE', selectedDate)}
+                                onTimeChange={selectedTime => updateData({ time: selectedTime })}
+                                onDateChange={selectedDate => updateData({ date: selectedDate })}
                             />
                             <TouchableOpacity
                                 onPress={handleSetDateTime}

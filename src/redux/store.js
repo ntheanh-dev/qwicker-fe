@@ -1,7 +1,6 @@
 import { configureStore, createSelector } from "@reduxjs/toolkit";
 import orderDetailSlice, { getSelectedVehicle } from "./orderDetailSlice";
 import appSlice from "./appSlice";
-import dateTimeSlice from "./dateTimeSlice";
 import formRegisterSlice from "./formRegisterSlice";
 import basicUserSlice from "./basicUserSlice";
 import shipperSlice from "./shipperSlice";
@@ -13,7 +12,6 @@ export default configureStore({
         orderDetail: orderDetailSlice,
         shipment: shipmentSlice,
         app: appSlice,
-        datetime: dateTimeSlice,
         formRegister: formRegisterSlice,
         basicUserSlice: basicUserSlice,
         shipperSlice: shipperSlice,

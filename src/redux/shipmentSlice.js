@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
+import { SHIPMENTYPE } from "../constants";
 
 export const INITIAL_ADDRESS = {
     contact: '',
@@ -19,6 +20,11 @@ const shipmentSlice = createSlice({
     initialState: {
         pick_up: INITIAL_ADDRESS,
         delivery_address: INITIAL_ADDRESS,
+        type: SHIPMENTYPE.NOW,
+        shipment_date: {
+            date: null,
+            time: null
+        },
         status: 'idle',
     },
     reducers: {
@@ -43,11 +49,38 @@ const shipmentSlice = createSlice({
         addAdditionalDeliveryAddressInfo: (state, action) => {
             state.delivery_address.contact = action.payload.contact
             state.delivery_address.phone_number = action.payload.phone_number
+        },
+
+        addDate: (state, action) => {
+            state.shipment_date.date = action.payload
+            if (action.payload !== null && state.shipment_date.time !== null)
+                state.type = SHIPMENTYPE.LATTER
+        },
+        addTime: (state, action) => {
+            state.shipment_date.time = action.payload
+            if (action.payload !== null && state.shipment_date.date !== null)
+                state.type = SHIPMENTYPE.LATTER
+        },
+        setShipmentTypeToNow: (state, action) => {
+            state.shipment_date.type = SHIPMENTYPE.NOW
+            state.shipment_date.date = null
+            state.shipment_date.time = null
         }
     }
 })
 
-export const { addPickUp, addDeliveryAddress, addAdditionalPickUpInfo, addAdditionalDeliveryAddressInfo } = shipmentSlice.actions
+export const getDate = state => state.shipment.shipment_date.date
+export const getTime = state => state.shipment.shipment_date.time
+export const isDateTimeFulFill = createSelector(
+    getDate, getTime,
+    (date, time) => {
+        return date !== null && time !== null
+    }
+)
+
+export const { addPickUp, addDeliveryAddress, addAdditionalPickUpInfo,
+    addAdditionalDeliveryAddressInfo, addDate, addTime, setShipmentTypeToNow } = shipmentSlice.actions
+export const getShipmentType = state => state.shipment.type
 export const getPickUP = state => state.shipment.pick_up
 export const getDeliveryAddress = state => state.shipment.delivery_address
 export default shipmentSlice.reducer
