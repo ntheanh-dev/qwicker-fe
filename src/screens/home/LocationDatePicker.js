@@ -4,7 +4,7 @@ import { Foundation, Entypo, MaterialIcons, AntDesign, Ionicons } from '@expo/ve
 import RBSheet from "react-native-raw-bottom-sheet";
 import DatePicker from 'react-native-modern-datepicker';
 
-import { formatDateToVietnamese, getCurrentDate } from '../../features/ultils';
+import { formatDateTimeToVietnamese, getCurrentDate } from '../../features/ultils';
 import { LOCATION, ROUTES, SHIPMENTYPE } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTypeChoosingLocation } from '../../redux/appSlice';
@@ -48,11 +48,11 @@ const LocationDatePicker = () => {
     }
     const handleSetDateTime = () => {
         //Check when datetimepicker opened but datetime is not picked
-        if (data.time === null) {
+        if (!data.time) {
             updateData({ time: '00:00' })
             dispath(addTime('00:00'))
         }
-        if (data.date === null) {
+        if (!data.date) {
             const currentDate = getCurrentDate()
             updateData({ date: currentDate })
             dispath(addDate(currentDate))
@@ -72,7 +72,7 @@ const LocationDatePicker = () => {
                         onPress={openButtonSheet}
                     >
                         <AntDesign name="calendar" size={24} color="black" />
-                        <Text className="font-bold">{`Lấy hàng ${formatDateToVietnamese(data.date)}`}</Text>
+                        <Text className="font-bold">{`Lấy hàng ${formatDateTimeToVietnamese(data.date, data.time)}`}</Text>
                     </TouchableOpacity>
                 )}
                 <View className="flex-row px-4 pt-2">
@@ -159,7 +159,7 @@ const LocationDatePicker = () => {
                     >
                         <View className="flex-row space-x-3 items-center">
                             <AntDesign name="calendar" size={24} color="black" />
-                            <Text className="text-lg">{isDateTimeFullFill ? formatDateToVietnamese(data.date) : 'Đặt lịch giao và nhận hàng'}</Text>
+                            <Text className="text-lg">{isDateTimeFullFill ? formatDateTimeToVietnamese(data.date) : 'Đặt lịch giao và nhận hàng'}</Text>
                         </View>
                         {data.shipmentType === SHIPMENTYPE.LATTER && <View className="absolute right-0" >
                             <AntDesign name="checkcircle" size={26} color="#3422F1" />

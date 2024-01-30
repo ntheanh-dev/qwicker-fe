@@ -16,7 +16,7 @@ export const getCurrentDate = () => {
 
     return `${year}/${month}/${day}`;
 }
-export function formatDateToVietnamese(dateString) {
+export function formatDateTimeToVietnamese(dateString, timeString) {
     const monthsInVietnamese = [
         'thg 1', 'thg 2', 'thg 3',
         'thg 4', 'thg 5', 'thg 6',
@@ -31,7 +31,7 @@ export function formatDateToVietnamese(dateString) {
     const monthIndex = dateObject.getMonth();
     const monthInVietnamese = monthsInVietnamese[monthIndex];
 
-    const formattedDate = `Th ${dateObject.getDay() + 1}, ${monthInVietnamese} ${day}`;
+    const formattedDate = `Th ${dateObject.getDay() + 1}, ${monthInVietnamese} ${day}, ${timeString}`;
 
     return formattedDate;
 }
