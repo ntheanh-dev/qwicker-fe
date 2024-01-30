@@ -1,5 +1,5 @@
 import { configureStore, createSelector } from "@reduxjs/toolkit";
-import orderDetailSlice, { getSelectedVehicle } from "./orderDetailSlice";
+import orderSlice, { getSelectedVehicle } from "./orderSlice";
 import appSlice from "./appSlice";
 import formRegisterSlice from "./formRegisterSlice";
 import basicUserSlice from "./basicUserSlice";
@@ -9,7 +9,7 @@ import paymentSlice from "./paymentSlice";
 import shipmentSlice, { getDeliveryAddress, getPickUP } from "./shipmentSlice";
 export default configureStore({
     reducer: {
-        orderDetail: orderDetailSlice,
+        order: orderSlice,
         shipment: shipmentSlice,
         app: appSlice,
         formRegister: formRegisterSlice,

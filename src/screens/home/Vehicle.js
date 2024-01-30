@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, Animated, Image, StyleSheet } from 'react
 import React from 'react'
 import { Feather, AntDesign } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
-import { addVehicle } from '../../redux/orderDetailSlice';
+import { addVehicle } from '../../redux/orderSlice';
 
 
 const Vehicle = ({ scrollY, data, selectedVehicle, setSelectedVehicle, scrollView }) => {

@@ -1,16 +1,12 @@
-import { View, Text, TouchableOpacity, TextInput, TouchableHighlight } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { Feather, AntDesign } from '@expo/vector-icons';
+import { View, Text, TextInput, TouchableHighlight } from 'react-native'
+import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
-import { addComment } from '../../redux/orderDetailSlice';
+import { addComment } from '../../redux/orderSlice';
 
 const AddCommentForCourier = ({ navigation }) => {
     const [word, setWord] = useState(500)
     const [txt, setText] = useState('')
     const dispatch = useDispatch()
-    // useEffect(() => {
-
-    // }, [])
     const handleTextChange = (t) => {
         setText(t)
         setWord(word => word -= 1)

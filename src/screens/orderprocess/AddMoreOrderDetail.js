@@ -10,7 +10,7 @@ import { INIT_PAYMENT, addPayment, getPayment } from '../../redux/paymentSlice';
 import { getIsFulFill } from '../../redux/productSlice';
 import { formatCurrency, formatDateTimeToVietnamese } from '../../features/ultils';
 import { getShipment } from '../../redux/shipmentSlice';
-import { getSelectedVehicle } from '../../redux/orderDetailSlice';
+import { getSelectedVehicle } from '../../redux/orderSlice';
 
 const AddMoreOrderDetail = ({ navigation }) => {
     const dispatch = useDispatch()
