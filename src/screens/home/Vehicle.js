@@ -15,15 +15,15 @@ const Vehicle = ({ scrollY, data, selectedVehicle, setSelectedVehicle, scrollVie
         extrapolate: 'clamp',
     });
 
-    const isSelected = selectedVehicle !== null && selectedVehicle === id
+    const isSelected = selectedVehicle !== null && selectedVehicle === data
     const handleSelect = () => {
         if (isSelected) {
             setSelectedVehicle(null)
             dispatch(addVehicle(null))
             scrollView.current.scrollTo({ x: 0, y: 0, animated: true })
         } else {
-            setSelectedVehicle(id)
-            dispatch(addVehicle(id))
+            setSelectedVehicle(data)
+            dispatch(addVehicle(data))
             scrollView.current.scrollTo({ x: 0, y: 300, animated: true })
         }
     }

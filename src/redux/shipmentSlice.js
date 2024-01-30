@@ -88,4 +88,5 @@ export const getShipmentType = state => state.shipment.type
 export const getPickUP = state => state.shipment.pick_up
 export const getDeliveryAddress = state => state.shipment.delivery_address
 export const getCost = state => state.shipment.cost
+export const getShipment = state => state.shipment
 export default shipmentSlice.reducer

@@ -1,19 +1,22 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { MaterialIcons, Feather, AntDesign, MaterialCommunityIcons, Ionicons, Entypo, Foundation } from '@expo/vector-icons';
-import { ROUTES } from '../../constants';
+import { ROUTES, SHIPMENTYPE } from '../../constants';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPaymentMethods, getPaymentMethods } from '../../redux/appSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { INIT_PAYMENT, addPayment, getPayment } from '../../redux/paymentSlice';
 import { getIsFulFill } from '../../redux/productSlice';
-import { getCost } from '../../redux/shipmentSlice';
-import { formatCurrency } from '../../features/ultils';
+import { formatCurrency, formatDateTimeToVietnamese } from '../../features/ultils';
+import { getShipment } from '../../redux/shipmentSlice';
+import { getSelectedVehicle } from '../../redux/orderDetailSlice';
 
 const AddMoreOrderDetail = ({ navigation }) => {
     const dispatch = useDispatch()
-    const payment = useSelector(getPayment)
+    const shipmentData = useSelector(getShipment)
+    const selectedVehicle = useSelector(getSelectedVehicle)
+
     // Product
     const isProductFormFulFill = useSelector(getIsFulFill)
     // Payment method
@@ -107,7 +110,6 @@ const AddMoreOrderDetail = ({ navigation }) => {
 
     const handleReviewOrder = () => {
         const data = getDisPatchShipmentData()
-        console.log(data)
         dispatch(addPayment(data))
         placeOrderBTS.current.open()
     }
@@ -117,7 +119,6 @@ const AddMoreOrderDetail = ({ navigation }) => {
         navigation.navigate(ROUTES.ORDER_STATUS_STACK)
     }
 
-    const cost = useSelector(getCost)
 
     return (
         <View className="bg-white flex-1 py-4 relative">
@@ -224,7 +225,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                             >
                                 <View>
                                     <Text className="text-lg font-semibold">Người gửi</Text>
-                                    <Text className="text-base text-gray-500">5,89</Text>
+                                    <Text className="text-base text-gray-500">{shipmentData.pick_up.short_name}</Text>
                                 </View>
                                 {selectedPaymentMethod === 1.1 && <View><MaterialIcons name="check-circle" size={24} color="#3422F1" /></View>}
                             </TouchableOpacity>
@@ -235,7 +236,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                             >
                                 <View>
                                     <Text className="text-lg font-semibold">Người nhận</Text>
-                                    <Text className="text-base text-gray-500">Hà Nội</Text>
+                                    <Text className="text-base text-gray-500">{shipmentData.delivery_address.short_name}</Text>
                                 </View>
                                 {selectedPaymentMethod === 1.2 && <View><MaterialIcons name="check-circle" size={24} color="#3422F1" /></View>}
                             </TouchableOpacity>
@@ -277,24 +278,24 @@ const AddMoreOrderDetail = ({ navigation }) => {
                         {/*---------------Time--------------- */}
                         <View className="flex-col py-4 border-b border-gray-300">
                             <Text className="text-base text-gray-500">Thời gian nhận hàng</Text>
-                            <Text className="text-lg font-bold">80000 năm sau</Text>
+                            <Text className="text-lg font-bold">{shipmentData.type === SHIPMENTYPE.NOW ? 'Ngay bây giờ' : formatDateTimeToVietnamese(shipmentData.shipment_date.date, shipmentData.shipment_date.time)}</Text>
                         </View>
                         {/* ------------- Place-------------- */}
                         <View className="flex-col py-4 border-b border-gray-300">
                             <View className="flex-row items-center ">
                                 <View className="flex items-center w-6"><Entypo name="circle" size={15} color="#3422F1" /></View>
-                                <Text className="text-lg font-bold ml-4">5, Hẻm 89</Text>
+                                <Text className="text-lg font-bold ml-4">{shipmentData.pick_up.short_name}</Text>
                             </View>
                             <View className="flex-row items-center ">
                                 <View className="flex items-center w-6"><Foundation name="marker" size={18} color="#3422F1" /></View>
-                                <Text className="text-lg font-bold ml-4">Ha noi</Text>
+                                <Text className="text-lg font-bold ml-4">{shipmentData.delivery_address.short_name}</Text>
                             </View>
                         </View>
                         {/* ---------------Vehicle----------- */}
                         <View className="py-4 border-b border-gray-300">
                             <View className="flex-row items-center ">
                                 <View className="flex items-center w-6"><Ionicons name="car-outline" size={25} color="#3422F1" /></View>
-                                <Text className="text-lg font-bold ml-4">Ô tô</Text>
+                                <Text className="text-lg font-bold ml-4">{selectedVehicle.name}</Text>
                             </View>
                         </View>
                         {/* ------------Payment method--------- */}
@@ -303,7 +304,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                                 <View className="flex items-center w-6">{getPaymentMethodUI(selectedPaymentMethod).icon}</View>
                                 <Text className="text-lg font-bold ml-4">{getPaymentMethodUI(selectedPaymentMethod).text}</Text>
                             </View>
-                            <Text>đ.9999999</Text>
+                            <Text>đ{formatCurrency(shipmentData.cost)}</Text>
                         </View>
                         {/* -------------Place BTN-------------- */}
                         <TouchableOpacity
@@ -325,10 +326,9 @@ const AddMoreOrderDetail = ({ navigation }) => {
                     <View className="flex-row justify-between items-center">
                         <Text className="text-base font-semibold text-gray-600">Tổng cộng</Text>
                         <View className="flex-row space-x-2 items-center">
-                            <Text className="text-2xl font-bold">đ{formatCurrency(cost)}</Text>
+                            <Text className="text-2xl font-bold">đ{formatCurrency(shipmentData.cost)}</Text>
                             <AntDesign name="exclamationcircleo" size={20} color="black" />
                         </View>
-
                     </View>
                     <TouchableOpacity
                         onPress={handleReviewOrder}
