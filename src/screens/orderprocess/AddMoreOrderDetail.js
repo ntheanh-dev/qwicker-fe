@@ -8,6 +8,8 @@ import { fetchPaymentMethods, getPaymentMethods } from '../../redux/appSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { INIT_PAYMENT, addPayment, getPayment } from '../../redux/paymentSlice';
 import { getIsFulFill } from '../../redux/productSlice';
+import { getCost } from '../../redux/shipmentSlice';
+import { formatCurrency } from '../../features/ultils';
 
 const AddMoreOrderDetail = ({ navigation }) => {
     const dispatch = useDispatch()
@@ -114,6 +116,8 @@ const AddMoreOrderDetail = ({ navigation }) => {
         placeOrderBTS.current.close()
         navigation.navigate(ROUTES.ORDER_STATUS_STACK)
     }
+
+    const cost = useSelector(getCost)
 
     return (
         <View className="bg-white flex-1 py-4 relative">
@@ -321,7 +325,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                     <View className="flex-row justify-between items-center">
                         <Text className="text-base font-semibold text-gray-600">Tổng cộng</Text>
                         <View className="flex-row space-x-2 items-center">
-                            <Text className="text-2xl font-bold">đ36.396</Text>
+                            <Text className="text-2xl font-bold">đ{formatCurrency(cost)}</Text>
                             <AntDesign name="exclamationcircleo" size={20} color="black" />
                         </View>
 

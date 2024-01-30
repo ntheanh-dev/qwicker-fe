@@ -25,6 +25,7 @@ const shipmentSlice = createSlice({
             date: null,
             time: null
         },
+        cost: null,
         status: 'idle',
     },
     reducers: {
@@ -65,6 +66,9 @@ const shipmentSlice = createSlice({
             state.shipment_date.type = SHIPMENTYPE.NOW
             state.shipment_date.date = null
             state.shipment_date.time = null
+        },
+        addCost: (state, action) => {
+            state.cost = action.payload
         }
     }
 })
@@ -79,8 +83,9 @@ export const isDateTimeFulFill = createSelector(
 )
 
 export const { addPickUp, addDeliveryAddress, addAdditionalPickUpInfo,
-    addAdditionalDeliveryAddressInfo, addDate, addTime, setShipmentTypeToNow } = shipmentSlice.actions
+    addAdditionalDeliveryAddressInfo, addDate, addTime, setShipmentTypeToNow, addCost } = shipmentSlice.actions
 export const getShipmentType = state => state.shipment.type
 export const getPickUP = state => state.shipment.pick_up
 export const getDeliveryAddress = state => state.shipment.delivery_address
+export const getCost = state => state.shipment.cost
 export default shipmentSlice.reducer

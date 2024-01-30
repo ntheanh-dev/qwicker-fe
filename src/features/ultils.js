@@ -99,3 +99,12 @@ export var objectToFormData = function (obj, form, namespace) {
     }
     return fd;
 };
+
+export const formatCurrency = amount => {
+    const formatter = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+    });
+
+    return formatter.format(amount);
+}

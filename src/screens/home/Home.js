@@ -1,5 +1,5 @@
 import { View, Text, Image, Animated, TouchableOpacity } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import CustomCarousel from '../../components/CustomCarousel'
 import Vehicle from './Vehicle';
 import LocationDatePicker from './LocationDatePicker';
@@ -9,6 +9,8 @@ import { fetchVehicles, getVehicles } from '../../redux/appSlice'
 import { isLocationAndShipmentFulfill } from '../../redux/store';
 import { ROUTES } from '../../constants';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { formatCurrency } from '../../features/ultils';
+import { addCost } from '../../redux/shipmentSlice';
 
 const Home = ({ navigation }) => {
     const dispatch = useDispatch()
@@ -25,14 +27,17 @@ const Home = ({ navigation }) => {
     }, [])
 
     const [selectedVehicle, setSelectedVehicle] = useState(null)
-
     const scrollY = useRef(new Animated.Value(0)).current
     const scrollView = React.createRef()
 
+    const cost = useMemo(() => (Math.floor(Math.random() * 200) + 50) * 1000)
     const handleNextStep = () => {
+        dispatch(addCost(cost))
         navigation.navigate(ROUTES.MORE_ORDER_DETAIL_STACK)
     }
     const isFulfill = useSelector(isLocationAndShipmentFulfill)
+    //generates a random cost between 50,000 and 250,000 
+    // Call api to get cost depend on picked location here
     return (
         <View className="flex-1 relative">
             <Animated.ScrollView
@@ -66,7 +71,7 @@ const Home = ({ navigation }) => {
                 <View className="flex-row justify-between items-center">
                     <Text className="text-base font-semibold text-gray-600">Tổng cộng</Text>
                     <View className="flex-row space-x-2 items-center">
-                        <Text className="text-2xl font-bold">đ36.396</Text>
+                        <Text className="text-2xl font-bold">đ{formatCurrency(cost)}</Text>
                         <AntDesign name="exclamationcircleo" size={20} color="black" />
                     </View>
 

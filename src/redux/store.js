@@ -28,10 +28,6 @@ export default configureStore({
 export const isLocationAndShipmentFulfill = createSelector(
     getPickUP, getDeliveryAddress, getSelectedVehicle,
     (pickUp, deliveryAddress, vehicle) => {
-        if (pickUp.short_name && deliveryAddress.short_name && vehicle !== null) {
-            return true
-        } else {
-            return false
-        }
+        return pickUp.short_name && deliveryAddress.short_name && vehicle
     }
 )

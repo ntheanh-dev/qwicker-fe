@@ -14,7 +14,7 @@ const INITIAL_ORDER = {
 
 
 const orderDetailSlice = createSlice({
-    name: 'orderdetail',
+    name: 'orderDetail',
     initialState: {
         items: [],
         status: 'idle'
