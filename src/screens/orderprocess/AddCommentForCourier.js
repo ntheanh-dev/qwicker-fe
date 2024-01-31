@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableHighlight } from 'react-native'
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
-import { addComment } from '../../redux/orderSlice';
+import { addDescription } from '../../redux/orderSlice';
 
 const AddCommentForCourier = ({ navigation }) => {
     const [word, setWord] = useState(500)
@@ -13,7 +13,7 @@ const AddCommentForCourier = ({ navigation }) => {
     }
     const handleSubmit = () => {
         if (txt.length > 0) {
-            dispatch(addComment(txt))
+            dispatch(addDescription(txt))
             navigation.goBack()
         }
     }

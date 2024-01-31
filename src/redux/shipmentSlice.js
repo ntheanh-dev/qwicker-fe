@@ -5,7 +5,7 @@ import { getCurrentDate } from "../features/ultils";
 export const INITIAL_ADDRESS = {
     contact: '',
     phone_number: '',
-    contry: '',
+    country: '',
     city: '',
     district: '',
     street: '',
@@ -27,7 +27,6 @@ const shipmentSlice = createSlice({
             time: '00:00'
         },
         cost: null,
-        status: 'idle',
     },
     reducers: {
         addPickUp: (state, action) => {
@@ -55,13 +54,11 @@ const shipmentSlice = createSlice({
 
         addDate: (state, action) => {
             state.shipment_date.date = action.payload
-            if (state.shipment_date.time)
-                state.type = SHIPMENTYPE.LATTER
+            state.type = SHIPMENTYPE.LATTER
         },
         addTime: (state, action) => {
             state.shipment_date.time = action.payload
-            if (state.shipment_date.date)
-                state.type = SHIPMENTYPE.LATTER
+            state.type = SHIPMENTYPE.LATTER
         },
         setShipmentTypeToNow: (state, action) => {
             state.shipment_date.type = SHIPMENTYPE.NOW
@@ -90,4 +87,20 @@ export const getPickUP = state => state.shipment.pick_up
 export const getDeliveryAddress = state => state.shipment.delivery_address
 export const getCost = state => state.shipment.cost
 export const getShipment = state => state.shipment
+export const getShipMentForm = createSelector(
+    state => state.shipment,
+    (s) => {
+        const { shipment_date, ...rest } = s
+        let shipmentDateTime = ''
+        if (s.type === SHIPMENTYPE.NOW) {
+            shipmentDateTime = null
+        } else {
+            shipmentDateTime = `${shipment_date.date}:${shipment_date.time}`
+        }
+        return {
+            ...rest,
+            shipment_date: shipmentDateTime
+        }
+    }
+)
 export default shipmentSlice.reducer

@@ -17,6 +17,9 @@ export const shipperEndpoints = {
     'login': '/o/token/',
     'current-user': 'shippers/current-user/'
 }
+export const jobEndpoints = {
+    'jobs': '/jobs/'
+}
 export const authAPI = (access_token) => axios.create({
     baseURL: BASE_URL,
     headers: {
