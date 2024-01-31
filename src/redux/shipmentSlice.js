@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 import { SHIPMENTYPE } from "../constants";
+import { getCurrentDate } from "../features/ultils";
 
 export const INITIAL_ADDRESS = {
     contact: '',
@@ -23,7 +24,7 @@ const shipmentSlice = createSlice({
         type: SHIPMENTYPE.NOW,
         shipment_date: {
             date: null,
-            time: null
+            time: '00:00'
         },
         cost: null,
         status: 'idle',
@@ -54,12 +55,12 @@ const shipmentSlice = createSlice({
 
         addDate: (state, action) => {
             state.shipment_date.date = action.payload
-            if (action.payload !== null && state.shipment_date.time !== null)
+            if (state.shipment_date.time)
                 state.type = SHIPMENTYPE.LATTER
         },
         addTime: (state, action) => {
             state.shipment_date.time = action.payload
-            if (action.payload !== null && state.shipment_date.date !== null)
+            if (state.shipment_date.date)
                 state.type = SHIPMENTYPE.LATTER
         },
         setShipmentTypeToNow: (state, action) => {

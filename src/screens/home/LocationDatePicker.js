@@ -35,9 +35,9 @@ const LocationDatePicker = () => {
         date: useSelector(getDate),
         time: useSelector(getTime),
         shipmentType: useSelector(getShipmentType),
-        showDateTimePicker: isDateTimeFulFill
+        showDateTimePicker: useSelector(isDateTimeFulFill)
     })
-    let isDateTimeFullFill = data.date !== null && data.time !== null
+    let dateTimeFulFill = data.date !== null && data.time !== null
     const openButtonSheet = () => {
         refRBSheet.current.open()
     }
@@ -47,18 +47,12 @@ const LocationDatePicker = () => {
         refRBSheet.current.close()
     }
     const handleSetDateTime = () => {
-        //Check when datetimepicker opened but datetime is not picked
-        if (!data.time) {
-            updateData({ time: '00:00' })
-            dispath(addTime('00:00'))
+        if (data.date !== null) {
+            dispath(addDate(data.date))
+            dispath(addTime(data.time))
+            updateData({ showDateTimePicker: false, shipmentType: SHIPMENTYPE.LATTER })
+            refRBSheet.current.close()
         }
-        if (!data.date) {
-            const currentDate = getCurrentDate()
-            updateData({ date: currentDate })
-            dispath(addDate(currentDate))
-        }
-        updateData({ showDateTimePicker: false, shipmentType: SHIPMENTYPE.LATTER })
-        refRBSheet.current.close()
     }
     return (
         <View className="px-4 pt-2 relative">
@@ -66,7 +60,7 @@ const LocationDatePicker = () => {
             <View
                 className=" rounded-xl py-3  flex-col border border-gray-200"
             >
-                {isDateTimeFullFill && (
+                {dateTimeFulFill && (
                     <TouchableOpacity
                         className="flex-row items-center py-2 pl-6 space-x-3 border-b border-gray-300"
                         onPress={openButtonSheet}
@@ -91,7 +85,7 @@ const LocationDatePicker = () => {
                                     <Text className="font-medium text-sm text-gray-600">Địa điểm lấy hàng</Text>
                                 )}
                             </TouchableOpacity>
-                            {!isDateTimeFullFill && <TouchableOpacity
+                            {!dateTimeFulFill && <TouchableOpacity
                                 onPress={openButtonSheet}
                                 className="flex-row space-x-1"
                             >
@@ -130,7 +124,7 @@ const LocationDatePicker = () => {
                     }
                 }}
                 onClose={() => {
-                    if (!isDateTimeFulFill) {
+                    if (!dateTimeFulFill) {
                         dispath(setShipmentTypeToNow())
                         updateData({ showDateTimePicker: false, shipmentType: SHIPMENTYPE.NOW })
                     }
@@ -159,7 +153,7 @@ const LocationDatePicker = () => {
                     >
                         <View className="flex-row space-x-3 items-center">
                             <AntDesign name="calendar" size={24} color="black" />
-                            <Text className="text-lg">{isDateTimeFullFill ? formatDateTimeToVietnamese(data.date) : 'Đặt lịch giao và nhận hàng'}</Text>
+                            <Text className="text-lg">{dateTimeFulFill ? formatDateTimeToVietnamese(data.date, data.time) : 'Đặt lịch giao và nhận hàng'}</Text>
                         </View>
                         {data.shipmentType === SHIPMENTYPE.LATTER && <View className="absolute right-0" >
                             <AntDesign name="checkcircle" size={26} color="#3422F1" />
@@ -172,12 +166,15 @@ const LocationDatePicker = () => {
                                 className="rounded-lg py-2"
                                 minuteInterval={5}
                                 current={getCurrentDate()}
+                                minimumDate={getCurrentDate()}
                                 onTimeChange={selectedTime => updateData({ time: selectedTime })}
                                 onDateChange={selectedDate => updateData({ date: selectedDate })}
                             />
                             <TouchableOpacity
                                 onPress={handleSetDateTime}
-                                className="flex justify-center items-center bg-[#3422F1] py-3 rounded-lg"
+                                className="flex justify-center items-center py-3 rounded-lg bg-gray-400"
+                                style={data.date && { backgroundColor: '#3422F1' }}
+
                             >
                                 <Text className="text-lg font-bold text-white">Đặt lịch giao</Text>
                             </TouchableOpacity>
