@@ -16,6 +16,17 @@ export const getCurrentDate = () => {
 
     return `${year}/${month}/${day}`;
 }
+export const getCurrentDateTime = () => {
+    const currentDate = new Date();
+
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth() + 1; // Note: Month is zero-based
+    const year = currentDate.getFullYear();
+    const hour = currentDate.getHours()
+    const minute = currentDate.getMinutes()
+    return `${year}-${month}-${day} ${hour}:${minute}`;
+
+}
 export function formatDateTimeToVietnamese(dateString, timeString) {
     const monthsInVietnamese = [
         'thg 1', 'thg 2', 'thg 3',

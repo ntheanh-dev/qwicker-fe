@@ -6,19 +6,22 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPaymentMethods, getPaymentMethods } from '../../redux/appSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { INIT_PAYMENT, addPayment, getPayment } from '../../redux/paymentSlice';
-import { getIsFulFill } from '../../redux/productSlice';
+import { INIT_PAYMENT, addPayment } from '../../redux/paymentSlice';
 import { formatCurrency, formatDateTimeToVietnamese } from '../../features/ultils';
 import { getShipment } from '../../redux/shipmentSlice';
 import { getSelectedVehicle } from '../../redux/orderSlice';
+import { orderForm } from '../../redux/store';
+import { isProductFulFill } from '../../redux/productSlice';
+import { postJob } from '../../redux/jobSlice';
+import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 
 const AddMoreOrderDetail = ({ navigation }) => {
     const dispatch = useDispatch()
     const shipmentData = useSelector(getShipment)
     const selectedVehicle = useSelector(getSelectedVehicle)
-
+    const order = useSelector(orderForm)
     // Product
-    const isProductFormFulFill = useSelector(getIsFulFill)
+    const isProductFormFulFill = useSelector(isProductFulFill)
     // Payment method
     const paymentMethodBTS = useRef();
     const initPaymentMethod = useSelector(getPaymentMethods)
@@ -59,15 +62,15 @@ const AddMoreOrderDetail = ({ navigation }) => {
         let data = { ...INIT_PAYMENT }
         switch (selectedPaymentMethod) {
             case 0:
-                const a = paymentMethod.find(ele => ele.name === "Momo")
+                const a = paymentMethod.find(ele => ele?.name === "Momo")
                 data.method = a.id
                 break
             case 1.1:
-                let b = paymentMethod.find(ele => ele.name === "Tiền mặt")
+                let b = paymentMethod.find(ele => ele?.name === "Tiền mặt")
                 data.method = b.id
                 break
             case 1.2:
-                let c = paymentMethod.find(ele => ele.name === "Tiền mặt")
+                let c = paymentMethod.find(ele => ele?.name === "Tiền mặt")
                 data.method = c.id
                 data.is_poster_pay = false
                 break
@@ -115,8 +118,26 @@ const AddMoreOrderDetail = ({ navigation }) => {
     }
 
     const handlePlaceOrder = () => {
-        placeOrderBTS.current.close()
-        navigation.navigate(ROUTES.ORDER_STATUS_STACK)
+        // using useSelector here to get access_token from appSlice
+        const access_token = 'TW0kcQMlpBmNIF3ORCMoyE0MvwOpbG'
+        const data = {
+            access_token: access_token,
+            formData: order
+        }
+        dispatch(postJob(data))
+            .then(unwrapResult)
+            .then(res => {
+                placeOrderBTS.current.close()
+                navigation.navigate(ROUTES.ORDER_STATUS_STACK)
+            })
+            .catch(e => {
+                Toast.show({
+                    type: ALERT_TYPE.WARNING,
+                    title: "Đăng bài thất bại",
+                    textBody: e
+                })
+                console.log(e)
+            })
     }
 
 
@@ -295,7 +316,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                         <View className="py-4 border-b border-gray-300">
                             <View className="flex-row items-center ">
                                 <View className="flex items-center w-6"><Ionicons name="car-outline" size={25} color="#3422F1" /></View>
-                                <Text className="text-lg font-bold ml-4">{selectedVehicle.name}</Text>
+                                <Text className="text-lg font-bold ml-4">{selectedVehicle?.name}</Text>
                             </View>
                         </View>
                         {/* ------------Payment method--------- */}
