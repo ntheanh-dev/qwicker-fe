@@ -119,7 +119,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
 
     const handlePlaceOrder = () => {
         // using useSelector here to get access_token from appSlice
-        const access_token = 'TW0kcQMlpBmNIF3ORCMoyE0MvwOpbG'
+        const access_token = '1pJoHL1bez99vwhyPWoVdDrpQo4w1L'
         const data = {
             access_token: access_token,
             formData: order
@@ -128,13 +128,13 @@ const AddMoreOrderDetail = ({ navigation }) => {
             .then(unwrapResult)
             .then(res => {
                 placeOrderBTS.current.close()
-                navigation.navigate(ROUTES.ORDER_STATUS_STACK)
+                navigation.navigate(ROUTES.ORDER_STATUS_STACK, { order: res })
             })
             .catch(e => {
                 Toast.show({
                     type: ALERT_TYPE.WARNING,
                     title: "Đăng bài thất bại",
-                    textBody: e
+                    textBody: 'Vui lòng thử lại'
                 })
                 console.log(e)
             })

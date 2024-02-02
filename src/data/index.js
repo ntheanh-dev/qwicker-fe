@@ -2,43 +2,81 @@ export const productType = [{ id: 1, name: 'Thực phẩm & đồ uống' }, { i
 { id: 4, name: 'Đồ điện tử' }, { id: 5, name: 'Nguyên liệu / Linh kiện' }, { id: 6, name: 'Đồ gia dụng / Nội thất' },
 { id: 7, name: 'Khác' }]
 
-export const vehicleType = [
+export const fakeVehicles = [
     {
         id: 1,
         name: 'Xe Máy',
         description: 'Vận chuyển mặt hàng nhỏ giá trị đến 3 triệu đồng',
         capacity: '0.5 x 0.4 x 0.5 Mét - Lên đến 30kg',
-        icon: require('../assets/images/motorbike.png'),
+        icon: "https://res.cloudinary.com/dqpo9h5s2/image/upload/v1706106196/vehicle_icon/gjisuqtnu1gl7rtpdron.png",
     },
     {
         id: 2,
         name: 'Xe Van 500 kg',
         description: 'Hoạt Động Tất Cả Khung Giờ | Chở Tối Đa 500Kg * 1.5CBM',
         capacity: '1.7 x 1.2 x 1.2 Mét Lên đến 500 kg',
-        icon: require('../assets/images/van500.png'),
+        icon: "https://res.cloudinary.com/dqpo9h5s2/image/upload/v1706106556/vehicle_icon/pkbqdybiilwiynh0yyxv.png",
     },
     {
         id: 3,
         name: 'Xe Van 1000 kg',
         description: 'Hoạt Động Tất Cả Khung Giờ | Chở Tối Đa 1000Kg * 4CBM',
         capacity: '1.7 x 1.2 x 1.2 Mét Lên đến 500 kg',
-        icon: require('../assets/images/van500.png'),
+        icon: "https://res.cloudinary.com/dqpo9h5s2/image/upload/v1706106626/vehicle_icon/rqqk1cvmbt7q5agsgdry.png",
     },
     {
         id: 4,
         name: 'Xe Tải 500kg',
         description: 'Giờ Cấm Tải 6H-9H & 16H-20H | Chở tối đa 500Kg & 1.5CBM',
         capacity: '1.9 x 1.4 x 1.4 Mét Lên đến 500 kg',
-        icon: require('../assets/images/truck.png'),
+        icon: "https://res.cloudinary.com/dqpo9h5s2/image/upload/v1706106669/vehicle_icon/lnnx9evnqsxy1gmygn23.png",
     },
     {
         id: 5,
         name: 'Xe Tải 1000kg',
         description: 'Giờ Cấm Tải 6H-9H & 16H-20H | Chở tối đa 1000Kg & 5CBM',
         capacity: '3 x 1.6 x 1.6 Mét Lên đến 1000 kg',
-        icon: require('../assets/images/truck.png'),
+        icon: "https://res.cloudinary.com/dqpo9h5s2/image/upload/v1706106704/vehicle_icon/enknv9eqjzcdpc10jxxo.png",
     },
 
+]
+
+export const fakeProductCategory = [
+    {
+        id: 1,
+        name: "Thực phẩm & đồ uống"
+    },
+    {
+        id: 2,
+        name: "Văn phòng phẩm"
+    },
+    {
+        id: 3,
+        name: "Quần áo & Phụ kiện"
+    },
+    {
+        id: 4,
+        name: "Đồ điện tử"
+    },
+    {
+        id: 5,
+        name: "Nguyên liệu / Linh kiện"
+    },
+    {
+        id: 6,
+        name: "Đồ gia dụng / Nội thất"
+    }
+]
+
+export const fakePaymentMethod = [
+    {
+        id: 1,
+        name: "Momo"
+    },
+    {
+        id: 2,
+        name: "Tiền mặt"
+    }
 ]
 
 export const fakeOrders = [
@@ -86,7 +124,7 @@ export const fakeAddress = [{
     id: 1,
     latitude: 10.816674118627507,
     longitude: 106.67741941096348,
-    contry: 'Việt Nam',
+    country: 'Việt Nam',
     city: 'Hồ Chí Minh',
     district: 'Phường 3, Gò Vấp',
     street: 'Nguyễn Kiệm',
@@ -97,11 +135,133 @@ export const fakeAddress = [{
     id: 2,
     latitude: 10.675584891564835,
     longitude: 106.69065525750209,
-    contry: 'Việt Nam',
+    country: 'Việt Nam',
     city: 'Hồ Chí Minh',
     district: 'Nhơn Đức, Nhà Bè',
-    street: '',
-    home_number: '',
+    street: null,
+    home_number: null,
     short_name: 'Nhơn Đức, Nhà Bè',
     long_name: 'Nhơn Đức, Nhà Bè, Thành phố Hồ Chí Minh, Việt Nam'
 }]
+
+export const fakeOrderData = {
+    order: { amount: null, is_poster_pay: true, method: 1, payment_date: null },
+    product: {
+        category: 3,
+        image: "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Fdeliverymanagement-b6da4a74-d2a8-4d98-a4b1-74212eaa599f/ImagePicker/dac6a2b9-5139-4293-aa6f-22f767a3187f.png",
+        mass: 1,
+        quantity: 1
+    },
+    shipment: {
+        cost: 244000,
+        delivery_address: {
+            city: "Hồ Chí Minh",
+            contact: "TheEm",
+            contry: "Việt Nam",
+            district: "Nhơn Đức, Nhà Bè",
+            home_number: "",
+            latitude: 10.675584891564835,
+            long_name: "Nhơn Đức, Nhà Bè, Thành phố Hồ Chí Minh, Việt Nam",
+            longitude: 106.69065525750209,
+            phone_number: "0373506362",
+            short_name: "Nhơn Đức, Nhà Bè",
+            street: ""
+        },
+        pick_up: {
+            city: "Hồ Chí Minh",
+            contact: "TheAnh",
+            contry: "Việt Nam",
+            district: "Phường 3, Gò Vấp",
+            home_number: "371",
+            latitude: 10.816674118627507,
+            long_name: "371 Đ. Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Nam",
+            longitude: 106.67741941096348,
+            phone_number: "0373508888",
+            short_name: "371 Đ. Nguyễn Kiệm",
+            street: "Nguyễn Kiệm"
+        },
+        shipment_date: { date: null, time: null }, status: "idle", type: "Now"
+    }
+}
+export const fakeFullOrderData = {
+    order: {
+        description: "test comment",
+        vehicle: 4
+    },
+    payment: {
+        amount: null,
+        is_poster_pay: true,
+        method: 1,
+        payment_date: null
+    },
+    product: {
+        category: 4,
+        image: "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%2540anonymous%252Fdeliverymanagement-b6da4a74-d2a8-4d98-a4b1-74212eaa599f/ImagePicker/ede48082-ad42-4342-80bc-3668519f05c9.png",
+        quantity: 1,
+        mass: 'Nhẹ hơn 10kg'
+    },
+    shipment: {
+        cost: 144000,
+        delivery_address: {
+            city: "Hồ Chí Minh",
+            contact: "F",
+            country: "Việt Nam",
+            district: "Nhơn Đức, Nhà Bè",
+            home_number: null,
+            latitude: 10.675584891564835,
+            longitude: 106.69065525750209,
+            phone_number: "5",
+            street: null
+        },
+        pick_up: {
+            city: "Hồ Chí Minh",
+            contact: "F",
+            country: "Việt Nam",
+            district: "Phường 3, Gò Vấp",
+            home_number: "371",
+            latitude: 10.816674118627507,
+            longitude: 106.67741941096348,
+            phone_number: "2",
+            street: "Nguyễn Kiệm"
+        },
+        // required even type = Now
+        shipment_date: "2024-01-31 00:00",
+        type: "Now"
+    }
+}
+
+
+
+dic = {
+    'shipment': {
+        'cost': 144000,
+        'delivery_address': {
+            'city': "Hồ Chí Minh",
+            'contact': "F",
+            'contry': "Việt Nam",
+            'district': "Nhơn Đức, Nhà Bè",
+            'home_number': "",
+            'latitud': 10.675584891564835,
+            'long_name': "Nhơn Đức, Nhà Bè, Thành phố Hồ Chí Minh, Việt Nam",
+            'longitude': 106.69065525750209,
+            'phone_number': "5",
+            'short_name': "Nhơn Đức, Nhà Bè",
+            'street': ""
+        },
+        'pick_up': {
+            'city': "Hồ Chí Minh",
+            'contact': "F",
+            'contry': "Việt Nam",
+            'district': "Phường 3, Gò Vấp",
+            'home_number': "371",
+            'latitude': 10.816674118627507,
+            'long_name': "371 Đ. Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Nam",
+            'longitude': 106.67741941096348,
+            'phone_number': "2",
+            'short_name': "371 Đ. Nguyễn Kiệm",
+            'street': "Nguyễn Kiệm"
+        },
+        'shipment_date': "2024/01/31 00:00",
+        'type': "Later"
+    }
+}
