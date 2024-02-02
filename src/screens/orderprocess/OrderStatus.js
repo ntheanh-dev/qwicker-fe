@@ -1,9 +1,11 @@
-import { View, Text, Dimensions, Animated, ScrollView, FlatList, Image, TouchableOpacity, RefreshControl } from 'react-native'
+import { View, Text, Dimensions, Animated, ScrollView, FlatList, Image, TouchableOpacity, RefreshControl, Alert } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import MapView, { Marker } from 'react-native-maps';
 import { MaterialIcons, Ionicons, Entypo, Foundation, AntDesign, } from '@expo/vector-icons';
 import { Easing, } from 'react-native-reanimated';
 import Dialog from "react-native-dialog";
+import { formatCurrency } from '../../features/ultils';
+import { ROUTES } from '../../constants';
 
 const INIT_REGION = {
     latitude: 10.678650548923207,
@@ -13,7 +15,19 @@ const INIT_REGION = {
 }
 const shipper = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 },]
 const { height } = Dimensions.get('window')
-const OrderStatus = ({ navigation }) => {
+const OrderStatus = ({ navigation, route }) => {
+    const { order } = route.params
+    const { payment, product, shipment, vehicle, status, ...orderData } = order
+    const getHeaderTitle = (status) => {
+        switch (status) {
+            case 'FINDING_SHIPPER':
+                return 'Đang tìm shipper'
+            case 'WAITING_SHIPPER':
+                return 'Đang đợi shipper'
+            default:
+                return 'Thông tin đơn hàng'
+        }
+    }
     // ---------------Marker Animation--------------
     const animatedColor = useRef(new Animated.Value(0)).current;
     const color = animatedColor.interpolate({
@@ -28,6 +42,11 @@ const OrderStatus = ({ navigation }) => {
     });
 
     useEffect(() => {
+
+        if (!order) {
+            navigation.goBack()
+        }
+
         Animated.loop(
             Animated.timing(animatedColor, {
                 toValue: 1,
@@ -47,6 +66,22 @@ const OrderStatus = ({ navigation }) => {
         navigation.getParent().setOptions({
             headerShown: false,
         });
+
+        const handleBack = () => {
+            navigation.getParent().setOptions({
+                headerShown: true,
+            });
+            navigation.navigate(ROUTES.HOME_STACK)
+        }
+
+        navigation.setOptions({
+            headerTitleAlign: 'center',
+            headerTitle: getHeaderTitle(status),
+            headerLeft: () =>
+                <TouchableOpacity onPress={handleBack}>
+                    <AntDesign name="left" size={16} color="black" />
+                </TouchableOpacity>
+        })
 
     }, [])
     // ---------------------Refesh shipper data--------------
@@ -97,49 +132,56 @@ const OrderStatus = ({ navigation }) => {
                 {/* ------------Finding------------ */}
                 <View className="flex-col items-center bg-white rounded-lg pt-4 pb-12 mb-5">
                     <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
-                    {/* <Text className="text-lg font-semibold py-1">Đang tìm tất cả tài xế gần bạn</Text>
-                    <Text className="text-gray-500">Vui lòng đợi trong ít phút</Text> */}
-                    <Text className="text-lg font-semibold pt-1 pb-4">Chúng tôi tìm thấy 99 tài xế</Text>
+                    {status === 'FINDING_SHIPPER' ?
+                        <>
+                            <Text className="text-lg font-semibold py-1">Đang tìm tất cả shipper gần bạn</Text>
+                            <Text className="text-gray-500">Vui lòng đợi trong ít phút</Text>
+                        </>
+                        :
+                        <>
+                            <Text className="text-lg font-semibold pt-1 pb-4">Chúng tôi tìm thấy 99 shipper</Text>
 
-                    {/* --------List Shipper------------ */}
-                    <FlatList
-                        data={shipper}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        renderItem={c => (
-                            <View
-                                key={c.item.id}
-                                className="flex-col border border-gray-300 mx-3 rounded-lg"
-                            >
-                                <View className="flex-row px-3 py-4">
-                                    <View className="basis-2/6 px-3">
-                                        <Image
-                                            source={require('../../assets/logo/user.png')}
-                                            className="h-12 w-12 "
-                                        />
-                                    </View>
-                                    <View className="basis-4/6 flex-col space-y-1">
-                                        <Text>Nguyễn Văn Long</Text>
-                                        <View className="flex-row items-center space-x-1">
-                                            <AntDesign name="star" size={15} color="#FFB534" />
-                                            <Text className="text-xs text-gray-600">5.00</Text>
+                            {/* --------List Shipper------------ */}
+                            <FlatList
+                                data={shipper}
+                                horizontal={true}
+                                showsHorizontalScrollIndicator={false}
+                                renderItem={c => (
+                                    <View
+                                        key={c.item.id}
+                                        className="flex-col border border-gray-300 mx-3 rounded-lg"
+                                    >
+                                        <View className="flex-row px-3 py-4">
+                                            <View className="basis-2/6 px-3">
+                                                <Image
+                                                    source={require('../../assets/logo/user.png')}
+                                                    className="h-12 w-12 "
+                                                />
+                                            </View>
+                                            <View className="basis-4/6 flex-col space-y-1">
+                                                <Text>Nguyễn Văn Long</Text>
+                                                <View className="flex-row items-center space-x-1">
+                                                    <AntDesign name="star" size={15} color="#FFB534" />
+                                                    <Text className="text-xs text-gray-600">5.00</Text>
+                                                </View>
+                                                <View className="bg-gray-100 rounded-md px-1">
+                                                    <Text className="text-xs text-gray-600 font-semibold">68C-12869 Truck</Text>
+                                                </View>
+                                            </View>
                                         </View>
-                                        <View className="bg-gray-100 rounded-md px-1">
-                                            <Text className="text-xs text-gray-600 font-semibold">68C-12869 Truck</Text>
-                                        </View>
+                                        <TouchableOpacity
+                                            activeOpacity={1}
+                                            onPress={() => handleChooseShipper({ name: 'a' })}
+                                            className="flex-row justify-center items-center py-2 space-x-1 border-t border-gray-300"
+                                        >
+                                            <AntDesign name="totop" size={18} color="black" />
+                                            <Text className="font-medium">Chọn</Text>
+                                        </TouchableOpacity>
                                     </View>
-                                </View>
-                                <TouchableOpacity
-                                    activeOpacity={1}
-                                    onPress={() => handleChooseShipper({ name: 'a' })}
-                                    className="flex-row justify-center items-center py-2 space-x-1 border-t border-gray-300"
-                                >
-                                    <AntDesign name="totop" size={18} color="black" />
-                                    <Text className="font-medium">Chọn</Text>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                    />
+                                )}
+                            />
+                        </>
+                    }
 
                     {/* -------Dialog confirm choosing shipper */}
                     <Dialog.Container visible={showDialogConfirm} className="rounded-3xl relative">
@@ -185,13 +227,13 @@ const OrderStatus = ({ navigation }) => {
                 {/* ------------ Order sumary---------- */}
                 <View className="flex-col bg-white rounded-lg mb-5">
                     <View className="border-b border-gray-300 py-2">
-                        <Text className="text-gray-600 pl-4 py-1">Truck 50000000kg</Text>
+                        <Text className="text-gray-600 pl-4 py-1">{vehicle.name}</Text>
                     </View>
                     {/* -----Time----- */}
                     <View className="flex-col px-4 pt-6">
                         <View className="flex-row">
                             <View className="basis-1/6"></View>
-                            <View><Text className="basis-5/6 text-gray-600">Hôm nay 20:11</Text></View>
+                            <View><Text className="basis-5/6 text-gray-600">{shipment.shipment_date}</Text></View>
                         </View>
                     </View>
                     {/* -----Places and Payment method----- */}
@@ -203,10 +245,12 @@ const OrderStatus = ({ navigation }) => {
                             </View>
                             <View className="flex-col basis-5/6 ">
                                 <View className="flex-row items-center ">
-                                    <Text className="text-lg font-semibold" >5, Hẻm 89</Text>
-                                    <View className="ml-2 p-1 rounded-md bg-gray-300"><Text>Tiền mặt</Text></View>
+                                    <Text className="text-lg font-semibold" >{shipment.pick_up.short_name}</Text>
+                                    {payment.is_poster_pay && (
+                                        <View className="ml-2 p-1 rounded-md bg-gray-300"><Text>{payment.method.name}</Text></View>
+                                    )}
                                 </View>
-                                <Text className="text-gray-600">5 89, Tổ 3, Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam</Text>
+                                <Text className="text-gray-600">{shipment.pick_up.long_name}</Text>
                             </View>
                         </View>
                         {/* -----------Pick up------------- */}
@@ -216,10 +260,12 @@ const OrderStatus = ({ navigation }) => {
                             </View>
                             <View className="flex-col basis-5/6 ">
                                 <View className="flex-row items-center ">
-                                    <Text className="text-lg font-semibold" >5, Hẻm 89</Text>
-                                    <View className="ml-2 p-1 rounded-md bg-gray-300"><Text>Tiền mặt</Text></View>
+                                    <Text className="text-lg font-semibold" >{shipment.delivery_address.short_name}</Text>
+                                    {!payment.is_poster_pay && (
+                                        <View className="ml-2 p-1 rounded-md bg-gray-300"><Text>{payment.method.name}</Text></View>
+                                    )}
                                 </View>
-                                <Text className="text-gray-600">5 89, Tổ 3, Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam</Text>
+                                <Text className="text-gray-600">{shipment.delivery_address.long_name}</Text>
                             </View>
                         </View>
                     </View>
@@ -240,7 +286,7 @@ const OrderStatus = ({ navigation }) => {
                     <View className="px-4 border-b border-gray-300">
                         <View className="flex-row justify-between items-center py-3">
                             <View className="flex-col">
-                                <Text className="text-base  font-semibold">99999999999999999999</Text>
+                                <Text className="text-base  font-semibold">{orderData.uuid}</Text>
                                 <Text className="text-gray-600">Mã đơn hàng</Text>
                             </View>
                             <View>
@@ -250,21 +296,21 @@ const OrderStatus = ({ navigation }) => {
                     </View>
                     <View className="px-4 border-b border-gray-300">
                         <View className="flex-col py-3">
-                            <Text className="text-base  font-semibold">0373506769</Text>
+                            <Text className="text-base  font-semibold">{`${shipment.pick_up.contact} ${shipment.pick_up.phone_number}`}</Text>
                             <Text className="text-gray-600">Thông tin liên hệ</Text>
                         </View>
                     </View>
                     <View className="flex-col px-4 pt-3 pb-5">
-                        <Text className="text-base font-semibold">Food & Beverage</Text>
-                        <Text className="text-base  font-semibold">1 gói hàng</Text>
-                        <Text className="text-gray-600">Delivery item details</Text>
+                        <Text className="text-base font-semibold">{product.category.name}</Text>
+                        <Text className="text-base  font-semibold">{product.quantity} gói hàng</Text>
+                        <Text className="text-gray-600">Chi tiết đơn hàng</Text>
                     </View>
                 </View>
                 {/* -----------------Fee---------------- */}
                 <View className="flex-row justify-between items-center bg-white rounded-lg px-4 py-5 mb-14 ">
-                    <Text className="text-base font-semibold text-gray-600">Tiền mặt</Text>
+                    <Text className="text-base font-semibold text-gray-600">{payment.method.name}</Text>
                     <View className="flex-row space-x-2 items-center">
-                        <Text className="text-lg font-bold">đ36.396</Text>
+                        <Text className="text-lg font-bold">{formatCurrency(shipment.cost)}</Text>
                         <AntDesign name="exclamationcircleo" size={20} color="black" />
                     </View>
                 </View>
