@@ -3,21 +3,27 @@ import React from 'react'
 import { ROUTES } from '../../../constants'
 import { Entypo, Foundation, Octicons, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { getDiffBetweenTwoTime, formatMomentDateToVietnamese } from '../../../features/ultils';
+import { getDiffBetweenTwoTime, formatMomentDateToVietnamese, formatCurrency } from '../../../features/ultils';
 
 const Order = ({ data }) => {
-    const { time } = data
+    const { time, shipment, payment, product, ...order } = data
     const navigation = useNavigation()
     var moment = require('moment-timezone');
     moment.tz.setDefault('Asia/Ho_Chi_Minh')
     const orderTime = moment(time)
 
     const getType = () => {
-        const restTime = getDiffBetweenTwoTime(time)
-        if (restTime.day >= 1) {
-            return 'later'
+        if (shipment.type === 'Now') {
+            return 'now'
+        } else {
+            const restTime = getDiffBetweenTwoTime(shipment.shipment_date)
+            if (restTime.day >= 1) {
+                return 'later'
+            } else {
+                return 'today'
+            }
         }
-        return restTime.hour <= 1 ? 'now' : 'today'
+
     }
     const type = getType()
     const headerColor = type === 'now' ? 'bg-orange-500' : type === 'today' ? 'bg-yellow-500' : 'bg-[#3422F1]'
@@ -42,21 +48,25 @@ const Order = ({ data }) => {
                 </View>
                 <View className="basis-5/6 ml-[-12] ">
                     <View>
-                        <Text className="font-medium text-lg">{data.pickUp}</Text>
+                        <Text className="font-medium text-lg">{shipment.pick_up.short_name}</Text>
                     </View>
                     <View className="py-2 flex-row justify-between items-center ">
-                        <Text className="font-medium text-lg">{data.deliveryAddress}</Text>
+                        <Text className="font-medium text-lg">{shipment.delivery_address.short_name}</Text>
                     </View>
                 </View>
             </View>
-            {data.comment &&
+            {order.descripttion &&
                 <View className="flex-row items-center space-x-4 px-4 mt-2">
                     <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
-                    <Text className="text-base text-gray-600">{data.comment}</Text>
+                    <Text className="text-base text-gray-600">{order.descripttion}</Text>
                 </View>}
             <View className="flex-row justify-between items-center p-4 ">
-                <Ionicons name="cash-outline" size={24} color="#3422F1" />
-                <Text className="text-xl font-semibold">{`đ${data.price.toLocaleString('en-US')}`}</Text>
+                <View>
+                    <Ionicons name="cash-outline" size={24} color="#3422F1" />
+                    <Text>{payment.method.name}</Text>
+                </View>
+
+                <Text className="text-xl font-semibold">đ{formatCurrency(shipment.cost)}</Text>
             </View>
         </TouchableOpacity>
     )

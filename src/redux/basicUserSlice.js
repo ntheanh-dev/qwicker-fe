@@ -37,6 +37,7 @@ const basicUserSlice = createSlice({
             .addCase(login.fulfilled, (state, action) => {
                 if (action.payload) {
                     state.user = action.payload.user
+                    state.token = action.payload.token
                 }
                 state.status = 'idle'
             })

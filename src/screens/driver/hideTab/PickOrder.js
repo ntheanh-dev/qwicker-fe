@@ -1,10 +1,60 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { MaterialIcons, Entypo, Foundation, Ionicons, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { getToken, joinJob, viewJob } from '../../../redux/shipperSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { formatCurrency } from '../../../features/ultils';
+import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 
 const PickOrder = ({ route, navigation }) => {
     const { itemId } = route.params;
-
+    const [job, setJob] = useState({})
+    const { product, payment, shipment, vehicle, ...order } = job
+    const [countShipper, setCountShipper] = useState(0)
+    const token = useSelector(getToken)
+    const dispatch = useDispatch()
+    useEffect(() => {
+        dispatch(viewJob({ token: token.access_token, jobId: itemId }))
+            .then(unwrapResult)
+            .then(res => {
+                setJob(res.job)
+                setCountShipper(res.joined_shipper)
+            })
+            .catch(e => {
+                console.log(e)
+                navigation.goBack()
+            })
+    }, [itemId])
+    const handleJoinJob = () => {
+        dispatch(joinJob({ token: token.access_token, jobId: itemId }))
+            .then(unwrapResult)
+            .then(res => {
+                Toast.show({
+                    type: ALERT_TYPE.WARNING,
+                    title: "Tham gia thành công",
+                    textBody: "Hãy chờ cho đến khi chủ đơn hàng chấp nhận bạn"
+                })
+                setTimeout(() => {
+                    navigation.goBack()
+                }, 2500)
+            })
+            .catch(resp => {
+                if (resp.status === 400) {
+                    Toast.show({
+                        type: ALERT_TYPE.WARNING,
+                        title: "Tham gia thất bại",
+                        textBody: "Ban đã tham gia đơn hàng này trước đó"
+                    })
+                } else {
+                    Toast.show({
+                        type: ALERT_TYPE.WARNING,
+                        title: "Tham gia thất bại",
+                        textBody: "Có thể đơn hàng này đã được nhận bởi người khác"
+                    })
+                }
+            })
+    }
     return (
         <View className="flex-1">
             <View className="px-4 bg-[#3422F1] pb-8">
@@ -25,8 +75,8 @@ const PickOrder = ({ route, navigation }) => {
                                     <Entypo name="circle" size={18} color="#3422F1" />
                                 </View>
                                 <View className="flex-col basis-5/6 ">
-                                    <Text className="text-lg font-semibold" >5, Hẻm 89</Text>
-                                    <Text className="text-gray-600">5 89, Tổ 3, Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam</Text>
+                                    <Text className="text-lg font-semibold" >{shipment?.pick_up.short_name}</Text>
+                                    <Text className="text-gray-600">{shipment?.pick_up.long_name}</Text>
                                 </View>
                             </View>
                             {/* -----------Pick up------------- */}
@@ -35,8 +85,8 @@ const PickOrder = ({ route, navigation }) => {
                                     <Foundation name="marker" size={28} color="#3422F1" />
                                 </View>
                                 <View className="flex-col basis-5/6 ">
-                                    <Text className="text-lg font-semibold" >5, Hẻm 89</Text>
-                                    <Text className="text-gray-600">5 89, Tổ 3, Hóc Môn, Thành phố Hồ Chí Minh, Việt Nam</Text>
+                                    <Text className="text-lg font-semibold" >{shipment?.delivery_address.short_name}</Text>
+                                    <Text className="text-gray-600">{shipment?.delivery_address.long_name}</Text>
                                 </View>
                             </View>
                         </View>
@@ -45,14 +95,15 @@ const PickOrder = ({ route, navigation }) => {
                     <View className="flex-col bg-white rounded-lg border border-gray-300 p-4 mb-2">
                         <View className="flex-col">
                             <View className="flex-row justify-between">
-                                <Text className="text-lg font-medium">Xe máy</Text>
+                                <Text className="text-lg font-medium">{vehicle?.name}</Text>
                                 <MaterialIcons name="keyboard-arrow-down" size={24} color="black" />
                             </View>
 
-                            <View className="flex-row items-center space-x-2 pt-3">
-                                <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
-                                <Text className="text-base text-gray-600">Giao hai thung bia</Text>
-                            </View>
+                            {order.descripttion &&
+                                <View className="flex-row items-center space-x-2 pt-3">
+                                    <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
+                                    <Text className="text-base text-gray-600">{order?.descripttion}</Text>
+                                </View>}
 
                         </View>
                     </View>
@@ -60,24 +111,24 @@ const PickOrder = ({ route, navigation }) => {
                     <View className="flex-row bg-white rounded-lg border border-gray-300 p-4 mb-2 space-x-4 items-center">
                         <Ionicons name="cash-outline" size={24} color="#3422F1" />
                         <View className="flex-col">
-                            <Text className="text-xl font-semibold">đ99999999</Text>
-                            <Text className="text-base font-medium text-gray-400 ">Thu tiền mặt</Text>
+                            <Text className="text-xl font-semibold">đ{formatCurrency(shipment?.cost)}</Text>
+                            <Text className="text-base font-medium text-gray-400 ">{payment?.method.name}</Text>
                         </View>
                     </View>
                     {/* ----------Product type---------- */}
                     <View className="flex-row bg-white rounded-lg border border-gray-300 p-4 mb-2 space-x-4 items-center">
                         <MaterialCommunityIcons name="format-list-bulleted-type" size={24} color="black" />
                         <View className="flex-col">
-                            <Text className="text-xl font-semibold">Thực phẩm & đồ uống</Text>
+                            <Text className="text-xl font-semibold">{product?.category.name}</Text>
                         </View>
                     </View>
                 </View>
                 {/* ---------Confirm Button Sheet-------- */}
                 <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
                     <Text className="text-xl font-semibold">Đừng bỏ lỡ!</Text>
-                    <Text className="text-base font-medium text-gray-400 ">9999 Tài xế đang tham gia</Text>
+                    <Text className="text-base font-medium text-gray-400 ">{countShipper} Tài xế đang tham gia</Text>
                     <TouchableOpacity
-                        underlayColor={'rbga(0,0,0,0)'}
+                        onPress={handleJoinJob}
                         className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
                     >
                         <Text className="text-lg font-medium text-white" >Tham gia ngay</Text>
