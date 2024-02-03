@@ -89,10 +89,8 @@ export const login = createAsyncThunk('user,loginUser',
 )
 export const findJob = createAsyncThunk('job, findJob',
     async (access_token, { rejectWithValue }) => {
-        const formData = new FormData()
-        formData.append('status', JOBSTATUS.FINDING_SHIPPER)
         try {
-            const res = API.authAPI(access_token).get(ShipperJobEndpoints['find-job'], formData)
+            const res = await authAPI(access_token).get(ShipperJobEndpoints['find-job'](`status=${JOBSTATUS.FINDING_SHIPPER}`))
             return res.data
         } catch (err) {
             console.log(err)
