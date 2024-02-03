@@ -24,6 +24,7 @@ export const jobEndpoints = {
 export const ShipperJobEndpoints = {
     'find-job': '/shipper/find-job/',
     'find-job': (pagrams) => `/shipper/find-job/?${pagrams}`,
+    'job': (jobId) => `/shipper/${jobId}/job`,
 }
 
 export const authAPI = (access_token) => axios.create({
