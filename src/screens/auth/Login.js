@@ -11,6 +11,9 @@ import { Entypo } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import * as Shipper from '../../redux/shipperSlice'
 import * as BasicUser from '../../redux/basicUserSlice'
+import API, { authAPI, jobEndpoints } from '../../configs/API';
+import { fakeFullOrderData } from '../../data';
+import { objectToFormData } from '../../features/ultils';
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -18,31 +21,34 @@ const Login = ({ navigation }) => {
     const [loading, setLoading] = useState(false)
     const role = useSelector(getRole)
     const dispatch = useDispatch()
-    const getLoginAction = role === ROLE.TRADITIONAL_USER ? BasicUser.login({ username: username, password: password }) : Shipper.login({ username: username, password: password })
     const handleLogin = () => {
-        setLoading(true)
-        dispatch(getLoginAction)
-            .then(unwrapResult)
-            .then(res => {
-                console.log(res)
-                if (res.token) {
-                    if (role === ROLE.TRADITIONAL_USER) {
-                        dispatch(BasicUser.setToken(res.token))
-                    } else {
-                        dispatch(Shipper.setToken(res.token))
-                    }
+        if (username.length === 0 || password.length === 0) {
+            Toast.show({
+                type: ALERT_TYPE.WARNING,
+                textBody: "Vui lòng nhập tài khoản và mật khẩu",
+            })
+
+        } else {
+            setLoading(true)
+            const loginAction = role === ROLE.TRADITIONAL_USER ? BasicUser.login({ username: username, password: password }) : Shipper.login({ username: username, password: password })
+            dispatch(loginAction)
+                .then(unwrapResult)
+                .then(res => {
+                    console.log(res)
                     setLoading(false)
                     navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.HOME : ROUTES.DRIVER_NAVIGATION)
-                }
-            })
-            .catch(e => {
-                setLoading(false)
-                Toast.show({
-                    type: ALERT_TYPE.WARNING,
-                    title: "Đăng nhập thất bại",
-                    textBody: "Tài khoản hoặc mật khẩu không chính xác"
                 })
-            })
+                .catch(e => {
+                    console.log(e)
+                    setLoading(false)
+                    Toast.show({
+                        type: ALERT_TYPE.WARNING,
+                        title: "Đăng nhập thất bại",
+                        textBody: "Tài khoản hoặc mật khẩu không chính xác"
+                    })
+                })
+        }
+
     }
     return (
         <SafeAreaView className="flex-1 flex-col justify-around h-full relative">

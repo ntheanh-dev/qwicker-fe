@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
-import API, { authAPI, shipperEndpoints } from "../configs/API";
+import API, { ShipperJobEndpoints, authAPI, shipperEndpoints } from "../configs/API";
+import { JOBSTATUS } from "../constants";
 
 const shipperSlice = createSlice({
     name: 'shipperSlice',
@@ -37,6 +38,7 @@ const shipperSlice = createSlice({
             .addCase(login.fulfilled, (state, action) => {
                 if (action.payload) {
                     state.user = action.payload.user
+                    state.token = action.payload.token
                 }
                 state.status = 'idle'
             })
@@ -66,8 +68,8 @@ export const login = createAsyncThunk('user,loginUser',
             const token = await API.post(shipperEndpoints['login'], {
                 "username": data?.username,
                 "password": data?.password,
-                "client_id": "FRIKdrZpG2VTtJqye7oijXxjfXUthIuAhgCKuMJL",
-                "client_secret": "XVGhzSO1fk9cR0RzLW0rGfYjRnQqghs3aDLHYb166zgJfiz3TfnMrtXc5sz3ThkeVqOfb5ti9g7F0WcjonYEefGt79vspJkC7iv2ZpRUWDYGXwZ6DuqPt7FluKqlMgVg",
+                "client_id": "RiYOr07gNa0xh6dbcnQKySftZ8KHnip88Cps9Jk8",
+                "client_secret": "et1xaPdvN7jDXyPLN45Axnbj1irvoHjItxJUwqXA42Pnd5fevezK96118PvwHgw5wFr9fLOwz985lW4eRkTk6VdHsj8zLbdHHiPGt0csWlqbNEGdvkRgTKS3CaWyxPPE",
                 "grant_type": "password"
             }, {
                 headers: {
@@ -85,5 +87,19 @@ export const login = createAsyncThunk('user,loginUser',
         }
     }
 )
+export const findJob = createAsyncThunk('job, findJob',
+    async (access_token, { rejectWithValue }) => {
+        const formData = new FormData()
+        formData.append('status', JOBSTATUS.FINDING_SHIPPER)
+        try {
+            const res = API.authAPI(access_token).get(ShipperJobEndpoints['find-job'], formData)
+            return res.data
+        } catch (err) {
+            console.log(err)
+            return rejectWithValue(err?.response?.data)
+        }
+    }
+)
 export const { setToken } = shipperSlice.actions
+export const getToken = state => state.shipperSlice.token
 export default shipperSlice.reducer
