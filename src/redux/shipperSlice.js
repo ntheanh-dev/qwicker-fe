@@ -111,6 +111,20 @@ export const viewJob = createAsyncThunk('job, viewJob',
         }
     }
 )
+
+export const joinJob = createAsyncThunk('job, joinJob',
+    async (data, { rejectWithValue }) => {
+        const { token, jobId } = data
+        try {
+            const res = await authAPI(token).post(ShipperJobEndpoints['join-job'](jobId))
+            return res.status
+        } catch (err) {
+            console.log(err)
+            return rejectWithValue(err?.response)
+        }
+    }
+)
+
 export const { setToken } = shipperSlice.actions
 export const getToken = state => state.shipperSlice.token
 export default shipperSlice.reducer

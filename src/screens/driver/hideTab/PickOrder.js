@@ -2,9 +2,10 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { MaterialIcons, Entypo, Foundation, Ionicons, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { getToken, viewJob } from '../../../redux/shipperSlice';
+import { getToken, joinJob, viewJob } from '../../../redux/shipperSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { formatCurrency } from '../../../features/ultils';
+import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 
 const PickOrder = ({ route, navigation }) => {
     const { itemId } = route.params;
@@ -24,8 +25,36 @@ const PickOrder = ({ route, navigation }) => {
                 console.log(e)
                 navigation.goBack()
             })
-    }, [])
-
+    }, [itemId])
+    const handleJoinJob = () => {
+        dispatch(joinJob({ token: token.access_token, jobId: itemId }))
+            .then(unwrapResult)
+            .then(res => {
+                Toast.show({
+                    type: ALERT_TYPE.WARNING,
+                    title: "Tham gia thành công",
+                    textBody: "Hãy chờ cho đến khi chủ đơn hàng chấp nhận bạn"
+                })
+                setTimeout(() => {
+                    navigation.goBack()
+                }, 2500)
+            })
+            .catch(resp => {
+                if (resp.status === 400) {
+                    Toast.show({
+                        type: ALERT_TYPE.WARNING,
+                        title: "Tham gia thất bại",
+                        textBody: "Ban đã tham gia đơn hàng này trước đó"
+                    })
+                } else {
+                    Toast.show({
+                        type: ALERT_TYPE.WARNING,
+                        title: "Tham gia thất bại",
+                        textBody: "Có thể đơn hàng này đã được nhận bởi người khác"
+                    })
+                }
+            })
+    }
     return (
         <View className="flex-1">
             <View className="px-4 bg-[#3422F1] pb-8">
@@ -99,7 +128,7 @@ const PickOrder = ({ route, navigation }) => {
                     <Text className="text-xl font-semibold">Đừng bỏ lỡ!</Text>
                     <Text className="text-base font-medium text-gray-400 ">{countShipper} Tài xế đang tham gia</Text>
                     <TouchableOpacity
-                        underlayColor={'rbga(0,0,0,0)'}
+                        onPress={handleJoinJob}
                         className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
                     >
                         <Text className="text-lg font-medium text-white" >Tham gia ngay</Text>
