@@ -2,26 +2,19 @@ import * as React from 'react';
 import { View, useWindowDimensions, Text, Image, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { Entypo, Feather } from '@expo/vector-icons';
-import OrderItem from './OrderItem';
-import OrderItemNotFound from './OrderItemNotFound';
-import CompletedOrderTab from './CompletedOrderTab';
+import ProcessingOrderTab from './ProcessingOrderTab';
+import DoneOrderTab from './DoneOrderTab';
+import CanceledOrderTab from './CanceledOrderTab';
 
-function FirstRoute({ index }) {
-    return (
-        <View style={{ flex: 1, backgroundColor: '#E5E7EB' }}>
-            <OrderItemNotFound />
-        </View>
-    )
-}
 
 const renderScene = ({ route, jumpTo }) => {
     switch (route.key) {
         case 1:
-            return <FirstRoute index={route.key} />;
+            return <ProcessingOrderTab index={route.key} />;
         case 2:
-            return <CompletedOrderTab index={route.key} />;
+            return <DoneOrderTab index={route.key} />;
         case 3:
-            return <FirstRoute index={route.key} />;
+            return <CanceledOrderTab index={route.key} />;
     }
 };
 

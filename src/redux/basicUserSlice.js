@@ -103,6 +103,19 @@ export const postJob = createAsyncThunk('job,PostJob',
     }
 )
 
+export const myJob = createAsyncThunk('job,myJob',
+    async (data, { rejectWithValue }) => {
+        const { access_token, params } = data
+        try {
+            const res = await authAPI(access_token).get(basicUserEndpoints['my-jobs'](params))
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
 export const getJoinedShipper = createAsyncThunk('job,getShipper',
     async (data, { rejectWithValue }) => {
         const { access_token, jobId } = data

@@ -10,7 +10,8 @@ export const baseEndpoints = {
 export const basicUserEndpoints = {
     'basic-user-register': '/users/',
     'login': '/o/token/',
-    'current-user': 'users/current-user/'
+    'current-user': 'users/current-user/',
+    'my-jobs': (pagrams) => `/jobs/my-jobs/?${pagrams}`,
 }
 export const shipperEndpoints = {
     'shipper-register': '/shippers/',
