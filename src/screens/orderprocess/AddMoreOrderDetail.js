@@ -12,14 +12,15 @@ import { getShipment } from '../../redux/shipmentSlice';
 import { getSelectedVehicle } from '../../redux/orderSlice';
 import { orderForm } from '../../redux/store';
 import { isProductFulFill } from '../../redux/productSlice';
-import { postJob } from '../../redux/jobSlice';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
+import { getBasicUserToken, postJob } from '../../redux/basicUserSlice';
 
 const AddMoreOrderDetail = ({ navigation }) => {
     const dispatch = useDispatch()
     const shipmentData = useSelector(getShipment)
     const selectedVehicle = useSelector(getSelectedVehicle)
     const order = useSelector(orderForm)
+    const { access_token } = useSelector(getBasicUserToken)
     // Product
     const isProductFormFulFill = useSelector(isProductFulFill)
     // Payment method
@@ -118,8 +119,6 @@ const AddMoreOrderDetail = ({ navigation }) => {
     }
 
     const handlePlaceOrder = () => {
-        // using useSelector here to get access_token from appSlice
-        const access_token = '1pJoHL1bez99vwhyPWoVdDrpQo4w1L'
         const data = {
             access_token: access_token,
             formData: order

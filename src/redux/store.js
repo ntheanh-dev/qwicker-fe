@@ -9,7 +9,6 @@ import paymentSlice, { getPayment } from "./paymentSlice";
 import shipmentSlice, { getDeliveryAddress, getPickUP, getShipment } from "./shipmentSlice";
 import { SHIPMENTYPE } from "../constants";
 import { appendToFormData, getCurrentDateTime, objectToFormData } from "../features/ultils";
-import jobSlice from "./jobSlice";
 export default configureStore({
     reducer: {
         order: orderSlice,
@@ -20,7 +19,6 @@ export default configureStore({
         shipperSlice: shipperSlice,
         productSlice: productSlice,
         paymentSlice: paymentSlice,
-        job: jobSlice
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

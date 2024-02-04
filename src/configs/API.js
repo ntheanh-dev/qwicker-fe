@@ -18,7 +18,8 @@ export const shipperEndpoints = {
     'current-user': 'shippers/current-user/'
 }
 export const jobEndpoints = {
-    'jobs': '/jobs/'
+    'jobs': '/jobs/',
+    'listShipper': (jobId) => `jobs/${jobId}/list-shipper/`
 }
 
 export const ShipperJobEndpoints = {

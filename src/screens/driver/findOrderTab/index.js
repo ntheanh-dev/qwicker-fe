@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, ScrollView, FlatList } from 'react-native'
-import React, { useEffect, useReducer, useState } from 'react'
+import { View, Text, TouchableOpacity, ScrollView, FlatList, RefreshControl } from 'react-native'
+import React, { useCallback, useEffect, useReducer, useState } from 'react'
 import { MaterialCommunityIcons, Entypo, Foundation, Octicons, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import { ROUTES } from '../../../constants';
 import { formatMomentDateToVietnamese, getDiffBetweenTwoTime } from '../../../features/ultils';
@@ -55,6 +55,18 @@ const FindOrderTab = ({ navigation }) => {
             )
         })
     }, [])
+    // ---------------------Refesh order data--------------
+    const [refreshing, setRefreshing] = useState(false);
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        dispath(findJob(token.access_token))
+            .then(unwrapResult)
+            .then(res => {
+                setJobs(res)
+                setRefreshing(false)
+            })
+            .catch(e => setRefreshing(false))
+    }, []);
     return (
         <View className="relative flex-1 px-3 bg-gray-100">
             {/* ---------------Filter space--------------- */}
@@ -115,22 +127,27 @@ const FindOrderTab = ({ navigation }) => {
                 ))}
                 <View className="h-80 w-full"></View>
             </ScrollView> */}
-            {jobs.length > 0 ? (
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    {jobs.map(ele => (
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
+                {jobs.length > 0 ? (
+                    jobs.map(ele => (
                         <Order key={ele.id} data={ele} />
-                    ))}
-                    <View className="h-80 w-full"></View>
-                </ScrollView>
-            ) : (
-                <View className="flex justify-center items-center mt-24">
-                    <LottieView style={{ width: 250, height: 250 }} source={require('../../../assets/animations/onboarding4.json')} loop autoPlay />
-                    <Text className="text-lg my-3 text-center">Thử xoá tuỳ chọn bộ lọc để xem thêm các đơn hàng</Text>
-                    <TouchableOpacity className="py-3 px-5 rounded-lg bg-[#3422F1]" onPress={handleClearFilter}>
-                        <Text className="text-white font-medium text-xl">Xoá tất cả bộ lọc</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
+                    ))
+                ) : (
+                    <View className="flex justify-center items-center mt-24">
+                        <LottieView style={{ width: 250, height: 250 }} source={require('../../../assets/animations/onboarding4.json')} loop autoPlay />
+                        <Text className="text-lg my-3 text-center">Thử xoá tuỳ chọn bộ lọc để xem thêm các đơn hàng</Text>
+                        <TouchableOpacity className="py-3 px-5 rounded-lg bg-[#3422F1]" onPress={handleClearFilter}>
+                            <Text className="text-white font-medium text-xl">Xoá tất cả bộ lọc</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+                <View className="h-80 w-full"></View>
+            </ScrollView>
         </View>
     )
 }

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
-import API, { authAPI, basicUserEndpoints } from "../configs/API";
+import API, { authAPI, basicUserEndpoints, jobEndpoints } from "../configs/API";
 
 const basicUserSlice = createSlice({
     name: 'basicUserSlice',
@@ -67,8 +67,8 @@ export const login = createAsyncThunk('user,loginUser',
             const token = await API.post(basicUserEndpoints['login'], {
                 "username": data?.username,
                 "password": data?.password,
-                "client_id": "FRIKdrZpG2VTtJqye7oijXxjfXUthIuAhgCKuMJL",
-                "client_secret": "XVGhzSO1fk9cR0RzLW0rGfYjRnQqghs3aDLHYb166zgJfiz3TfnMrtXc5sz3ThkeVqOfb5ti9g7F0WcjonYEefGt79vspJkC7iv2ZpRUWDYGXwZ6DuqPt7FluKqlMgVg",
+                "client_id": "RiYOr07gNa0xh6dbcnQKySftZ8KHnip88Cps9Jk8",
+                "client_secret": "et1xaPdvN7jDXyPLN45Axnbj1irvoHjItxJUwqXA42Pnd5fevezK96118PvwHgw5wFr9fLOwz985lW4eRkTk6VdHsj8zLbdHHiPGt0csWlqbNEGdvkRgTKS3CaWyxPPE",
                 "grant_type": "password"
             }, {
                 headers: {
@@ -85,6 +85,37 @@ export const login = createAsyncThunk('user,loginUser',
         }
     }
 )
+
+export const postJob = createAsyncThunk('job,PostJob',
+    async (data, { rejectWithValue }) => {
+        const { access_token, formData } = data
+        try {
+            const res = await authAPI(access_token).post(jobEndpoints['jobs'], formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
+export const getJoinedShipper = createAsyncThunk('job,getShipper',
+    async (data, { rejectWithValue }) => {
+        const { access_token, jobId } = data
+        try {
+            const res = await authAPI(access_token).get(jobEndpoints['listShipper'](jobId))
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
 export const getBasicUserToken = state => state.basicUserSlice.token
 export const getBasicUserStatus = state => state.basicUserSlice.status
 export const { setToken } = basicUserSlice.actions
