@@ -12,6 +12,7 @@ export const basicUserEndpoints = {
     'login': '/o/token/',
     'current-user': 'users/current-user/',
     'my-jobs': (pagrams) => `/jobs/my-jobs/?${pagrams}`,
+    'assign-job': (jobId) => `/jobs/${jobId}/assign/`
 }
 export const shipperEndpoints = {
     'shipper-register': '/shippers/',

@@ -129,6 +129,27 @@ export const getJoinedShipper = createAsyncThunk('job,getShipper',
     }
 )
 
+export const assignJob = createAsyncThunk('job,assignJob',
+    async (data, { rejectWithValue }) => {
+        const { access_token, orderId, shipperId } = data
+        console.log(data)
+        const formData = new FormData()
+        formData.append('shipper', shipperId)
+        try {
+            const res = await authAPI(access_token).post(basicUserEndpoints['assign-job'](orderId), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            return res
+        } catch (err) {
+            console.log(err)
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
 export const getBasicUserToken = state => state.basicUserSlice.token
 export const getBasicUserStatus = state => state.basicUserSlice.status
 export const { setToken } = basicUserSlice.actions

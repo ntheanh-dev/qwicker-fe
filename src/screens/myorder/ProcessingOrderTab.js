@@ -18,7 +18,6 @@ const ProcessingOrderTab = () => {
         distpatch(myJob(form))
             .then(unwrapResult)
             .then(res => {
-                console.log(res)
                 setOrder(res)
             })
             .catch(e => console.log(e))
@@ -30,13 +29,11 @@ const ProcessingOrderTab = () => {
         distpatch(myJob(form))
             .then(unwrapResult)
             .then(res => {
-                console.log(res)
                 setOrder(res)
                 setRefreshing(false)
             })
             .catch(e => {
                 setRefreshing(false)
-                console.log(e)
             })
     }, []);
     return (
@@ -45,13 +42,11 @@ const ProcessingOrderTab = () => {
             className="flex-1 bg-gray-100 px-2"
             showsVerticalScrollIndicator={false}
         >
-            {order.length > 0 ? (
-                order.map(ele => {
-                    <OrderItem key={ele.id} {...ele} />
-                })
-            ) : (
-                <OrderItemNotFound />
-            )}
+            {order.length > 0 ?
+                order.map(ele => <OrderItem key={ele.id} {...ele} />
+                ) : (
+                    <OrderItemNotFound />
+                )}
             <View className="h-80 w-full"></View>
         </ScrollView>
     )

@@ -7,7 +7,7 @@ import Dialog from "react-native-dialog";
 import { formatCurrency } from '../../features/ultils';
 import { ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
-import { getBasicUserToken, getJoinedShipper } from '../../redux/basicUserSlice';
+import { assignJob, getBasicUserToken, getJoinedShipper } from '../../redux/basicUserSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 
@@ -24,6 +24,7 @@ const OrderStatus = ({ navigation, route }) => {
     const { order } = route.params
     const { payment, product, shipment, vehicle, status, ...orderData } = order
     const [shipper, setShipper] = useState([])
+    const [selectedShipper, setSelectedShipper] = useState(null)
     const getHeaderTitle = (status) => {
         switch (status) {
             case 'FINDING_SHIPPER':
@@ -121,11 +122,22 @@ const OrderStatus = ({ navigation, route }) => {
     const [showDialogConfirm, setShowDialogConfim] = useState(false)
 
     const handleConfirmShipper = () => {
-        setShowDialogConfim(false)
+        const data = {
+            access_token: access_token,
+            orderId: order.id,
+            shipperId: selectedShipper.id
+        }
+        console.log(data)
+        distpatch(assignJob(data))
+            .then(res => {
+                console.log(res)
+            })
+            .catch(e => console.log(e))
+        setSelectedShipper(null)
     }
-    const handleChooseShipper = (data) => {
+    const handleChooseShipper = (id) => {
         /// Update dialgon ui with specific data
-        setShowDialogConfim(true)
+
     }
 
     return (
@@ -201,7 +213,7 @@ const OrderStatus = ({ navigation, route }) => {
                                             </View>
                                             <TouchableOpacity
                                                 activeOpacity={1}
-                                                onPress={() => handleChooseShipper({ name: 'a' })}
+                                                onPress={() => setSelectedShipper(item)}
                                                 className="flex-row justify-center items-center py-2 space-x-1 border-t border-gray-300"
                                             >
                                                 <AntDesign name="totop" size={18} color="black" />
@@ -215,25 +227,26 @@ const OrderStatus = ({ navigation, route }) => {
                     }
 
                     {/* -------Dialog confirm choosing shipper */}
-                    <Dialog.Container visible={showDialogConfirm} className="rounded-3xl relative">
+                    <Dialog.Container visible={selectedShipper !== null} className="rounded-3xl relative">
                         <Dialog.Title>
                             <Text className="text-2xl">Bạn có chắc chắn không?</Text>
                         </Dialog.Title>
                         <View className="flex-row px-3 py-4 items-center">
                             <View className="basis-2/6 px-3">
                                 <Image
-                                    source={require('../../assets/logo/user.png')}
+                                    // source={require('../../assets/logo/user.png')}
+                                    source={{ uri: selectedShipper?.avatar }}
                                     className="h-14 w-14 "
                                 />
                             </View>
                             <View className="basis-4/6 flex-col space-y-1">
-                                <Text>Nguyễn Văn Long</Text>
+                                <Text>{`${selectedShipper?.last_name} ${selectedShipper?.first_name}`}</Text>
                                 <View className="flex-row items-center space-x-1">
                                     <AntDesign name="star" size={15} color="#FFB534" />
                                     <Text className="text-xs text-gray-600">5.00</Text>
                                 </View>
                                 <View className="bg-gray-100 rounded-md px-1">
-                                    <Text className="text-xs text-gray-600 font-semibold">68C-12869 Truck</Text>
+                                    <Text className="text-xs text-gray-600 font-semibold">{`${selectedShipper?.more.vehicle_number} ${selectedShipper?.more.vehicle?.name}`}</Text>
                                 </View>
                             </View>
                         </View>
@@ -247,7 +260,7 @@ const OrderStatus = ({ navigation, route }) => {
                             </TouchableOpacity>
                             <TouchableOpacity
                                 className="w-full flex-row justify-center py-4"
-                                onPress={() => setShowDialogConfim(false)}
+                                onPress={() => setSelectedShipper(null)}
                             >
                                 <Text className="text-lg font-semibold text-[#3422F1]">Tiếp tục tìm kiếm shipper</Text>
                             </TouchableOpacity>
