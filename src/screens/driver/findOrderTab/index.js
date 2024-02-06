@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView, FlatList, RefreshControl } from 'react-native'
 import React, { useCallback, useEffect, useReducer, useState } from 'react'
 import { MaterialCommunityIcons, Entypo, Foundation, Octicons, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
-import { ROUTES } from '../../../constants';
+import { JOBSTATUS, ROUTES } from '../../../constants';
 import { formatMomentDateToVietnamese, getDiffBetweenTwoTime } from '../../../features/ultils';
 import { useNavigation } from '@react-navigation/native';
 import LottieView from 'lottie-react-native';
@@ -26,7 +26,7 @@ const FindOrderTab = ({ navigation }) => {
         filterIndex: 1,
         sortIndex: 1
     })
-    const [jobs, setJobs] = useState([])
+    const [jobs, setJobs] = useState(null)
     const handleClearFilter = () => {
         updateFilter({
             filterIndex: 1,
@@ -38,9 +38,15 @@ const FindOrderTab = ({ navigation }) => {
     }
     useEffect(() => {
         if (token) {
-            dispath(findJob(token.access_token))
+            const form = {
+                access_token: token.access_token,
+                status: JOBSTATUS.FINDING_SHIPPER
+            }
+            dispath(findJob(form))
                 .then(unwrapResult)
-                .then(res => setJobs(res))
+                .then(res => {
+                    setJobs(res)
+                })
                 .catch(e => console.log(e))
         }
     }, [])
@@ -59,7 +65,7 @@ const FindOrderTab = ({ navigation }) => {
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        dispath(findJob(token.access_token))
+        dispath(findJob(token.access_token,))
             .then(unwrapResult)
             .then(res => {
                 setJobs(res)
@@ -121,20 +127,14 @@ const FindOrderTab = ({ navigation }) => {
                 </View>
             </TouchableOpacity>}
             {/* ---------------Data space----------------- */}
-            {/* <ScrollView showsVerticalScrollIndicator={false}>
-                {DATA.map(ele => (
-                    <Order key={ele.id} data={ele} />
-                ))}
-                <View className="h-80 w-full"></View>
-            </ScrollView> */}
             <ScrollView
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
             >
-                {jobs.length > 0 ? (
-                    jobs.map(ele => (
+                {jobs?.results?.length > 0 ? (
+                    jobs.results.map(ele => (
                         <Order key={ele.id} data={ele} />
                     ))
                 ) : (

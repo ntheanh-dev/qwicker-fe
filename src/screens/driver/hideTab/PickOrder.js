@@ -8,18 +8,16 @@ import { formatCurrency } from '../../../features/ultils';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 
 const PickOrder = ({ route, navigation }) => {
-    const { itemId } = route.params;
+    const { jobId } = route.params;
     const [job, setJob] = useState({})
-    const { product, payment, shipment, vehicle, ...order } = job
-    const [countShipper, setCountShipper] = useState(0)
+    const { product, payment, shipment, vehicle, shipper_count, ...order } = job
     const token = useSelector(getToken)
     const dispatch = useDispatch()
     useEffect(() => {
         dispatch(viewJob({ token: token.access_token, jobId: itemId }))
             .then(unwrapResult)
             .then(res => {
-                setJob(res.job)
-                setCountShipper(res.joined_shipper)
+                setJob(res)
             })
             .catch(e => {
                 console.log(e)
@@ -126,7 +124,7 @@ const PickOrder = ({ route, navigation }) => {
                 {/* ---------Confirm Button Sheet-------- */}
                 <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
                     <Text className="text-xl font-semibold">Đừng bỏ lỡ!</Text>
-                    <Text className="text-base font-medium text-gray-400 ">{countShipper} Tài xế đang tham gia</Text>
+                    <Text className="text-base font-medium text-gray-400 ">{shipper_count} Tài xế đang tham gia</Text>
                     <TouchableOpacity
                         onPress={handleJoinJob}
                         className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"

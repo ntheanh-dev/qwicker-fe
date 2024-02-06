@@ -90,7 +90,7 @@ export const login = createAsyncThunk('user,loginUser',
 export const findJob = createAsyncThunk('job, findJob',
     async (access_token, { rejectWithValue }) => {
         try {
-            const res = await authAPI(access_token).get(ShipperJobEndpoints['find-job'](`status=${JOBSTATUS.FINDING_SHIPPER}`))
+            const res = await authAPI(access_token).get(ShipperJobEndpoints['find-job'])
             return res.data
         } catch (err) {
             console.log(err)
@@ -103,7 +103,7 @@ export const viewJob = createAsyncThunk('job, viewJob',
     async (data, { rejectWithValue }) => {
         const { token, jobId } = data
         try {
-            const res = await authAPI(token).get(ShipperJobEndpoints['job'](jobId))
+            const res = await authAPI(token).get(ShipperJobEndpoints['job-retrieve'](jobId))
             return res.data
         } catch (err) {
             console.log(err)

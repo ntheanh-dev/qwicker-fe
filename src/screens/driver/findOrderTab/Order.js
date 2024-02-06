@@ -31,7 +31,7 @@ const Order = ({ data }) => {
     const headerTime = orderTime.minute() < 10 ? `${orderTime.hour()}:0${orderTime.minute()}` : `${orderTime.hour()}:${orderTime.minute()}`
     return (
         <TouchableOpacity
-            onPress={() => navigation.navigate(ROUTES.PICK_ORDER_DRIVER_TAB, { itemId: data.id })}
+            onPress={() => navigation.navigate(ROUTES.PICK_ORDER_DRIVER_TAB, { jobId: data.id })}
             className="flex-col rounded-md overflow-hidden my-2 bg-white pb-3"
         >
             <View className={`flex-row justify-between items-center p-3 ${headerColor}`}>
