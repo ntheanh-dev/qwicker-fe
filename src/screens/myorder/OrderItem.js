@@ -9,7 +9,7 @@ const OrderItem = ({ shipment, vehicle, ...order }) => {
     const navigation = useNavigation()
     return (
         <TouchableOpacity
-            onPress={() => navigation.navigate(ROUTES.ORDER_STATUS_STACK, { order: { ...order, shipment: shipment, vehicle: vehicle } })}
+            onPress={() => navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: order.id })}
             // onPress={() => navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { title: 'Nhận lúc 99:99' })}
             className="flex-col pt-3 bg-white mt-4 rounded-lg space-y-3 overflow-hidden"
         >

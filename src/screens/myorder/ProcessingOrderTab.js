@@ -11,7 +11,7 @@ const ProcessingOrderTab = () => {
     const distpatch = useDispatch()
     const { access_token } = useSelector(getBasicUserToken)
     const [refreshing, setRefreshing] = useState(false);
-    const [order, setOrder] = useState([])
+    const [order, setOrder] = useState()
 
     useEffect(() => {
         const form = { access_token: access_token, params: `status=${JOBSTATUS.FINDING_SHIPPER}` }
@@ -42,8 +42,8 @@ const ProcessingOrderTab = () => {
             className="flex-1 bg-gray-100 px-2"
             showsVerticalScrollIndicator={false}
         >
-            {order.length > 0 ?
-                order.map(ele => <OrderItem key={ele.id} {...ele} />
+            {order ?
+                order.results.map(ele => <OrderItem key={ele.id} {...ele} />
                 ) : (
                     <OrderItemNotFound />
                 )}

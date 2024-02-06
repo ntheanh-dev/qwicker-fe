@@ -7,7 +7,7 @@ import Dialog from "react-native-dialog";
 import { formatCurrency } from '../../features/ultils';
 import { ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
-import { assignJob, getBasicUserToken, getJoinedShipper } from '../../redux/basicUserSlice';
+import { assignJob, getBasicUserToken, getJoinedShipper, myJob, retrieve } from '../../redux/basicUserSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 
@@ -21,8 +21,10 @@ const { height } = Dimensions.get('window')
 const OrderStatus = ({ navigation, route }) => {
     const distpatch = useDispatch()
     const { access_token } = useSelector(getBasicUserToken)
-    const { order } = route.params
+    const { orderId } = route.params
+    const [order, setOrder] = useState({})
     const { payment, product, shipment, vehicle, status, ...orderData } = order
+
     const [shipper, setShipper] = useState([])
     const [selectedShipper, setSelectedShipper] = useState(null)
     const getHeaderTitle = (status) => {
@@ -32,7 +34,7 @@ const OrderStatus = ({ navigation, route }) => {
             case 'WAITING_SHIPPER':
                 return 'Đang đợi shipper'
             default:
-                return 'Thông tin đơn hàng'
+                return
         }
     }
     // ---------------Marker Animation--------------
@@ -48,9 +50,40 @@ const OrderStatus = ({ navigation, route }) => {
         outputRange: [0, 1]  // <-- value that larger than your content's height
     });
 
-    useEffect(() => {
+    const handleBack = () => {
+        navigation.getParent().setOptions({
+            headerShown: true,
+        });
+        navigation.navigate(ROUTES.HOME_STACK)
+    }
 
-        if (!order) {
+    useEffect(() => {
+        if (orderId) {
+            const form = {
+                access_token: access_token,
+                orderId: orderId
+            }
+            distpatch(retrieve(form))
+                .then(unwrapResult)
+                .then(res => {
+                    setOrder(res)
+                    distpatch(getJoinedShipper(form))
+                        .then(unwrapResult)
+                        .then(res => {
+                            setShipper(res)
+                            const countShipper = res.length
+                            if (countShipper > 0) {
+                                Toast.show({
+                                    type: ALERT_TYPE.SUCCESS,
+                                    title: `Chúng tôi tìm thấy ${countShipper} shipper`,
+                                    textBody: "Giờ đây bạn có thể xem và quyết định ai là người vận chuyển đơn hàng của bạn"
+                                })
+                            }
+                        })
+                        .catch(e => setRefreshing(false))
+                })
+                .catch(e => console.log(e))
+        } else {
             navigation.goBack()
         }
 
@@ -74,16 +107,11 @@ const OrderStatus = ({ navigation, route }) => {
             headerShown: false,
         });
 
-        const handleBack = () => {
-            navigation.getParent().setOptions({
-                headerShown: true,
-            });
-            navigation.navigate(ROUTES.HOME_STACK)
-        }
+
 
         navigation.setOptions({
             headerTitleAlign: 'center',
-            headerTitle: getHeaderTitle(status),
+            headerTitle: "Thông tin đơn hàng",
             headerLeft: () =>
                 <TouchableOpacity onPress={handleBack}>
                     <AntDesign name="left" size={16} color="black" />
@@ -95,7 +123,7 @@ const OrderStatus = ({ navigation, route }) => {
     const [refreshing, setRefreshing] = React.useState(false);
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
-        distpatch(getJoinedShipper({ access_token: access_token, jobId: orderData.id }))
+        distpatch(getJoinedShipper({ access_token: access_token, orderId: orderId }))
             .then(unwrapResult)
             .then(res => {
                 setRefreshing(false)
@@ -119,7 +147,6 @@ const OrderStatus = ({ navigation, route }) => {
             .catch(e => setRefreshing(false))
     }, []);
     //--------------------------------------------------------
-    const [showDialogConfirm, setShowDialogConfim] = useState(false)
 
     const handleConfirmShipper = () => {
         const data = {
@@ -127,10 +154,9 @@ const OrderStatus = ({ navigation, route }) => {
             orderId: order.id,
             shipperId: selectedShipper.id
         }
-        console.log(data)
         distpatch(assignJob(data))
-            .then(res => {
-                console.log(res)
+            .then(status => {
+                // handleBack()
             })
             .catch(e => console.log(e))
         setSelectedShipper(null)
@@ -186,8 +212,8 @@ const OrderStatus = ({ navigation, route }) => {
                                 renderItem={({ item }) => {
                                     const { more, ...s } = item
                                     const { vehicle_number, vehicle } = more
-                                    const title = `${vehicle_number} ${vehicle.name}`
-                                    const fullName = `${s.last_name} ${s.first_name}`
+                                    const title = `${vehicle_number} ${vehicle?.name}`
+                                    const fullName = `${s?.last_name} ${s?.first_name}`
                                     return (
                                         <View
                                             key={item.id}
@@ -196,7 +222,7 @@ const OrderStatus = ({ navigation, route }) => {
                                             <View className="flex-row px-3 py-4">
                                                 <View className="basis-2/6 px-3">
                                                     <Image
-                                                        source={{ uri: s.avatar }}
+                                                        source={{ uri: s?.avatar }}
                                                         className="h-12 w-12 "
                                                     />
                                                 </View>
@@ -271,13 +297,13 @@ const OrderStatus = ({ navigation, route }) => {
                 {/* ------------ Order sumary---------- */}
                 <View className="flex-col bg-white rounded-lg mb-5">
                     <View className="border-b border-gray-300 py-2">
-                        <Text className="text-gray-600 pl-4 py-1">{vehicle.name}</Text>
+                        <Text className="text-gray-600 pl-4 py-1">{vehicle?.name}</Text>
                     </View>
                     {/* -----Time----- */}
                     <View className="flex-col px-4 pt-6">
                         <View className="flex-row">
                             <View className="basis-1/6"></View>
-                            <View><Text className="basis-5/6 text-gray-600">{shipment.shipment_date}</Text></View>
+                            <View><Text className="basis-5/6 text-gray-600">{shipment?.shipment_date}</Text></View>
                         </View>
                     </View>
                     {/* -----Places and Payment method----- */}
@@ -289,12 +315,12 @@ const OrderStatus = ({ navigation, route }) => {
                             </View>
                             <View className="flex-col basis-5/6 ">
                                 <View className="flex-row items-center ">
-                                    <Text className="text-lg font-semibold" >{shipment.pick_up.short_name}</Text>
-                                    {payment.is_poster_pay && (
-                                        <View className="ml-2 p-1 rounded-md bg-gray-300"><Text>{payment.method.name}</Text></View>
+                                    <Text className="text-lg font-semibold" >{shipment?.pick_up?.short_name}</Text>
+                                    {payment?.is_poster_pay && (
+                                        <View className="ml-2 p-1 rounded-md bg-gray-300"><Text>{payment?.method?.name}</Text></View>
                                     )}
                                 </View>
-                                <Text className="text-gray-600">{shipment.pick_up.long_name}</Text>
+                                <Text className="text-gray-600">{shipment?.pick_up.long_name}</Text>
                             </View>
                         </View>
                         {/* -----------Pick up------------- */}
@@ -304,12 +330,12 @@ const OrderStatus = ({ navigation, route }) => {
                             </View>
                             <View className="flex-col basis-5/6 ">
                                 <View className="flex-row items-center ">
-                                    <Text className="text-lg font-semibold" >{shipment.delivery_address.short_name}</Text>
-                                    {!payment.is_poster_pay && (
-                                        <View className="ml-2 p-1 rounded-md bg-gray-300"><Text>{payment.method.name}</Text></View>
+                                    <Text className="text-lg font-semibold" >{shipment?.delivery_address.short_name}</Text>
+                                    {!payment?.is_poster_pay && (
+                                        <View className="ml-2 p-1 rounded-md bg-gray-300"><Text>{payment?.method.name}</Text></View>
                                     )}
                                 </View>
-                                <Text className="text-gray-600">{shipment.delivery_address.long_name}</Text>
+                                <Text className="text-gray-600">{shipment?.delivery_address.long_name}</Text>
                             </View>
                         </View>
                     </View>
@@ -340,21 +366,21 @@ const OrderStatus = ({ navigation, route }) => {
                     </View>
                     <View className="px-4 border-b border-gray-300">
                         <View className="flex-col py-3">
-                            <Text className="text-base  font-semibold">{`${shipment.pick_up.contact} ${shipment.pick_up.phone_number}`}</Text>
+                            <Text className="text-base  font-semibold">{`${shipment?.pick_up.contact} ${shipment?.pick_up.phone_number}`}</Text>
                             <Text className="text-gray-600">Thông tin liên hệ</Text>
                         </View>
                     </View>
                     <View className="flex-col px-4 pt-3 pb-5">
-                        <Text className="text-base font-semibold">{product.category.name}</Text>
-                        <Text className="text-base  font-semibold">{product.quantity} gói hàng</Text>
+                        <Text className="text-base font-semibold">{product?.category.name}</Text>
+                        <Text className="text-base  font-semibold">{product?.quantity} gói hàng</Text>
                         <Text className="text-gray-600">Chi tiết đơn hàng</Text>
                     </View>
                 </View>
                 {/* -----------------Fee---------------- */}
                 <View className="flex-row justify-between items-center bg-white rounded-lg px-4 py-5 mb-14 ">
-                    <Text className="text-base font-semibold text-gray-600">{payment.method.name}</Text>
+                    <Text className="text-base font-semibold text-gray-600">{payment?.method.name}</Text>
                     <View className="flex-row space-x-2 items-center">
-                        <Text className="text-lg font-bold">{formatCurrency(shipment.cost)}</Text>
+                        <Text className="text-lg font-bold">{formatCurrency(shipment?.cost)}</Text>
                         <AntDesign name="exclamationcircleo" size={20} color="black" />
                     </View>
                 </View>

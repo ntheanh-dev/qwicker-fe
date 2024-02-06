@@ -116,11 +116,24 @@ export const myJob = createAsyncThunk('job,myJob',
     }
 )
 
+export const retrieve = createAsyncThunk('job,Retrieve',
+    async (data, { rejectWithValue }) => {
+        const { access_token, orderId } = data
+        try {
+            const res = await authAPI(access_token).get(basicUserEndpoints['job-retrieve'](orderId))
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
 export const getJoinedShipper = createAsyncThunk('job,getShipper',
     async (data, { rejectWithValue }) => {
-        const { access_token, jobId } = data
+        const { access_token, orderId } = data
         try {
-            const res = await authAPI(access_token).get(jobEndpoints['listShipper'](jobId))
+            const res = await authAPI(access_token).get(jobEndpoints['listShipper'](orderId))
             return res.data
         } catch (err) {
             return rejectWithValue(err?.response.data)
@@ -132,7 +145,6 @@ export const getJoinedShipper = createAsyncThunk('job,getShipper',
 export const assignJob = createAsyncThunk('job,assignJob',
     async (data, { rejectWithValue }) => {
         const { access_token, orderId, shipperId } = data
-        console.log(data)
         const formData = new FormData()
         formData.append('shipper', shipperId)
         try {
@@ -141,9 +153,8 @@ export const assignJob = createAsyncThunk('job,assignJob',
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            return res
+            return res.status
         } catch (err) {
-            console.log(err)
             return rejectWithValue(err?.response.data)
         }
 

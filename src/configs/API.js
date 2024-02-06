@@ -11,7 +11,8 @@ export const basicUserEndpoints = {
     'basic-user-register': '/users/',
     'login': '/o/token/',
     'current-user': 'users/current-user/',
-    'my-jobs': (pagrams) => `/jobs/my-jobs/?${pagrams}`,
+    'my-jobs': (pagrams) => `/jobs/?${pagrams}`,
+    'job-retrieve': (jobId) => `/jobs/${jobId}/`,
     'assign-job': (jobId) => `/jobs/${jobId}/assign/`
 }
 export const shipperEndpoints = {

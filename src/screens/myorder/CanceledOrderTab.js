@@ -11,14 +11,13 @@ const CanceledOrderTab = () => {
     const distpatch = useDispatch()
     const { access_token } = useSelector(getBasicUserToken)
     const [refreshing, setRefreshing] = useState(false);
-    const [order, setOrder] = useState([])
+    const [order, setOrder] = useState()
 
     useEffect(() => {
         const form = { access_token: access_token, params: `status=${JOBSTATUS.CANCELED}` }
         distpatch(myJob(form))
             .then(unwrapResult)
             .then(res => {
-                console.log(res)
                 setOrder(res)
             })
             .catch(e => console.log(e))
@@ -30,13 +29,11 @@ const CanceledOrderTab = () => {
         distpatch(myJob(form))
             .then(unwrapResult)
             .then(res => {
-                console.log(res)
                 setOrder(res)
                 setRefreshing(false)
             })
             .catch(e => {
                 setRefreshing(false)
-                console.log(e)
             })
     }, []);
     return (
@@ -45,11 +42,11 @@ const CanceledOrderTab = () => {
             className="flex-1 bg-gray-100 px-2"
             showsVerticalScrollIndicator={false}
         >
-            {order.length > 0 ? (
-                <View></View>
-            ) : (
-                <OrderItemNotFound />
-            )}
+            {order ?
+                order.results.map(ele => <OrderItem key={ele.id} {...ele} />
+                ) : (
+                    <OrderItemNotFound />
+                )}
             <View className="h-80 w-full"></View>
         </ScrollView>
     )
