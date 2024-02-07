@@ -17,7 +17,7 @@ const DATA = [{ id: 1, pickUp: 'Thanh Xuan', deliveryAddress: 'Ha Noi', comment:
 { id: 3, pickUp: 'Thanh Xuan', deliveryAddress: 'Ha Noi', price: 123000, time: "2024-01-17 20:00:00" },]
 const FindOrderTab = ({ navigation }) => {
     const dispath = useDispatch()
-    const token = useSelector(getToken)
+    const { access_token } = useSelector(getToken)
 
     const [filter, updateFilter] = useReducer((prev, next) => ({
         ...prev, ...next
@@ -37,12 +37,8 @@ const FindOrderTab = ({ navigation }) => {
         updateFilter({ showFilter: false })
     }
     useEffect(() => {
-        if (token) {
-            const form = {
-                access_token: token.access_token,
-                status: JOBSTATUS.FINDING_SHIPPER
-            }
-            dispath(findJob(form))
+        if (access_token) {
+            dispath(findJob(access_token))
                 .then(unwrapResult)
                 .then(res => {
                     setJobs(res)
@@ -65,7 +61,7 @@ const FindOrderTab = ({ navigation }) => {
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        dispath(findJob(token.access_token,))
+        dispath(findJob(access_token,))
             .then(unwrapResult)
             .then(res => {
                 setJobs(res)

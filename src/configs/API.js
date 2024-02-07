@@ -22,13 +22,15 @@ export const shipperEndpoints = {
 }
 export const jobEndpoints = {
     'jobs': '/jobs/',
-    'listShipper': (jobId) => `jobs/${jobId}/list-shipper/`
+    'listShipper': (jobId) => `/jobs/${jobId}/list-shipper/`
+
 }
 
 export const ShipperJobEndpoints = {
     'find-job': `/shipper-jobs/find/`,
     'job-retrieve': (jobId) => `/shipper-jobs/${jobId}/`,
-    'join-job': (jobId) => `/shipper-jobs/${jobId}/join/`
+    'join-job': (jobId) => `/shipper-jobs/${jobId}/join/`,
+    'my-jobs': (pagrams) => `/shipper-jobs/my-jobs/?${pagrams}`,
 }
 
 export const authAPI = (access_token) => axios.create({

@@ -5,7 +5,7 @@ import { MaterialIcons, Ionicons, Entypo, Foundation, AntDesign, } from '@expo/v
 import { Easing, } from 'react-native-reanimated';
 import Dialog from "react-native-dialog";
 import { formatCurrency } from '../../features/ultils';
-import { ROUTES } from '../../constants';
+import { JOBSTATUS, ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { assignJob, getBasicUserToken, getJoinedShipper, myJob, retrieve } from '../../redux/basicUserSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -122,29 +122,31 @@ const OrderStatus = ({ navigation, route }) => {
     // ---------------------Refesh shipper data--------------
     const [refreshing, setRefreshing] = React.useState(false);
     const onRefresh = React.useCallback(() => {
-        setRefreshing(true);
-        distpatch(getJoinedShipper({ access_token: access_token, orderId: orderId }))
-            .then(unwrapResult)
-            .then(res => {
-                setRefreshing(false)
-                setShipper(res)
-                const countShipper = res.length
-                if (countShipper === 0) {
-                    Toast.show({
-                        type: ALERT_TYPE.WARNING,
-                        title: `Đang tìm shipper ở ngần bạn`,
-                        textBody: "Sẽ mất một khoảng thời gian ngắn để shipper xác nhận đơn hàng của bạn"
-                    })
-                } else {
-                    Toast.show({
-                        type: ALERT_TYPE.SUCCESS,
-                        title: `Chúng tôi tìm thấy ${countShipper} shipper`,
-                        textBody: "Giờ đây bạn có thể xem và quyết định ai là người vận chuyển đơn hàng của bạn"
-                    })
+        if (orderData.status === JOBSTATUS.FINDING_SHIPPER) {
+            setRefreshing(true);
+            distpatch(getJoinedShipper({ access_token: access_token, orderId: orderId }))
+                .then(unwrapResult)
+                .then(res => {
+                    setRefreshing(false)
+                    setShipper(res)
+                    const countShipper = res.length
+                    if (countShipper === 0) {
+                        Toast.show({
+                            type: ALERT_TYPE.WARNING,
+                            title: `Đang tìm shipper ở ngần bạn`,
+                            textBody: "Sẽ mất một khoảng thời gian ngắn để shipper xác nhận đơn hàng của bạn"
+                        })
+                    } else {
+                        Toast.show({
+                            type: ALERT_TYPE.SUCCESS,
+                            title: `Chúng tôi tìm thấy ${countShipper} shipper`,
+                            textBody: "Giờ đây bạn có thể xem và quyết định ai là người vận chuyển đơn hàng của bạn"
+                        })
 
-                }
-            })
-            .catch(e => setRefreshing(false))
+                    }
+                })
+                .catch(e => setRefreshing(false))
+        }
     }, []);
     //--------------------------------------------------------
 
@@ -160,10 +162,6 @@ const OrderStatus = ({ navigation, route }) => {
             })
             .catch(e => console.log(e))
         setSelectedShipper(null)
-    }
-    const handleChooseShipper = (id) => {
-        /// Update dialgon ui with specific data
-
     }
 
     return (
@@ -195,62 +193,70 @@ const OrderStatus = ({ navigation, route }) => {
                 {/* ------------Finding------------ */}
                 <View className="flex-col items-center bg-white rounded-lg pt-4 pb-12 mb-5">
                     <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
-                    {shipper.length === 0 ?
-                        <>
-                            <Text className="text-lg font-semibold py-1">Đang tìm tất cả shipper gần bạn</Text>
-                            <Text className="text-gray-500">Vui lòng đợi trong ít phút</Text>
-                        </>
-                        :
-                        <>
-                            <Text className="text-lg font-semibold pt-1 pb-4">Chúng tôi tìm thấy {shipper.length} shipper</Text>
+                    {orderData.status === JOBSTATUS.FINDING_SHIPPER ?
+                        shipper.length === 0 ?
+                            <>
+                                <Text className="text-lg font-semibold py-1">Đang tìm tất cả shipper gần bạn</Text>
+                                <Text className="text-gray-500">Vui lòng đợi trong ít phút</Text>
+                            </>
+                            :
+                            <>
+                                <Text className="text-lg font-semibold pt-1 pb-4">Chúng tôi tìm thấy {shipper.length} shipper</Text>
 
-                            {/* --------List Shipper------------ */}
-                            <FlatList
-                                data={shipper}
-                                horizontal={true}
-                                showsHorizontalScrollIndicator={false}
-                                renderItem={({ item }) => {
-                                    const { more, ...s } = item
-                                    const { vehicle_number, vehicle } = more
-                                    const title = `${vehicle_number} ${vehicle?.name}`
-                                    const fullName = `${s?.last_name} ${s?.first_name}`
-                                    return (
-                                        <View
-                                            key={item.id}
-                                            className="flex-col border border-gray-300 mx-3 rounded-lg"
-                                        >
-                                            <View className="flex-row px-3 py-4">
-                                                <View className="basis-2/6 px-3">
-                                                    <Image
-                                                        source={{ uri: s?.avatar }}
-                                                        className="h-12 w-12 "
-                                                    />
-                                                </View>
-                                                <View className="basis-4/6 flex-col space-y-1">
-                                                    <Text>{fullName}</Text>
-                                                    <View className="flex-row items-center space-x-1">
-                                                        <AntDesign name="star" size={15} color="#FFB534" />
-                                                        <Text className="text-xs text-gray-600">5.00</Text>
-                                                    </View>
-                                                    <View className="bg-gray-100 rounded-md px-1">
-                                                        <Text className="text-xs text-gray-600 font-semibold">{title}</Text>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                            <TouchableOpacity
-                                                activeOpacity={1}
-                                                onPress={() => setSelectedShipper(item)}
-                                                className="flex-row justify-center items-center py-2 space-x-1 border-t border-gray-300"
+                                {/* --------List Shipper------------ */}
+                                <FlatList
+                                    data={shipper}
+                                    horizontal={true}
+                                    showsHorizontalScrollIndicator={false}
+                                    renderItem={({ item }) => {
+                                        const { more, ...s } = item
+                                        const { vehicle_number, vehicle } = more
+                                        const title = `${vehicle_number} ${vehicle?.name}`
+                                        const fullName = `${s?.last_name} ${s?.first_name}`
+                                        return (
+                                            <View
+                                                key={item.id}
+                                                className="flex-col border border-gray-300 mx-3 rounded-lg"
                                             >
-                                                <AntDesign name="totop" size={18} color="black" />
-                                                <Text className="font-medium">Chọn</Text>
-                                            </TouchableOpacity>
-                                        </View>
-                                    )
-                                }}
-                            />
-                        </>
+                                                <View className="flex-row px-3 py-4">
+                                                    <View className="basis-2/6 px-3">
+                                                        <Image
+                                                            source={{ uri: s?.avatar }}
+                                                            className="h-12 w-12 "
+                                                        />
+                                                    </View>
+                                                    <View className="basis-4/6 flex-col space-y-1">
+                                                        <Text>{fullName}</Text>
+                                                        <View className="flex-row items-center space-x-1">
+                                                            <AntDesign name="star" size={15} color="#FFB534" />
+                                                            <Text className="text-xs text-gray-600">5.00</Text>
+                                                        </View>
+                                                        <View className="bg-gray-100 rounded-md px-1">
+                                                            <Text className="text-xs text-gray-600 font-semibold">{title}</Text>
+                                                        </View>
+                                                    </View>
+                                                </View>
+                                                <TouchableOpacity
+                                                    activeOpacity={1}
+                                                    onPress={() => setSelectedShipper(item)}
+                                                    className="flex-row justify-center items-center py-2 space-x-1 border-t border-gray-300"
+                                                >
+                                                    <AntDesign name="totop" size={18} color="black" />
+                                                    <Text className="font-medium">Chọn</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        )
+                                    }}
+                                />
+                            </>
+                        : (
+                            <>
+                                <Text className="text-lg font-semibold py-1">Shipper đang trên đường đến chỗ bạn</Text>
+                                <Text className="text-gray-500">Vui lòng đợi trong ít phút</Text>
+                            </>
+                        )
                     }
+
 
                     {/* -------Dialog confirm choosing shipper */}
                     <Dialog.Container visible={selectedShipper !== null} className="rounded-3xl relative">

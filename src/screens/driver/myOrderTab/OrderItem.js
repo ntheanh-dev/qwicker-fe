@@ -1,29 +1,35 @@
 import { View, Text, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { Entypo, Foundation, Octicons, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
-import { formatMomentDateToVietnamese2 } from '../../../features/ultils';
+import { formatCurrency, formatMomentDateToVietnamese2 } from '../../../features/ultils';
 import { useNavigation } from '@react-navigation/native';
-import { ROUTES } from '../../../constants';
+import { JOBSTATUS, ROUTES } from '../../../constants';
 
-const OrderItem = ({ data, title, index }) => {
+const OrderItem = ({ shipment, vehicle, product, payment, title, ...order }) => {
     const navigation = useNavigation()
-
+    const handleNavigate = () => {
+        navigation.navigate(ROUTES.REVIEW_ORDER_DRIVER_TAB,
+            { shipment: shipment, vehicle: vehicle, product: product, payment: payment, order, order, title: title }
+        )
+    }
     return (
         <TouchableOpacity
-            onPress={() => navigation.navigate(ROUTES.REVIEW_ORDER_DRIVER_TAB, { title: 'Nhận lúc 99:99', data: data, index: index })}
+            onPress={handleNavigate}
             className="flex-col bg-white rounded-xl overflow-hidden my-3"
         >
-            <View className={`flex-row justify-between items-center p-3 ${index === 1 ? 'bg-orange-500' : 'border-gray-300 border-b'} `}>
-                <Text className={`text-lg font-semibold ${index === 1 && 'text-white'}`}>{title}</Text>
-                {title !== 'Đang xử lý' && <View className="flex-row items-center space-x-1">
-                    <Text className="text-lg font-medium text-gray-500">{formatMomentDateToVietnamese2(data.time)}</Text>
-                </View>}
+            <View className={`flex-row justify-between items-center p-3 ${Number(order.status) === JOBSTATUS.WAITING_SHIPPER ? 'bg-orange-500' : 'border-gray-300 border-b'} `}>
+                <Text className={`text-lg font-semibold ${Number(order.status) === JOBSTATUS.WAITING_SHIPPER && 'text-white'}`}>{title}</Text>
+                {Number(order.status) !== JOBSTATUS.WAITING_SHIPPER && (
+                    <View className="flex-row items-center space-x-1">
+                        <Text className="text-lg font-medium text-gray-500">{formatMomentDateToVietnamese2(shipment.shipment_date)}</Text>
+                    </View>
+                )}
             </View>
 
-            {title !== 'Đang xử lý' &&
+            {Number(order.status) !== JOBSTATUS.WAITING_SHIPPER &&
                 <View className="flex-row items-center justify-between pt-6 pb-2 px-4">
-                    <Text className="text-gray-600 text-sm">{`${data.distance} kilomet`}</Text>
-                    <Text className="text-gray-600 text-sm">{`#${data.uuid}`}</Text>
+                    <Text className="text-gray-600 text-sm">{`3.65 kilomet`}</Text>
+                    <Text className="text-gray-600 text-sm">{`#${order.uuid}`}</Text>
                 </View>
             }
 
@@ -34,23 +40,23 @@ const OrderItem = ({ data, title, index }) => {
                 </View>
                 <View className="basis-5/6 ml-[-12] ">
                     <View>
-                        <Text className="font-medium text-lg">{data.pickUp.title}</Text>
+                        <Text className="font-medium text-lg">{shipment.pick_up.short_name}</Text>
                     </View>
                     <View className="py-2 flex-row justify-between items-center ">
-                        <Text className="font-medium text-lg">{data.deliveryAddress.title}</Text>
+                        <Text className="font-medium text-lg">{shipment.delivery_address.short_name}</Text>
                     </View>
                 </View>
             </View>
 
-            {data.comment &&
+            {order.description &&
                 <View className="flex-row items-center space-x-4 px-4 mt-2">
                     <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
-                    <Text className="text-base text-gray-600">{data.comment}</Text>
+                    <Text className="text-base text-gray-600">{order.description}</Text>
                 </View>
             }
             <View className="flex-row justify-between items-center p-4">
                 <Ionicons name="cash-outline" size={24} color="#3422F1" />
-                <Text className="text-xl font-semibold">{`đ${data.price.toLocaleString('en-US')}`}</Text>
+                <Text className="text-xl font-semibold">{formatCurrency(shipment.cost)}</Text>
             </View>
         </TouchableOpacity>
 

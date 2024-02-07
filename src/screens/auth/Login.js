@@ -34,7 +34,6 @@ const Login = ({ navigation }) => {
             dispatch(loginAction)
                 .then(unwrapResult)
                 .then(res => {
-                    console.log(res)
                     setLoading(false)
                     navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.HOME : ROUTES.DRIVER_NAVIGATION)
                 })

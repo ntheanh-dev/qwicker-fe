@@ -2,17 +2,17 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 
 import { Feather, MaterialCommunityIcons, Ionicons, Octicons, Foundation, Entypo, FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { formatMomentDateToVietnamese2 } from '../../../features/ultils';
+import { formatCurrency, formatMomentDateToVietnamese2 } from '../../../features/ultils';
+import { JOBSTATUS } from '../../../constants';
 const ReviewOrder = ({ navigation, route }) => {
-    const { data, index } = route.params
-    const [star, setStar] = useState(5)
+    const { shipment, product, vehicle, order, payment } = route.params
     return (
         <View className="p-2 flex-1 flex-col relative">
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* ----------------Contact with comsumer------------ */}
-                {index === 1 && (
+                {Number(order.status) === JOBSTATUS.WAITING_SHIPPER && (
                     <View className="p-4 bg-white flex-row items-center mb-4">
-                        <Text numberOfLines={1} className="font-semibold text-xl basis-4/6">Liên hệ khách hàng: Nguyễn Thế Anh</Text>
+                        <Text numberOfLines={1} className="font-semibold text-xl basis-4/6">Liên hệ khách hàng: {shipment.pick_up.contact}</Text>
                         <View className="basis-1/6 flex justify-center items-center">
                             <MaterialCommunityIcons name="android-messages" size={24} color="#3422F1" />
                         </View>
@@ -25,17 +25,17 @@ const ReviewOrder = ({ navigation, route }) => {
                 <View className="flex-row bg-white p-4 space-x-4 items-center mb-4">
                     <Ionicons name="cash-outline" size={24} color="#3422F1" />
                     <View className="flex-col">
-                        <Text className="text-xl font-semibold">{`đ${data.price.toLocaleString('en-US')}`}</Text>
-                        <Text className="text-base font-medium text-gray-400 ">Thu tiền mặt</Text>
+                        <Text className="text-xl font-semibold">{formatCurrency(shipment.cost)}</Text>
+                        <Text className="text-base font-medium text-gray-400 ">{payment.method.name}</Text>
                     </View>
                 </View>
                 {/* -----------Location, date time, uuid----------- */}
                 <View className="flex-col bg-white p-4 mb-4 ">
                     <View className="flex-row items-center justify-between">
-                        <Text className="text-base text-gray-500">{formatMomentDateToVietnamese2(data.time)}</Text>
-                        <Text className="text-gray-600 text-base">{`#${data.uuid}`}</Text>
+                        <Text className="text-base text-gray-500">{formatMomentDateToVietnamese2(shipment.shipment_date)}</Text>
+                        <Text className="text-gray-600 text-base">{`#${order.uuid}`}</Text>
                     </View>
-                    {index === 1 && <TouchableOpacity className="bg-blue-100 rounded-md flex-row space-x-2 py-3 px-6 my-4 items-center">
+                    {Number(order.status) === JOBSTATUS.WAITING_SHIPPER && <TouchableOpacity className="bg-blue-100 rounded-md flex-row space-x-2 py-3 px-6 my-4 items-center">
                         <Foundation name="clipboard-pencil" size={24} color="black" />
                         <Text>Cần xác nhận giao hàng thành công tại điểm trả hàng.</Text>
                     </TouchableOpacity>}
@@ -47,9 +47,9 @@ const ReviewOrder = ({ navigation, route }) => {
                         </View>
 
                         <View className="basis-5/6 flex-col">
-                            <Text className="text-xl font-semibold">{data.pickUp.title}</Text>
-                            <Text className="text-lg text-gray-600">{data.pickUp.location}</Text>
-                            <Text className="text-lg text-gray-600">{`A Phat: 0373054756`}</Text>
+                            <Text className="text-xl font-semibold">{shipment.pick_up.short_name}</Text>
+                            <Text className="text-lg text-gray-600">{shipment.pick_up.long_name}</Text>
+                            <Text className="text-lg text-gray-600">{`${shipment.pick_up.contact}: ${shipment.pick_up.phone_number}`}</Text>
                         </View>
                         <View className="basis-1/6 flex justify-center items-start">
                             <FontAwesome name="location-arrow" size={30} color="#3422F1" />
@@ -61,9 +61,9 @@ const ReviewOrder = ({ navigation, route }) => {
                         </View>
 
                         <View className="basis-5/6 flex-col mt-2">
-                            <Text className="text-xl font-semibold">{data.deliveryAddress.title}</Text>
-                            <Text className="text-lg text-gray-600">{data.deliveryAddress.location}</Text>
-                            <Text className="text-lg text-gray-600">{`A Phat: 0373054756`}</Text>
+                            <Text className="text-xl font-semibold">{shipment.delivery_address.short_name}</Text>
+                            <Text className="text-lg text-gray-600">{shipment.delivery_address.long_name}</Text>
+                            <Text className="text-lg text-gray-600">{`${shipment.delivery_address.contact}: ${shipment.delivery_address.phone_number}`}</Text>
                         </View>
                         <View className="basis-1/6 flex justify-center items-start">
                             <FontAwesome name="location-arrow" size={30} color="#3422F1" />
@@ -72,11 +72,11 @@ const ReviewOrder = ({ navigation, route }) => {
                 </View>
                 {/* -------------Vehicle, comment----------- */}
                 <View className="flex-col bg-white p-4 mb-4 ">
-                    <Text className="font-semibold text-xl">{data.vehicle.title}</Text>
-                    {data.comment &&
+                    <Text className="font-semibold text-xl">{vehicle.name}</Text>
+                    {order.description &&
                         <View className="flex-row items-center space-x-4 px-4 mt-2">
                             <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
-                            <Text className="text-base text-gray-600">{data.comment}</Text>
+                            <Text className="text-base text-gray-600">{order.description}</Text>
                         </View>
                     }
                 </View>
@@ -84,17 +84,16 @@ const ReviewOrder = ({ navigation, route }) => {
                 <View className="flex-row bg-white p-4 mb-2 space-x-2 items-center">
                     <MaterialCommunityIcons name="format-list-bulleted-type" size={24} color="black" />
                     <View className="flex-col">
-                        <Text className="text-xl font-semibold">{data.product.name}</Text>
+                        <Text className="text-xl font-semibold">{product.category.name}</Text>
                     </View>
                 </View>
                 <View className="h-80"></View>
             </ScrollView>
             {/* -----------Confirm bottom btn---------- */}
-            {index === 1 && (
+            {Number(order.status) === JOBSTATUS.WAITING_SHIPPER && (
                 <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
                     <Text className="text-base font-medium text-gray-400 text-center ">Xác nhận với khách hàng về các loại phí phát sinh</Text>
                     <TouchableOpacity
-                        underlayColor={'rbga(0,0,0,0)'}
                         className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
                     >
                         <Text className="text-lg font-medium text-white" >Liên hệ với khách hàng</Text>
