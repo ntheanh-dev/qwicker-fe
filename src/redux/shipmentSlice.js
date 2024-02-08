@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 import { SHIPMENTYPE } from "../constants";
-import { getCurrentDate } from "../features/ultils";
+import { getCurrentDate, getCurrentDateTime } from "../features/ultils";
+import { fakeAddress } from "../data";
 
 export const INITIAL_ADDRESS = {
     contact: '',
@@ -90,16 +91,24 @@ export const getShipment = state => state.shipment
 export const getShipMentForm = createSelector(
     state => state.shipment,
     (s) => {
-        const { shipment_date, ...rest } = s
+        let { shipment_date, pick_up, delivery_address, ...rest } = s
+        pick_up = Object.fromEntries(
+            Object.entries(pick_up).filter(([key, value]) => key !== 'short_name' && key !== 'long_name')
+        );
+        delivery_address = Object.fromEntries(
+            Object.entries(delivery_address).filter(([key, value]) => key !== 'short_name' && key !== 'long_name')
+        );
         let shipmentDateTime = ''
         if (s.type === SHIPMENTYPE.NOW) {
-            shipmentDateTime = null
+            shipmentDateTime = getCurrentDateTime()
         } else {
-            shipmentDateTime = `${shipment_date.date}:${shipment_date.time}`
+            shipmentDateTime = `${shipment_date.date.replaceAll('/', '-')} ${shipment_date.time}`
         }
         return {
+            pick_up: pick_up,
+            delivery_address: delivery_address,
+            shipment_date: shipmentDateTime,
             ...rest,
-            shipment_date: shipmentDateTime
         }
     }
 )

@@ -87,7 +87,7 @@ const OrderDetail = ({ navigation }) => {
         if (isFullField()) {
             const { selectedCategory, checkedMass, quantity, image } = productDetail
             dispatch(setProduct({
-                category: selectedCategory,
+                category_id: selectedCategory,
                 quantity: quantity,
                 mass: checkedMass,
                 image: image,

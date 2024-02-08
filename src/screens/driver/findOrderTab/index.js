@@ -41,6 +41,7 @@ const FindOrderTab = ({ navigation }) => {
             dispath(findJob(access_token))
                 .then(unwrapResult)
                 .then(res => {
+                    console.log(res)
                     setJobs(res)
                 })
                 .catch(e => console.log(e))
@@ -64,6 +65,7 @@ const FindOrderTab = ({ navigation }) => {
         dispath(findJob(access_token,))
             .then(unwrapResult)
             .then(res => {
+                console.log(res)
                 setJobs(res)
                 setRefreshing(false)
             })

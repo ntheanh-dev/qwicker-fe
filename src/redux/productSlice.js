@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 
 const INIT_PRODUCT = {
-    category: null,
+    category_id: null,
     quantity: 1,
     mass: null,
     image: null,
@@ -34,8 +34,8 @@ export const getProduct = state => state.productSlice.product
 export const isProductFulFill = createSelector(
     getProduct,
     (product) => {
-        const { category, mass, quantity, image } = product
-        return category && mass && quantity && image
+        const { category_id, mass, quantity, image } = product
+        return category_id && mass && quantity && image
     }
 )
 export const { removeProductData, setProduct } = productSlice.actions

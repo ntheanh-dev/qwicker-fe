@@ -64,15 +64,15 @@ const AddMoreOrderDetail = ({ navigation }) => {
         switch (selectedPaymentMethod) {
             case 0:
                 const a = paymentMethod.find(ele => ele?.name === "Momo")
-                data.method = a.id
+                data.method_id = a.id
                 break
             case 1.1:
                 let b = paymentMethod.find(ele => ele?.name === "Tiền mặt")
-                data.method = b.id
+                data.method_id = b.id
                 break
             case 1.2:
                 let c = paymentMethod.find(ele => ele?.name === "Tiền mặt")
-                data.method = c.id
+                data.method_id = c.id
                 data.is_poster_pay = false
                 break
         }

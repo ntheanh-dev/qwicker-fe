@@ -14,7 +14,7 @@ const PickOrder = ({ route, navigation }) => {
     const token = useSelector(getToken)
     const dispatch = useDispatch()
     useEffect(() => {
-        dispatch(viewJob({ token: token.access_token, jobId: itemId }))
+        dispatch(viewJob({ token: token.access_token, jobId: jobId }))
             .then(unwrapResult)
             .then(res => {
                 setJob(res)
@@ -23,9 +23,9 @@ const PickOrder = ({ route, navigation }) => {
                 console.log(e)
                 navigation.goBack()
             })
-    }, [itemId])
+    }, [jobId])
     const handleJoinJob = () => {
-        dispatch(joinJob({ token: token.access_token, jobId: itemId }))
+        dispatch(joinJob({ token: token.access_token, jobId: jobId }))
             .then(unwrapResult)
             .then(res => {
                 Toast.show({

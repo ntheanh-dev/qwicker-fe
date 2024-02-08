@@ -47,7 +47,10 @@ const ProcessingOrderTab = ({ title }) => {
                 {order?.results?.length > 0 ? (
                     order.results.map(ele => <OrderItem key={ele.id} {...ele} title={title} />)
                 ) : (
-                    <OrderItemNotFound />
+                    <>
+                        <View className="h-40 w-full"></View>
+                        <OrderItemNotFound className="pt-40" />
+                    </>
                 )}
                 <View className="h-80 w-full"></View>
             </ScrollView>

@@ -6,9 +6,8 @@ import basicUserSlice from "./basicUserSlice";
 import shipperSlice from "./shipperSlice";
 import productSlice, { getProduct } from "./productSlice";
 import paymentSlice, { getPayment } from "./paymentSlice";
-import shipmentSlice, { getDeliveryAddress, getPickUP, getShipment } from "./shipmentSlice";
-import { SHIPMENTYPE } from "../constants";
-import { appendToFormData, getCurrentDateTime, objectToFormData } from "../features/ultils";
+import shipmentSlice, { getDeliveryAddress, getPickUP, getShipMentForm } from "./shipmentSlice";
+import { objectToFormData } from "../features/ultils";
 export default configureStore({
     reducer: {
         order: orderSlice,
@@ -35,26 +34,13 @@ export const isLocationAndShipmentFulfill = createSelector(
 )
 
 export const orderForm = createSelector(
-    getShipment, getProduct, getPayment, getOrder,
-    (shipm, prod, pay, ord) => {
-        /// Shipment
-        const { shipment_date, ...s } = shipm
-        let shipmentDateTime = ''
-        if (s.type === SHIPMENTYPE.NOW) {
-            shipmentDateTime = getCurrentDateTime()
-        } else {
-
-            shipmentDateTime = `${shipment_date.date.replaceAll('/', '-')} ${shipment_date.time}`
-        }
-        const shipment = {
-            ...s,
-            shipment_date: shipmentDateTime
-        }
+    getShipMentForm, getProduct, getPayment, getOrder,
+    (shipment, prod, pay, ord) => {
         /// Order
         const vehicle = ord.vehicle?.id
         const order = {
             ...ord,
-            vehicle: vehicle
+            vehicle_id: vehicle
         }
         const formData = objectToFormData({
             shipment: shipment,
