@@ -153,7 +153,7 @@ export const assignJob = createAsyncThunk('job,assignJob',
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            return res.status
+            return res.data
         } catch (err) {
             return rejectWithValue(err?.response.data)
         }

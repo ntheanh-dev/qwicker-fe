@@ -31,6 +31,7 @@ export const ShipperJobEndpoints = {
     'job-retrieve': (jobId) => `/shipper-jobs/${jobId}/`,
     'join-job': (jobId) => `/shipper-jobs/${jobId}/join/`,
     'my-jobs': (pagrams) => `/shipper-jobs/my-jobs/?${pagrams}`,
+    'complete': (jobId) => `/shipper-jobs/${jobId}/complete/`,
 }
 
 export const authAPI = (access_token) => axios.create({

@@ -3,9 +3,21 @@ import React, { useState } from 'react'
 
 import { Feather, MaterialCommunityIcons, Ionicons, Octicons, Foundation, Entypo, FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { formatCurrency, formatMomentDateToVietnamese2 } from '../../../features/ultils';
-import { JOBSTATUS } from '../../../constants';
+import { JOBSTATUS, ROUTES } from '../../../constants';
+import { useDispatch, useSelector } from 'react-redux';
+import { compeleteJob, getToken } from '../../../redux/shipperSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 const ReviewOrder = ({ navigation, route }) => {
     const { shipment, product, vehicle, order, payment } = route.params
+    const dispatch = useDispatch()
+    const { access_token } = useSelector(getToken)
+    const handleCompelte = () => {
+        dispatch(compeleteJob({ access_token: access_token, jobId: order.id }))
+            .then(unwrapResult)
+            .then(res => navigation.navigate(ROUTES.FIND_ORDER_DRIVER_TAB))
+            .catch(e => console.log(e))
+    }
+
     return (
         <View className="p-2 flex-1 flex-col relative">
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -94,6 +106,7 @@ const ReviewOrder = ({ navigation, route }) => {
                 <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
                     <Text className="text-base font-medium text-gray-400 text-center ">Xác nhận với khách hàng về các loại phí phát sinh</Text>
                     <TouchableOpacity
+                        onPress={handleCompelte}
                         className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
                     >
                         <Text className="text-lg font-medium text-white" >Liên hệ với khách hàng</Text>

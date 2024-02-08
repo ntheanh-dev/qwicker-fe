@@ -24,7 +24,6 @@ const OrderStatus = ({ navigation, route }) => {
     const { orderId } = route.params
     const [order, setOrder] = useState({})
     const { payment, product, shipment, vehicle, status, ...orderData } = order
-
     const [shipper, setShipper] = useState([])
     const [selectedShipper, setSelectedShipper] = useState(null)
     const getHeaderTitle = (status) => {
@@ -122,7 +121,7 @@ const OrderStatus = ({ navigation, route }) => {
     // ---------------------Refesh shipper data--------------
     const [refreshing, setRefreshing] = React.useState(false);
     const onRefresh = React.useCallback(() => {
-        if (orderData.status === JOBSTATUS.FINDING_SHIPPER) {
+        if (status == JOBSTATUS.FINDING_SHIPPER) {
             setRefreshing(true);
             distpatch(getJoinedShipper({ access_token: access_token, orderId: orderId }))
                 .then(unwrapResult)
@@ -157,10 +156,17 @@ const OrderStatus = ({ navigation, route }) => {
             shipperId: selectedShipper.id
         }
         distpatch(assignJob(data))
-            .then(status => {
-                // handleBack()
+            .then(unwrapResult)
+            .then(res => {
+                setOrder(res)
             })
-            .catch(e => console.log(e))
+            .catch(e => {
+                Toast.show({
+                    type: ALERT_TYPE.WARNING,
+                    title: `Lựa chọn thất bại`,
+                    textBody: "Hãy thử lại sau một vài phút"
+                })
+            })
         setSelectedShipper(null)
     }
 
@@ -193,8 +199,8 @@ const OrderStatus = ({ navigation, route }) => {
                 {/* ------------Finding------------ */}
                 <View className="flex-col items-center bg-white rounded-lg pt-4 pb-12 mb-5">
                     <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
-                    {orderData.status === JOBSTATUS.FINDING_SHIPPER ?
-                        shipper.length === 0 ?
+                    {status == JOBSTATUS.FINDING_SHIPPER &&
+                        (shipper.length === 0 ?
                             <>
                                 <Text className="text-lg font-semibold py-1">Đang tìm tất cả shipper gần bạn</Text>
                                 <Text className="text-gray-500">Vui lòng đợi trong ít phút</Text>
@@ -249,14 +255,14 @@ const OrderStatus = ({ navigation, route }) => {
                                     }}
                                 />
                             </>
-                        : (
-                            <>
-                                <Text className="text-lg font-semibold py-1">Shipper đang trên đường đến chỗ bạn</Text>
-                                <Text className="text-gray-500">Vui lòng đợi trong ít phút</Text>
-                            </>
                         )
                     }
-
+                    {status == JOBSTATUS.WAITING_SHIPPER && (
+                        <>
+                            <Text className="text-lg font-semibold py-1">Shipper đang trên đường đến chỗ bạn</Text>
+                            <Text className="text-gray-500">Vui lòng đợi trong ít phút</Text>
+                        </>
+                    )}
 
                     {/* -------Dialog confirm choosing shipper */}
                     <Dialog.Container visible={selectedShipper !== null} className="rounded-3xl relative">

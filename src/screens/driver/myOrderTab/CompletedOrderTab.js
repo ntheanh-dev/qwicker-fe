@@ -15,7 +15,7 @@ const CompletedOrderTab = ({ title }) => {
     const [order, setOrder] = useState()
 
     useEffect(() => {
-        const form = { access_token: access_token, params: `status=${JOBSTATUS.DONE}` }
+        const form = { access_token: access_token, params: `status=${JOBSTATUS.DONE},${JOBSTATUS.WAITING_PAY}` }
         dispatch(myJobs(form))
             .then(unwrapResult)
             .then(res => {
@@ -26,7 +26,7 @@ const CompletedOrderTab = ({ title }) => {
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        const form = { access_token: access_token, params: `status=${JOBSTATUS.DONE}` }
+        const form = { access_token: access_token, params: `status=${JOBSTATUS.DONE},${JOBSTATUS.WAITING_PAY}` }
         dispatch(myJobs(form))
             .then(unwrapResult)
             .then(res => {
