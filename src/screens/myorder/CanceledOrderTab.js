@@ -42,7 +42,7 @@ const CanceledOrderTab = () => {
             className="flex-1 bg-gray-100 px-2"
             showsVerticalScrollIndicator={false}
         >
-            {order ?
+            {order?.results.length > 0 ?
                 order.results.map(ele => <OrderItem key={ele.id} {...ele} />
                 ) : (
                     <OrderItemNotFound />

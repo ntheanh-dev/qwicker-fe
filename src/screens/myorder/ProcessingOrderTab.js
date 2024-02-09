@@ -14,7 +14,7 @@ const ProcessingOrderTab = () => {
     const [order, setOrder] = useState()
 
     useEffect(() => {
-        const form = { access_token: access_token, params: `status=${JOBSTATUS.FINDING_SHIPPER},${JOBSTATUS.WAITING_SHIPPER}` }
+        const form = { access_token: access_token, params: `status=${JOBSTATUS.FINDING_SHIPPER},${JOBSTATUS.WAITING_PAY}` }
         distpatch(myJob(form))
             .then(unwrapResult)
             .then(res => {
@@ -25,7 +25,7 @@ const ProcessingOrderTab = () => {
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        const form = { access_token: access_token, params: `status=${JOBSTATUS.FINDING_SHIPPER},${JOBSTATUS.WAITING_SHIPPER}` }
+        const form = { access_token: access_token, params: `status=${JOBSTATUS.FINDING_SHIPPER},${JOBSTATUS.WAITING_PAY}` }
         distpatch(myJob(form))
             .then(unwrapResult)
             .then(res => {

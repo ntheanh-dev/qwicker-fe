@@ -12,7 +12,6 @@ const DoneOrderTab = () => {
     const { access_token } = useSelector(getBasicUserToken)
     const [refreshing, setRefreshing] = useState(false);
     const [order, setOrder] = useState()
-
     useEffect(() => {
         const form = { access_token: access_token, params: `status=${JOBSTATUS.DONE}` }
         distpatch(myJob(form))
@@ -43,7 +42,7 @@ const DoneOrderTab = () => {
             className="flex-1 bg-gray-100 px-2"
             showsVerticalScrollIndicator={false}
         >
-            {order ?
+            {order?.results.length > 0 ?
                 order.results.map(ele => <OrderItem key={ele.id} {...ele} />
                 ) : (
                     <OrderItemNotFound />
