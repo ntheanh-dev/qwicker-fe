@@ -11,11 +11,11 @@ const OrderItem = ({ shipment, vehicle, ...order }) => {
     const handleNavigate = () => {
         let route = ''
         if (Number(order.status) == JOBSTATUS.DONE) {
-            navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { ...order, shipment: shipment, vehicle: vehicle })
+            navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: order.id })
         } else if (Number(order.status) == JOBSTATUS.WAITING_PAY) {
             // navigate to handle pay by momo or vnpay
         } else {
-            navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: order.id })
+            navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: order.id, status: order.status })
         }
     }
     return (

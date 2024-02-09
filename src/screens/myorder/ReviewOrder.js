@@ -5,12 +5,23 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import { Feather, MaterialCommunityIcons, Ionicons, Foundation, Octicons, Entypo, FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { formatCurrency, formatMomentDateToVietnamese2 } from '../../features/ultils';
 import { useDispatch, useSelector } from 'react-redux';
-import { getBasicUserToken, sendFeedback } from '../../redux/basicUserSlice';
+import { getBasicUserToken, retrieve, sendFeedback } from '../../redux/basicUserSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 const comments = [{ id: 1, content: 'Thái độ tốt' }, { id: 2, content: 'Tình trạng phương tiện tốt' }, { id: 3, content: 'Rất đúng giờ' }, { id: 4, content: 'Phản hồi nhanh chóng' }]
 const ReviewOrder = ({ navigation, route }) => {
     const dispatch = useDispatch()
-    const { shipment, vehicle, product, payment, winner, ...order } = route.params
+    const { orderId } = route.params
+    const [orderData, setOrderData] = useState({})
+    const { shipment, vehicle, product, payment, winner, ...order } = orderData
+    useEffect(() => {
+        dispatch(retrieve({ access_token: access_token, orderId: orderId }))
+            .then(unwrapResult)
+            .then(res => {
+                setOrderData(res)
+            })
+            .catch(e => console.log(e))
+    }, [])
     const { access_token } = useSelector(getBasicUserToken)
     const refRBSheet = useRef();
     const [isReviewed, setIsReviewed] = useState(false)
@@ -49,13 +60,18 @@ const ReviewOrder = ({ navigation, route }) => {
     const handleFeedback = () => {
         if (text.length > 0) {
             const formData = new FormData()
-            formData.append('shipper', winner.id)
+            formData.append('shipper', winner?.id)
             formData.append('rating', star)
+            formData.append('comment', text)
 
             dispatch(sendFeedback({ access_token: access_token, jobId: order.id, formData: formData }))
                 .then(unwrapResult)
                 .then(res => {
-                    console.log(res)
+                    Toast.show({
+                        type: ALERT_TYPE.SUCCESS,
+                        title: `Đánh giá thành công`,
+                    })
+                    refRBSheet.current.close()
                 })
                 .catch(e => console.log(e))
         }
@@ -70,29 +86,23 @@ const ReviewOrder = ({ navigation, route }) => {
                     <View className="flex-row space-x-4">
                         <View className="basis-1/6 px-3 ">
                             <Image
-                                source={{ uri: winner.avatar }}
+                                source={{ uri: winner?.avatar }}
                                 className="h-12 w-12 rounded-full"
                             />
                         </View>
                         <View className="basis-5/6 flex-col space-y-1">
-                            <Text>{`${winner.first_name} ${winner.last_name}`}</Text>
-                            {isReviewed ? (
-                                <View className="bg-gray-100 rounded-md px-1 w-28">
-                                    <Text className="text-xs text-gray-600 font-semibold">{`${winner.more.vehicle_number} ${winner.more.vehicle.name}`}</Text>
-                                </View>
-                            ) : (
-                                <TouchableOpacity
-                                    className="flex-row space-x-1 items-center"
-                                    onPress={handlePressBottomBTN}
-                                >
-                                    <MaterialIcons name="star-border" size={20} color="#3422F1" />
-                                    <Text className="text-md text-[#3422F1] font-semibold">Đánh giá ngay</Text>
-                                </TouchableOpacity>
-                            )}
+                            <Text>{`${winner?.first_name} ${winner?.last_name}`}</Text>
+                            <View className="bg-gray-100 rounded-md px-1 w-28">
+                                <Text className="text-xs text-gray-600 font-semibold">{`${winner?.more.vehicle_number} ${winner?.more.vehicle.name}`}</Text>
+                            </View>
 
+                            <View className="flex-row items-center space-x-1">
+                                <AntDesign name="star" size={20} color="yellow" />
+                                <Text className="text-xs text-gray-600 font-semibold">{winner?.rating}</Text>
+                            </View>
                         </View>
                     </View>
-                    <View className="flex-row pt-8">
+                    <View className="flex-row pt-4">
                         <View className="flex-1 flex-row space-x-2 justify-center items-center">
                             <MaterialCommunityIcons name="android-messages" size={24} color="#3422F1" />
                             <Text className="text-base font-semibold">Nhắn ngay</Text>
@@ -107,15 +117,15 @@ const ReviewOrder = ({ navigation, route }) => {
                 <View className="flex-row bg-white p-4 space-x-4 items-center mb-4">
                     <Ionicons name="cash-outline" size={24} color="#3422F1" />
                     <View className="flex-col">
-                        <Text className="text-xl font-semibold">{formatCurrency(shipment.cost)}</Text>
-                        <Text className="text-base font-medium text-gray-400 ">{payment.method.name}</Text>
+                        <Text className="text-xl font-semibold">{formatCurrency(shipment?.cost)}</Text>
+                        <Text className="text-base font-medium text-gray-400 ">{payment?.method.name}</Text>
                     </View>
                 </View>
                 {/* -----------Location, date time, uuid----------- */}
                 <View className="flex-col bg-white p-4 mb-4">
                     <View className="flex-row items-center justify-between pb-3">
-                        <Text className="text-base text-gray-500">{formatMomentDateToVietnamese2(shipment.shipment_date)}</Text>
-                        <Text className="text-gray-600 text-base">{`#${order.uuid}`}</Text>
+                        <Text className="text-base text-gray-500">{formatMomentDateToVietnamese2(shipment?.shipment_date)}</Text>
+                        <Text className="text-gray-600 text-base">{`#${order?.uuid}`}</Text>
                     </View>
 
                     <View className="flex-row space-x-2">
@@ -125,9 +135,9 @@ const ReviewOrder = ({ navigation, route }) => {
                         </View>
 
                         <View className="basis-5/6 flex-col">
-                            <Text className="text-xl font-semibold">{shipment.pick_up.short_name}</Text>
-                            <Text className="text-lg text-gray-600">{shipment.pick_up.long_name}</Text>
-                            <Text className="text-lg text-gray-600">{`${shipment.pick_up.contact}: ${shipment.pick_up.phone_number}`}</Text>
+                            <Text className="text-xl font-semibold">{shipment?.pick_up?.short_name}</Text>
+                            <Text className="text-lg text-gray-600">{shipment?.pick_up?.long_name}</Text>
+                            <Text className="text-lg text-gray-600">{`${shipment?.pick_up?.contact}: ${shipment?.pick_up?.phone_number}`}</Text>
                         </View>
                         <View className="basis-1/6 flex justify-center items-start">
                             <FontAwesome name="location-arrow" size={30} color="#3422F1" />
@@ -139,9 +149,9 @@ const ReviewOrder = ({ navigation, route }) => {
                         </View>
 
                         <View className="basis-5/6 flex-col mt-2">
-                            <Text className="text-xl font-semibold">{shipment.delivery_address.short_name}</Text>
-                            <Text className="text-lg text-gray-600">{shipment.delivery_address.long_name}</Text>
-                            <Text className="text-lg text-gray-600">{`${shipment.delivery_address.contact}: ${shipment.delivery_address.phone_number}`}</Text>
+                            <Text className="text-xl font-semibold">{shipment?.delivery_address?.short_name}</Text>
+                            <Text className="text-lg text-gray-600">{shipment?.delivery_address?.long_name}</Text>
+                            <Text className="text-lg text-gray-600">{`${shipment?.delivery_address?.contact}: ${shipment?.delivery_address?.phone_number}`}</Text>
                         </View>
                         <View className="basis-1/6 flex justify-center items-start">
                             <FontAwesome name="location-arrow" size={30} color="#3422F1" />
@@ -150,11 +160,11 @@ const ReviewOrder = ({ navigation, route }) => {
                 </View>
                 {/* -------------Vehicle----------- */}
                 <View className="flex-col bg-white p-4 mb-4 ">
-                    <Text className="font-semibold text-xl">{vehicle.name}</Text>
+                    <Text className="font-semibold text-xl">{vehicle?.name}</Text>
                     {order.description &&
                         <View className="flex-row items-center space-x-4 px-4 mt-2">
                             <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
-                            <Text className="text-base text-gray-600">{order.description}</Text>
+                            <Text className="text-base text-gray-600">{order?.description}</Text>
                         </View>
                     }
                 </View>
@@ -162,16 +172,21 @@ const ReviewOrder = ({ navigation, route }) => {
                 <View className="flex-row bg-white p-4 mb-2 space-x-2 items-center">
                     <MaterialCommunityIcons name="format-list-bulleted-type" size={24} color="black" />
                     <View className="flex-col">
-                        <Text className="text-xl font-semibold">{product.category.name}</Text>
+                        <Text className="text-xl font-semibold">{product?.category?.name}</Text>
                     </View>
                 </View>
+                {/* -----------Feedback Button----------- */}
+                <TouchableOpacity
+                    onPress={handlePressBottomBTN}
+                >
+                    <Text className="text-md font-medium text-[#3422F1] text-center py-2 underline">Đánh giá</Text>
+                </TouchableOpacity>
                 <View className="h-40"></View>
             </ScrollView>
 
             {/* --------------Place order again----------- */}
             <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
                 <TouchableOpacity
-                    underlayColor={'rbga(0,0,0,0)'}
                     className={`rounded-lg w-full flex justify-center items-center h-14 bg-[#3422F1]`}
                 >
                     <Text className="text-lg font-medium text-white" >Đặt lại đơn hàng</Text>

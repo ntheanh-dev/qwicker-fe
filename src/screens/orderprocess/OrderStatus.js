@@ -21,9 +21,9 @@ const { height } = Dimensions.get('window')
 const OrderStatus = ({ navigation, route }) => {
     const distpatch = useDispatch()
     const { access_token } = useSelector(getBasicUserToken)
-    const { orderId } = route.params
+    const { orderId, status } = route.params
     const [order, setOrder] = useState({})
-    const { payment, product, shipment, vehicle, status, ...orderData } = order
+    const { payment, product, shipment, vehicle, ...orderData } = order
     const [shipper, setShipper] = useState([])
     const [selectedShipper, setSelectedShipper] = useState(null)
     const getHeaderTitle = (status) => {
@@ -66,24 +66,25 @@ const OrderStatus = ({ navigation, route }) => {
                 .then(unwrapResult)
                 .then(res => {
                     setOrder(res)
-                    distpatch(getJoinedShipper(form))
-                        .then(unwrapResult)
-                        .then(res => {
-                            setShipper(res)
-                            const countShipper = res.length
-                            if (countShipper > 0) {
-                                Toast.show({
-                                    type: ALERT_TYPE.SUCCESS,
-                                    title: `Chúng tôi tìm thấy ${countShipper} shipper`,
-                                    textBody: "Giờ đây bạn có thể xem và quyết định ai là người vận chuyển đơn hàng của bạn"
-                                })
-                            }
-                        })
-                        .catch(e => setRefreshing(false))
+                    if (status == JOBSTATUS.FINDING_SHIPPER) {
+                        distpatch(getJoinedShipper(form))
+                            .then(unwrapResult)
+                            .then(res => {
+                                setShipper(res)
+                                const countShipper = res.length
+                                if (countShipper > 0) {
+                                    Toast.show({
+                                        type: ALERT_TYPE.SUCCESS,
+                                        title: `Chúng tôi tìm thấy ${countShipper} shipper`,
+                                        textBody: "Giờ đây bạn có thể xem và quyết định ai là người vận chuyển đơn hàng của bạn"
+                                    })
+                                }
+                            })
+                            .catch(e => console.log(e))
+                    }
+
                 })
                 .catch(e => console.log(e))
-        } else {
-            navigation.goBack()
         }
 
         Animated.loop(
@@ -128,6 +129,7 @@ const OrderStatus = ({ navigation, route }) => {
                 .then(res => {
                     setRefreshing(false)
                     setShipper(res)
+                    console.log(res)
                     const countShipper = res.length
                     if (countShipper === 0) {
                         Toast.show({
@@ -144,7 +146,10 @@ const OrderStatus = ({ navigation, route }) => {
 
                     }
                 })
-                .catch(e => setRefreshing(false))
+                .catch(e => {
+                    console.log(e)
+                    setRefreshing(false)
+                })
         }
     }, []);
     //--------------------------------------------------------
@@ -235,7 +240,7 @@ const OrderStatus = ({ navigation, route }) => {
                                                         <Text>{fullName}</Text>
                                                         <View className="flex-row items-center space-x-1">
                                                             <AntDesign name="star" size={15} color="#FFB534" />
-                                                            <Text className="text-xs text-gray-600">5.00</Text>
+                                                            <Text className="text-xs text-gray-600">{s.rating}</Text>
                                                         </View>
                                                         <View className="bg-gray-100 rounded-md px-1">
                                                             <Text className="text-xs text-gray-600 font-semibold">{title}</Text>
@@ -281,7 +286,7 @@ const OrderStatus = ({ navigation, route }) => {
                                 <Text>{`${selectedShipper?.last_name} ${selectedShipper?.first_name}`}</Text>
                                 <View className="flex-row items-center space-x-1">
                                     <AntDesign name="star" size={15} color="#FFB534" />
-                                    <Text className="text-xs text-gray-600">5.00</Text>
+                                    <Text className="text-xs text-gray-600">{selectedShipper?.rating}</Text>
                                 </View>
                                 <View className="bg-gray-100 rounded-md px-1">
                                     <Text className="text-xs text-gray-600 font-semibold">{`${selectedShipper?.more.vehicle_number} ${selectedShipper?.more.vehicle?.name}`}</Text>
