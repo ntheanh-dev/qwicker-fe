@@ -7,11 +7,20 @@ import { JOBSTATUS, ROUTES } from '../../constants';
 
 const OrderItem = ({ shipment, vehicle, ...order }) => {
     const navigation = useNavigation()
-    const title = order.status === JOBSTATUS.FINDING_SHIPPER ? 'Đang tìm shipper' : 'Đang đợi shipper'
+    const title = order.status == JOBSTATUS.FINDING_SHIPPER ? 'Đang tìm shipper' : (order.status == JOBSTATUS.DONE ? 'Hoành thành' : 'Đợi thanh toán')
+    const handleNavigate = () => {
+        let route = ''
+        if (Number(order.status) == JOBSTATUS.DONE) {
+            navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { ...order, shipment: shipment, vehicle: vehicle })
+        } else if (Number(order.status) == JOBSTATUS.WAITING_PAY) {
+            // navigate to handle pay by momo or vnpay
+        } else {
+            navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: order.id })
+        }
+    }
     return (
         <TouchableOpacity
-            onPress={() => navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: order.id })}
-            // onPress={() => navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { title: 'Nhận lúc 99:99' })}
+            onPress={handleNavigate}
             className="flex-col pt-3 bg-white mt-4 rounded-lg space-y-3 overflow-hidden"
         >
             <View className="border-b border-gray-300 pb-3 px-4">

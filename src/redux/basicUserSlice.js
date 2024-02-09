@@ -161,6 +161,23 @@ export const assignJob = createAsyncThunk('job,assignJob',
     }
 )
 
+export const sendFeedback = createAsyncThunk('job,sendFeedback',
+    async (data, { rejectWithValue }) => {
+        const { access_token, jobId, formData } = data
+        try {
+            const res = await authAPI(access_token).post(basicUserEndpoints['send_feedback'](jobId), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
 export const getBasicUserToken = state => state.basicUserSlice.token
 export const getBasicUserStatus = state => state.basicUserSlice.status
 export const { setToken } = basicUserSlice.actions

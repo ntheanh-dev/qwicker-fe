@@ -3,31 +3,29 @@ import React, { useEffect, useRef, useState } from 'react'
 import RBSheet from "react-native-raw-bottom-sheet";
 
 import { Feather, MaterialCommunityIcons, Ionicons, Foundation, Octicons, Entypo, FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
-import { formatMomentDateToVietnamese2 } from '../../features/ultils';
+import { formatCurrency, formatMomentDateToVietnamese2 } from '../../features/ultils';
+import { useDispatch, useSelector } from 'react-redux';
+import { getBasicUserToken, sendFeedback } from '../../redux/basicUserSlice';
+import { unwrapResult } from '@reduxjs/toolkit';
 const comments = [{ id: 1, content: 'Thái độ tốt' }, { id: 2, content: 'Tình trạng phương tiện tốt' }, { id: 3, content: 'Rất đúng giờ' }, { id: 4, content: 'Phản hồi nhanh chóng' }]
 const ReviewOrder = ({ navigation, route }) => {
-    const { data } = route.params
+    const dispatch = useDispatch()
+    const { shipment, vehicle, product, payment, winner, ...order } = route.params
+    const { access_token } = useSelector(getBasicUserToken)
     const refRBSheet = useRef();
     const [isReviewed, setIsReviewed] = useState(false)
-    const [star, setStar] = useState(5)
+    const [star, setStar] = useState(0)
     const [text, setText] = useState('')
     const renderStars = () => {
-        const handleSetStar = (i) => {
-            if (star === i) {
-                setStar(i - 1)
-            } else {
-                setStar(i)
-            }
-        }
         const arr = []
         for (let i = 1; i <= 5; i++) {
             if (i <= star) {
-                arr.push(<TouchableOpacity key={i} onPress={() => handleSetStar(i)}>
+                arr.push(<TouchableOpacity key={i} onPress={() => setStar(i)}>
                     <MaterialIcons name="star" size={34} color="yellow" />
                 </TouchableOpacity>
                 )
             } else {
-                arr.push(<TouchableOpacity key={i} onPress={() => handleSetStar(i)}>
+                arr.push(<TouchableOpacity key={i} onPress={() => setStar(i)}>
                     <MaterialIcons name="star-border" size={34} color="black" />
                 </TouchableOpacity>
                 )
@@ -47,23 +45,40 @@ const ReviewOrder = ({ navigation, route }) => {
             setText(text => `${text}, ${comment.toLowerCase()}`)
         }
     }
+
+    const handleFeedback = () => {
+        if (text.length > 0) {
+            const formData = new FormData()
+            formData.append('shipper', winner.id)
+            formData.append('rating', star)
+
+            dispatch(sendFeedback({ access_token: access_token, jobId: order.id, formData: formData }))
+                .then(unwrapResult)
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(e => console.log(e))
+        }
+
+    }
+
     return (
         <View className="p-2 flex-1 flex-col relative">
             <ScrollView>
                 {/* ---------Driver infor---------- */}
                 <View className="bg-white p-4 flex-col mb-4">
                     <View className="flex-row space-x-4">
-                        <View className="basis-1/6 px-3">
+                        <View className="basis-1/6 px-3 ">
                             <Image
-                                source={require('../../assets/logo/user.png')}
-                                className="h-12 w-12 "
+                                source={{ uri: winner.avatar }}
+                                className="h-12 w-12 rounded-full"
                             />
                         </View>
                         <View className="basis-5/6 flex-col space-y-1">
-                            <Text>Nguyễn Văn Long</Text>
+                            <Text>{`${winner.first_name} ${winner.last_name}`}</Text>
                             {isReviewed ? (
                                 <View className="bg-gray-100 rounded-md px-1 w-28">
-                                    <Text className="text-xs text-gray-600 font-semibold">68C-12869 Truck</Text>
+                                    <Text className="text-xs text-gray-600 font-semibold">{`${winner.more.vehicle_number} ${winner.more.vehicle.name}`}</Text>
                                 </View>
                             ) : (
                                 <TouchableOpacity
@@ -92,15 +107,15 @@ const ReviewOrder = ({ navigation, route }) => {
                 <View className="flex-row bg-white p-4 space-x-4 items-center mb-4">
                     <Ionicons name="cash-outline" size={24} color="#3422F1" />
                     <View className="flex-col">
-                        <Text className="text-xl font-semibold">{`đ${data.price.toLocaleString('en-US')}`}</Text>
-                        <Text className="text-base font-medium text-gray-400 ">Thu tiền mặt</Text>
+                        <Text className="text-xl font-semibold">{formatCurrency(shipment.cost)}</Text>
+                        <Text className="text-base font-medium text-gray-400 ">{payment.method.name}</Text>
                     </View>
                 </View>
                 {/* -----------Location, date time, uuid----------- */}
                 <View className="flex-col bg-white p-4 mb-4">
                     <View className="flex-row items-center justify-between pb-3">
-                        <Text className="text-base text-gray-500">{formatMomentDateToVietnamese2(data.time)}</Text>
-                        <Text className="text-gray-600 text-base">{`#${data.uuid}`}</Text>
+                        <Text className="text-base text-gray-500">{formatMomentDateToVietnamese2(shipment.shipment_date)}</Text>
+                        <Text className="text-gray-600 text-base">{`#${order.uuid}`}</Text>
                     </View>
 
                     <View className="flex-row space-x-2">
@@ -110,9 +125,9 @@ const ReviewOrder = ({ navigation, route }) => {
                         </View>
 
                         <View className="basis-5/6 flex-col">
-                            <Text className="text-xl font-semibold">{data.pickUp.title}</Text>
-                            <Text className="text-lg text-gray-600">{data.pickUp.location}</Text>
-                            <Text className="text-lg text-gray-600">{`A Phat: 0373054756`}</Text>
+                            <Text className="text-xl font-semibold">{shipment.pick_up.short_name}</Text>
+                            <Text className="text-lg text-gray-600">{shipment.pick_up.long_name}</Text>
+                            <Text className="text-lg text-gray-600">{`${shipment.pick_up.contact}: ${shipment.pick_up.phone_number}`}</Text>
                         </View>
                         <View className="basis-1/6 flex justify-center items-start">
                             <FontAwesome name="location-arrow" size={30} color="#3422F1" />
@@ -124,9 +139,9 @@ const ReviewOrder = ({ navigation, route }) => {
                         </View>
 
                         <View className="basis-5/6 flex-col mt-2">
-                            <Text className="text-xl font-semibold">{data.deliveryAddress.title}</Text>
-                            <Text className="text-lg text-gray-600">{data.deliveryAddress.location}</Text>
-                            <Text className="text-lg text-gray-600">{`A Phat: 0373054756`}</Text>
+                            <Text className="text-xl font-semibold">{shipment.delivery_address.short_name}</Text>
+                            <Text className="text-lg text-gray-600">{shipment.delivery_address.long_name}</Text>
+                            <Text className="text-lg text-gray-600">{`${shipment.delivery_address.contact}: ${shipment.delivery_address.phone_number}`}</Text>
                         </View>
                         <View className="basis-1/6 flex justify-center items-start">
                             <FontAwesome name="location-arrow" size={30} color="#3422F1" />
@@ -135,11 +150,11 @@ const ReviewOrder = ({ navigation, route }) => {
                 </View>
                 {/* -------------Vehicle----------- */}
                 <View className="flex-col bg-white p-4 mb-4 ">
-                    <Text className="font-semibold text-xl">{data.vehicle.title}</Text>
-                    {data.comment &&
+                    <Text className="font-semibold text-xl">{vehicle.name}</Text>
+                    {order.description &&
                         <View className="flex-row items-center space-x-4 px-4 mt-2">
                             <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
-                            <Text className="text-base text-gray-600">{data.comment}</Text>
+                            <Text className="text-base text-gray-600">{order.description}</Text>
                         </View>
                     }
                 </View>
@@ -147,7 +162,7 @@ const ReviewOrder = ({ navigation, route }) => {
                 <View className="flex-row bg-white p-4 mb-2 space-x-2 items-center">
                     <MaterialCommunityIcons name="format-list-bulleted-type" size={24} color="black" />
                     <View className="flex-col">
-                        <Text className="text-xl font-semibold">{data.product.name}</Text>
+                        <Text className="text-xl font-semibold">{product.category.name}</Text>
                     </View>
                 </View>
                 <View className="h-40"></View>
@@ -214,7 +229,7 @@ const ReviewOrder = ({ navigation, route }) => {
                             value={text}
                         />
                         <TouchableOpacity
-                            underlayColor={'rbga(0,0,0,0)'}
+                            onPress={handleFeedback}
                             className={`rounded-lg w-full flex justify-center items-center h-14 ${text.length > 0 ? 'bg-[#3422F1]' : 'bg-gray-400'}`}
                         >
                             <Text className="text-lg font-medium text-white" >ĐÁNH GIÁ</Text>

@@ -13,7 +13,8 @@ export const basicUserEndpoints = {
     'current-user': 'users/current-user/',
     'my-jobs': (pagrams) => `/jobs/?${pagrams}`,
     'job-retrieve': (jobId) => `/jobs/${jobId}/`,
-    'assign-job': (jobId) => `/jobs/${jobId}/assign/`
+    'assign-job': (jobId) => `/jobs/${jobId}/assign/`,
+    'send_feedback': (jobId) => `/jobs/${jobId}/feedback/`
 }
 export const shipperEndpoints = {
     'shipper-register': '/shippers/',
