@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
-import API, { authAPI, basicUserEndpoints, jobEndpoints } from "../configs/API";
+import API, { authAPI, baseEndpoints, basicUserEndpoints, jobEndpoints } from "../configs/API";
 
 const basicUserSlice = createSlice({
     name: 'basicUserSlice',
@@ -82,6 +82,32 @@ export const login = createAsyncThunk('user,loginUser',
             }
         } catch (err) {
             return rejectWithValue(err?.response.data)
+        }
+    }
+)
+
+export const googleLogin = createAsyncThunk('user,loginUser',
+    async (access_token, { rejectWithValue }) => {
+        try {
+            const res = await API.post(baseEndpoints['convert-token'], {
+                "token": access_token,
+                "backend": 'google-oauth2',
+                "client_id": "RiYOr07gNa0xh6dbcnQKySftZ8KHnip88Cps9Jk8",
+                "client_secret": "et1xaPdvN7jDXyPLN45Axnbj1irvoHjItxJUwqXA42Pnd5fevezK96118PvwHgw5wFr9fLOwz985lW4eRkTk6VdHsj8zLbdHHiPGt0csWlqbNEGdvkRgTKS3CaWyxPPE",
+                "grant_type": "convert_token"
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            let user = await authAPI(res.data.access_token).get(basicUserEndpoints['current-user'])
+            return {
+                user: user.data,
+                token: res.data
+            }
+        } catch (err) {
+            console.log(err)
+            return rejectWithValue(err?.response?.data)
         }
     }
 )

@@ -1,5 +1,5 @@
 import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants'
 import { AntDesign, EvilIcons } from '@expo/vector-icons';
@@ -14,6 +14,11 @@ import * as BasicUser from '../../redux/basicUserSlice'
 import API, { authAPI, jobEndpoints } from '../../configs/API';
 import { fakeFullOrderData } from '../../data';
 import { objectToFormData } from '../../features/ultils';
+import {
+    GoogleSignin,
+    GoogleSigninButton,
+    statusCodes,
+} from "@react-native-google-signin/google-signin";
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -49,6 +54,45 @@ const Login = ({ navigation }) => {
         }
 
     }
+
+    useEffect(() => {
+        configureGoogleSignIn();
+    }, []);
+
+    const configureGoogleSignIn = () => {
+        GoogleSignin.configure({
+            webClientId: "297909054584-ec2ra6tq46trk2gvj9ubqsf1rq20q335.apps.googleusercontent.com",
+            androidClientId: "297909054584-2tm4tc03cuv9iqp3vdmtlusbcrukof88.apps.googleusercontent.com",
+            iosClientId: "297909054584-gdp0dd9vhljuo9n6sk0q59lope7i0r4v.apps.googleusercontent.com",
+        });
+    };
+
+    const handleGoogleSignIn = async () => {
+
+        const handleErr = () => {
+            setLoading(false)
+            Toast.show({
+                type: ALERT_TYPE.WARNING,
+                title: "Đăng nhập thất bại",
+                textBody: "Hãy thử lại sau ít phút"
+            })
+        }
+
+        setLoading(true)
+        try {
+            await GoogleSignin.hasPlayServices();
+            const res = await GoogleSignin.getTokens();
+            dispatch(BasicUser.googleLogin(res.accessToken))
+                .then(unwrapResult)
+                .then(res => {
+                    navigation.navigate(ROUTES.HOME)
+                })
+                .catch(e => handleErr())
+        } catch (e) {
+            handleErr()
+        }
+    };
+
     return (
         <SafeAreaView className="flex-1 flex-col justify-around h-full relative">
             <Spinner visible={loading} size='large' animation='fade' />
@@ -84,13 +128,20 @@ const Login = ({ navigation }) => {
                     </TouchableOpacity>
                     {role === ROLE.TRADITIONAL_USER && <View className="flex-col space-y-3">
                         <Text className="text-center text-gray-500 font-medium text-sm py-2">hoặc đăng nhập bằng</Text>
-                        <View className="flex-row justify-center space-x-4">
+                        {/* <View className="flex-row justify-center space-x-4">
                             <TouchableOpacity className="border-2 border-gray-400 rounded-full p-3">
                                 <AntDesign name="googleplus" size={28} color="black" />
                             </TouchableOpacity>
                             <TouchableOpacity className="border-2 border-gray-400 rounded-full p-3">
                                 <EvilIcons name="sc-facebook" size={28} color="#316FF6" />
                             </TouchableOpacity>
+                        </View> */}
+                        <View className="flex items-center">
+                            <GoogleSigninButton
+                                size={GoogleSigninButton.Size.Icon}
+                                color={GoogleSigninButton.Color.Dark}
+                                onPress={handleGoogleSignIn}
+                            />
                         </View>
                     </View>}
                 </View>

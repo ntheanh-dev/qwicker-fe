@@ -21,7 +21,6 @@ DerivedData
 *.xcuserstate
 project.xcworkspace
 **/.xcode.env.local
-
 # Gradle
 /build/
 /packages/react-native-gradle-plugin/build/
@@ -158,4 +157,6 @@ vendor/
 .circleci/generated_config.yml
 .circleci/storage
 
-%ProgramData%/Microsoft/Windows/UUS/State/_active.uusver
+%ProgramData%
+.expo
+.idea

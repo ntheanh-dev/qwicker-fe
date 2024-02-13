@@ -127,7 +127,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
             .then(unwrapResult)
             .then(res => {
                 placeOrderBTS.current.close()
-                navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: res.id })
+                navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: res.id, status: res.status })
             })
             .catch(e => {
                 Toast.show({

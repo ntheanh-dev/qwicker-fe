@@ -5,7 +5,8 @@ export const baseEndpoints = {
     'product-categories': '/product-categories/',
     'vehicles': '/vehicles/',
     'product-categories': '/product-categories/',
-    'payment-method': '/payment-method/'
+    'payment-method': '/payment-method/',
+    'convert-token': '/auth/convert-token'
 }
 export const basicUserEndpoints = {
     'basic-user-register': '/users/',
@@ -37,10 +38,12 @@ export const ShipperJobEndpoints = {
 
 export const authAPI = (access_token) => axios.create({
     baseURL: BASE_URL,
+    timeout: 6000,
     headers: {
         "Authorization": `Bearer ${access_token}`
     }
 })
 export default axios.create({
-    baseURL: BASE_URL
+    baseURL: BASE_URL,
+    timeout: 6000,
 })
