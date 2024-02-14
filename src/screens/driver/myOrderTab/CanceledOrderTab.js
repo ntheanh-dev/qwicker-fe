@@ -1,25 +1,25 @@
-import { View, FlatList, ScrollView, RefreshControl } from 'react-native'
+import { View, ScrollView, RefreshControl } from 'react-native'
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import OrderItem from './OrderItem';
-import { fakeOrders } from '../../../data';
 import { useDispatch, useSelector } from 'react-redux';
 import { getToken, myJobs } from '../../../redux/shipperSlice';
 import { JOBSTATUS } from '../../../constants';
 import { unwrapResult } from '@reduxjs/toolkit';
 import OrderItemNotFound from './OrderItemNotFound';
+import { useFetchPaginatedData } from '../../../hooks/fetchPaginatedData';
 
 const CanceledOrderTab = ({ title }) => {
     const dispatch = useDispatch()
     const { access_token } = useSelector(getToken)
     const [refreshing, setRefreshing] = useState(false);
-    const [order, setOrder] = useState()
+    const fetcher = useFetchPaginatedData(access_token)
 
     useEffect(() => {
         const form = { access_token: access_token, params: `status=${JOBSTATUS.CANCELED}` }
         dispatch(myJobs(form))
             .then(unwrapResult)
             .then(res => {
-                setOrder(res)
+                fetcher.setData(res)
             })
             .catch(e => console.log(e))
     }, [])
@@ -31,7 +31,7 @@ const CanceledOrderTab = ({ title }) => {
             .then(unwrapResult)
             .then(res => {
                 setRefreshing(false)
-                setOrder(res)
+                fetcher.setData(res)
             })
             .catch(e => {
                 setRefreshing(false)
@@ -44,8 +44,8 @@ const CanceledOrderTab = ({ title }) => {
                 showsVerticalScrollIndicator={false}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             >
-                {order?.results?.length > 0 ? (
-                    order.results.map(ele => <OrderItem key={ele.id} {...ele} title={title} />)
+                {fetcher.results.length > 0 ? (
+                    fetcher.results.map(ele => <OrderItem key={ele.id} {...ele} title={title} />)
                 ) : (
                     <>
                         <View className="h-40 w-full"></View>

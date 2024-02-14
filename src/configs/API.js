@@ -10,7 +10,7 @@ export const baseEndpoints = {
 }
 export const basicUserEndpoints = {
     'basic-user-register': '/users/',
-    'login': '/o/token/',
+    'login': '/auth/token/',
     'current-user': 'users/current-user/',
     'my-jobs': (pagrams) => `/jobs/?${pagrams}`,
     'job-retrieve': (jobId) => `/jobs/${jobId}/`,
@@ -19,7 +19,7 @@ export const basicUserEndpoints = {
 }
 export const shipperEndpoints = {
     'shipper-register': '/shippers/',
-    'login': '/o/token/',
+    'login': '/auth/token/',
     'current-user': 'shippers/current-user/'
 }
 export const jobEndpoints = {
@@ -39,6 +39,13 @@ export const ShipperJobEndpoints = {
 export const authAPI = (access_token) => axios.create({
     baseURL: BASE_URL,
     timeout: 6000,
+    headers: {
+        "Authorization": `Bearer ${access_token}`
+    }
+})
+export const urlAuthAPI = (access_token, url) => axios.create({
+    baseURL: url,
+    timeout: 5000,
     headers: {
         "Authorization": `Bearer ${access_token}`
     }

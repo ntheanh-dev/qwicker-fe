@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, FlatList, RefreshControl } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, FlatList, RefreshControl, Alert } from 'react-native'
 import React, { useCallback, useEffect, useReducer, useState } from 'react'
 import { MaterialCommunityIcons, Entypo, Foundation, Octicons, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
 import { JOBSTATUS, ROUTES } from '../../../constants';
@@ -9,6 +9,8 @@ import Order from './Order';
 import { useDispatch, useSelector } from 'react-redux';
 import { findJob, getToken } from '../../../redux/shipperSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { urlAuthAPI } from '../../../configs/API';
+import { useFetchPaginatedData } from '../../../hooks/fetchPaginatedData';
 
 const FILTER_DATA = [{ id: 1, content: 'Tất cả' }, { id: 2, content: 'Ngay bây giờ' }, { id: 3, content: 'Hôm nay' }, { id: 4, content: 'Khác' },]
 const SORT_DATA = [{ id: 1, content: 'Thời gian' }, { id: 2, content: 'Địa điểm' }]
@@ -26,7 +28,7 @@ const FindOrderTab = ({ navigation }) => {
         filterIndex: 1,
         sortIndex: 1
     })
-    const [jobs, setJobs] = useState(null)
+    const fetcher = useFetchPaginatedData(access_token)
     const handleClearFilter = () => {
         updateFilter({
             filterIndex: 1,
@@ -41,8 +43,7 @@ const FindOrderTab = ({ navigation }) => {
             dispath(findJob(access_token))
                 .then(unwrapResult)
                 .then(res => {
-                    console.log(res)
-                    setJobs(res)
+                    fetcher.setData(res)
                 })
                 .catch(e => console.log(e))
         }
@@ -65,14 +66,17 @@ const FindOrderTab = ({ navigation }) => {
         dispath(findJob(access_token,))
             .then(unwrapResult)
             .then(res => {
-                console.log(res)
-                setJobs(res)
+                fetcher.setData(res)
                 setRefreshing(false)
             })
             .catch(e => setRefreshing(false))
     }, []);
+    //------------------Scroll event--------------------
+    const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
+        return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
+    }
     return (
-        <View className="relative flex-1 px-3 bg-gray-100">
+        <View className="relative flex-1 px-3 bg-gray-100 pb-20">
             {/* ---------------Filter space--------------- */}
             {filter.showFilter && <TouchableOpacity
                 onPress={handleApplyFilter}
@@ -130,9 +134,14 @@ const FindOrderTab = ({ navigation }) => {
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
+                onScroll={({ nativeEvent }) => {
+                    if (isCloseToBottom(nativeEvent)) {
+                        fetcher.next()
+                    }
+                }}
             >
-                {jobs?.results?.length > 0 ? (
-                    jobs.results.map(ele => (
+                {fetcher.results.length > 0 ? (
+                    fetcher.results.map(ele => (
                         <Order key={ele.id} data={ele} />
                     ))
                 ) : (
@@ -144,7 +153,6 @@ const FindOrderTab = ({ navigation }) => {
                         </TouchableOpacity>
                     </View>
                 )}
-                <View className="h-80 w-full"></View>
             </ScrollView>
         </View>
     )
