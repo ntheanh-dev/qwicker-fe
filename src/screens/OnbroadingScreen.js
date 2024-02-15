@@ -4,12 +4,20 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import Onboarding from 'react-native-onboarding-swiper';
 import LottieView from 'lottie-react-native';
 import { ROUTES } from '../constants';
+import { useDispatch } from 'react-redux';
+import { setIsUseAppBefore } from '../redux/appSlice';
 const OnbroadingScreen = ({ navigation }) => {
+    const dispatch = useDispatch()
+    const handleDone = () => {
+        dispatch(setIsUseAppBefore())
+        navigation.navigate(ROUTES.CHOOSEACCOUNT)
+    }
+
     return (
         <SafeAreaView className="flex-1">
             <Onboarding
-                onDone={() => navigation.navigate(ROUTES.CHOOSEACCOUNT)}
-                onSkip={() => navigation.navigate(ROUTES.CHOOSEACCOUNT)}
+                onDone={handleDone}
+                onSkip={handleDone}
                 pages={[
                     {
                         backgroundColor: '#fff',

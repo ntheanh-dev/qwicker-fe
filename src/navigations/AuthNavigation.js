@@ -1,21 +1,37 @@
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ROUTES } from '../constants';
+import { ROLE, ROUTES } from '../constants';
 import ChooseAccount from '../screens/auth/ChooseAccount';
 import DrawerNavigation from './DrawerNavigation';
 import OnbroadingScreen from '../screens/OnbroadingScreen';
 import RegisterNavigation from './RegisterNavigation';
 import { useSelector } from 'react-redux';
-import { getIsUseAppBefore } from '../redux/appSlice';
+import { getIsUseAppBefore, getRole } from '../redux/appSlice';
 import Login from '../screens/auth/Login';
 import BottomNavigation from './BottomNavigation';
+import { getBasicUserToken } from '../redux/basicUserSlice';
+import { getToken } from '../redux/shipperSlice';
 const Stack = createNativeStackNavigator();
 const AuthNavigation = () => {
     const useAppBefore = useSelector(getIsUseAppBefore)
+    const role = useSelector(getRole)
+    const basisUserToken = useSelector(getBasicUserToken)
+    const shipperToken = useSelector(getToken)
+    const getIniteRoute = () => {
+        if (!useAppBefore) {
+            return ROUTES.ONBOARDING
+        }
+        if (role === ROLE.TRADITIONAL_USER && basisUserToken?.access_token) {
+            return ROUTES.HOME
+        }
+        if (role === ROLE.DRIVER && shipperToken?.access_token) {
+            return ROUTES.DRIVER_NAVIGATION
+        }
+        return ROUTES.LOGIN
+    }
     return (
         <Stack.Navigator
-            // initialRouteName={useAppBefore ? ROUTES.CHOOSEACCOUNT : ROUTES.ONBOARDING}
-            initialRouteName={ROUTES.LOGIN}
+            initialRouteName={getIniteRoute()}
             screenOptions={{ headerShown: false }}
         >
             <Stack.Screen

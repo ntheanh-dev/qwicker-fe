@@ -8,6 +8,8 @@ import productSlice, { getProduct } from "./productSlice";
 import paymentSlice, { getPayment } from "./paymentSlice";
 import shipmentSlice, { getDeliveryAddress, getPickUP, getShipMentForm } from "./shipmentSlice";
 import { objectToFormData } from "../features/ultils";
+import { persistReducer, persistStore } from "redux-persist";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const appReducer = combineReducers({
     order: orderSlice,
@@ -21,21 +23,34 @@ const appReducer = combineReducers({
 })
 
 
+
 const reducerProxy = (state, action) => {
     if (action.type === 'logout/LOGOUT') {
-        return appReducer(undefined, action);
+        const { app, ...restState } = state;
+        const newAppReducer = appReducer(undefined, action);
+        newAppReducer.app = app
+        return newAppReducer
     }
     return appReducer(state, action);
 }
 
-export default configureStore({
-    reducer: reducerProxy,
+const persistedReducer = persistReducer({
+    key: 'root',
+    storage: AsyncStorage,
+}, reducerProxy)
+
+
+const store = configureStore({
+    reducer: persistedReducer,
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: false,
         }),
 })
 
+const persistor = persistStore(store)
+
+export { store, persistor }
 
 export const logout = createAsyncThunk(
     "auth/logout",

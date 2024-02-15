@@ -18,6 +18,9 @@ const appSlice = createSlice({
         setTypeChoosingLocation: (state, action) => {
             state.typeChoosingLocation = action.payload;
         },
+        setIsUseAppBefore: (state, action) => {
+            state.isUseAppBefore = true
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -95,5 +98,5 @@ export const getVehicles = (state) => state.app.vehicles
 export const getRole = (state) => state.app.role
 export const getIsUseAppBefore = (state) => state.app.isUseAppBefore
 export const getTypeChoosingLocation = state => state.app.typeChoosingLocation
-export const { setRole, setTypeChoosingLocation } = appSlice.actions
+export const { setRole, setTypeChoosingLocation, setIsUseAppBefore } = appSlice.actions
 export default appSlice.reducer
