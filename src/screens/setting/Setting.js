@@ -3,11 +3,14 @@ import React, { useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import ChangeUserInforBottomSheet from './ChangeUserInforBottomSheet';
 import { ROLE, ROUTES } from '../../constants';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getRole } from '../../redux/appSlice'
+import { logout } from '../../redux/store';
 const Setting = ({ navigation }) => {
     const role = useSelector(getRole)
+    const dispatch = useDispatch()
     const login = () => {
+        dispatch(logout())
         navigation.navigate(ROUTES.LOGIN)
     }
 
