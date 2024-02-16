@@ -15,7 +15,8 @@ export const basicUserEndpoints = {
     'my-jobs': (pagrams) => `/jobs/?${pagrams}`,
     'job-retrieve': (jobId) => `/jobs/${jobId}/`,
     'assign-job': (jobId) => `/jobs/${jobId}/assign/`,
-    'send_feedback': (jobId) => `/jobs/${jobId}/feedback/`
+    'send_feedback': (jobId) => `/jobs/${jobId}/feedback/`,
+    'view_feedbacks': (shipperId) => `/feedbacks/?shipper=${shipperId}`
 }
 export const shipperEndpoints = {
     'shipper-register': '/shippers/',

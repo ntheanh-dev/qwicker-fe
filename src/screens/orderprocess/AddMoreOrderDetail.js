@@ -10,7 +10,7 @@ import { INIT_PAYMENT, addPayment } from '../../redux/paymentSlice';
 import { formatCurrency, formatDateTimeToVietnamese } from '../../features/ultils';
 import { getShipment } from '../../redux/shipmentSlice';
 import { getSelectedVehicle } from '../../redux/orderSlice';
-import { orderForm } from '../../redux/store';
+import { orderForm, resetOrder } from '../../redux/store';
 import { isProductFulFill } from '../../redux/productSlice';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 import { getBasicUserToken, postJob } from '../../redux/basicUserSlice';
@@ -28,7 +28,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
     const initPaymentMethod = useSelector(getPaymentMethods)
     const [paymentMethod, setPaymentMethod] = useState(initPaymentMethod)
     const [showPayer, setShowPayer] = useState(false)
-    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(0)
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(1.1)
     // -1: init , 0: Momo, 1.1 sender, 1.2: receiver
     const getPaymentMethodUI = (selectedPaymentMethod) => {
         result = {}
@@ -127,7 +127,9 @@ const AddMoreOrderDetail = ({ navigation }) => {
             .then(unwrapResult)
             .then(res => {
                 placeOrderBTS.current.close()
-                navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: res.id, status: res.status })
+                if (res.id) {
+                    navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: res.id, status: res.status })
+                }
             })
             .catch(e => {
                 Toast.show({

@@ -60,7 +60,7 @@ const ReviewOrder = ({ navigation, route }) => {
     const handleFeedback = () => {
         if (text.length > 0) {
             const formData = new FormData()
-            formData.append('shipper', winner?.id)
+            formData.append('shipper_id', winner?.id)
             formData.append('rating', star)
             formData.append('comment', text)
 

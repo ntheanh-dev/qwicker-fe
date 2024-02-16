@@ -204,6 +204,19 @@ export const sendFeedback = createAsyncThunk('job,sendFeedback',
     }
 )
 
+export const viewFeedback = createAsyncThunk('feedback,viewFeedback',
+    async (data, { rejectWithValue }) => {
+        const { access_token, shipperId } = data
+        try {
+            const res = await authAPI(access_token).get(basicUserEndpoints['view_feedbacks'](shipperId))
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
 export const getBasicUserToken = state => state.basicUserSlice.token
 export const getBasicUserStatus = state => state.basicUserSlice.status
 export const { setToken } = basicUserSlice.actions

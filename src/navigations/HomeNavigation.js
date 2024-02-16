@@ -10,6 +10,7 @@ import OrderDetail from '../screens/orderprocess/OrderDetail';
 import { MaterialIcons, Feather, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
 import AddCommentForCourier from '../screens/orderprocess/AddCommentForCourier';
 import OrderStatus from '../screens/orderprocess/OrderStatus';
+import ViewFeedback from '../screens/orderprocess/ViewFeedback';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ const Stack = createNativeStackNavigator();
 const HomeNavigation = () => {
     return (
         <Stack.Navigator initialRouteName={ROUTES.HOME_STACK}
+            screenOptions={{ headerTitleAlign: 'center' }}
         >
             <Stack.Screen name={ROUTES.HOME_STACK} component={Home} options={{ headerShown: false }} />
             <Stack.Screen name={ROUTES.MAP_STACK} component={Map} options={{ headerShown: false }} />
@@ -25,7 +27,6 @@ const HomeNavigation = () => {
                 name={ROUTES.MORE_ORDER_DETAIL_STACK}
                 component={AddMoreOrderDetail}
                 options={{
-                    headerTitleAlign: 'center',
                     headerTitle: () => (
                         <View className="flex-col justify-between space-y-1">
                             <Text className="text-lg font-semibold">Bổ sung chi tiết</Text>
@@ -45,7 +46,6 @@ const HomeNavigation = () => {
                 name={ROUTES.ORDER_DETAIL_STACK}
                 component={OrderDetail}
                 options={{
-                    headerTitleAlign: 'center',
                     headerTitle: () => (
                         <Text className="text-lg font-semibold">Chi tiết giao hàng</Text>
                     ),
@@ -56,7 +56,6 @@ const HomeNavigation = () => {
                 name={ROUTES.ADD_COMMENT_FOR_COURIER_STACK}
                 component={AddCommentForCourier}
                 options={({ navigation }) => ({
-                    headerTitleAlign: 'center',
                     headerTitle: () => (
                         <Text className="text-lg font-semibold">Ghi chú cho Tài xế</Text>
                     ),
@@ -70,24 +69,8 @@ const HomeNavigation = () => {
                     ),
                 })}
             />
-            <Stack.Screen
-                name={ROUTES.ORDER_STATUS_STACK}
-                component={OrderStatus}
-                options={({ navigation }) => ({
-                    headerTitleAlign: 'center',
-                    headerTitle: () => (
-                        <Text className="text-lg font-semibold">Đang tìm tài xế</Text>
-                    ),
-                    headerBackVisible: false,
-                    headerLeft: () => (
-                        <TouchableOpacity
-                            onPress={() => navigation.goBack()}
-                        >
-                            <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
-                        </TouchableOpacity>
-                    ),
-                })}
-            />
+            <Stack.Screen name={ROUTES.ORDER_STATUS_STACK} component={OrderStatus} />
+            <Stack.Screen name={ROUTES.VIEW_FEEDBACK_STACK} component={ViewFeedback} />
 
         </Stack.Navigator>
     )

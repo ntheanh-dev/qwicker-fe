@@ -66,7 +66,7 @@ const OrderStatus = ({ navigation, route }) => {
                 .then(unwrapResult)
                 .then(res => {
                     setOrder(res)
-                    if (status == JOBSTATUS.FINDING_SHIPPER) {
+                    if (Number(status) == JOBSTATUS.FINDING_SHIPPER) {
                         distpatch(getJoinedShipper(form))
                             .then(unwrapResult)
                             .then(res => {
@@ -107,10 +107,7 @@ const OrderStatus = ({ navigation, route }) => {
             headerShown: false,
         });
 
-
-
         navigation.setOptions({
-            headerTitleAlign: 'center',
             headerTitle: "Thông tin đơn hàng",
             headerLeft: () =>
                 <TouchableOpacity onPress={handleBack}>
@@ -247,14 +244,25 @@ const OrderStatus = ({ navigation, route }) => {
                                                         </View>
                                                     </View>
                                                 </View>
-                                                <TouchableOpacity
-                                                    activeOpacity={1}
-                                                    onPress={() => setSelectedShipper(item)}
-                                                    className="flex-row justify-center items-center py-2 space-x-1 border-t border-gray-300"
+                                                <View
+                                                    className="flex-row border-t border-gray-300"
                                                 >
-                                                    <AntDesign name="totop" size={18} color="black" />
-                                                    <Text className="font-medium">Chọn</Text>
-                                                </TouchableOpacity>
+                                                    <TouchableOpacity
+                                                        activeOpacity={1}
+                                                        onPress={() => navigation.navigate(ROUTES.VIEW_FEEDBACK_STACK, { shipper: item })}
+                                                        className="flex-row flex-1 items-center justify-center py-2 border-r border-gray-300"
+                                                    >
+                                                        <Text className="font-medium">Xem đánh giá</Text>
+                                                    </TouchableOpacity>
+
+                                                    <TouchableOpacity
+                                                        activeOpacity={1}
+                                                        className="flex-row flex-1 items-center justify-center"
+                                                        onPress={() => setSelectedShipper(item)}
+                                                    >
+                                                        <Text className="font-medium">Chọn</Text>
+                                                    </TouchableOpacity>
+                                                </View>
                                             </View>
                                         )
                                     }}

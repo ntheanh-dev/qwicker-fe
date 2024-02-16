@@ -26,6 +26,7 @@ export default {
     ORDER_DETAIL_STACK: 'Order Detail Stack',
     ADD_COMMENT_FOR_COURIER_STACK: 'Add comment for courier stack',
     ORDER_STATUS_STACK: 'Order Status Stack',
+    VIEW_FEEDBACK_STACK: 'View Feedback Stack',
 
     DRIVER_NAVIGATION: 'Driver navigation',
     HOME_DRIVER_TAB: 'Home driver tab',
