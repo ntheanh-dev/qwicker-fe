@@ -30,6 +30,14 @@ const reducerProxy = (state, action) => {
         const newAppReducer = appReducer(undefined, action);
         newAppReducer.app = app
         return newAppReducer
+    } else if (action.type === 'resetOrder/RESETORDER') {
+        return {
+            ...state,
+            order: undefined,
+            shipment: undefined,
+            productSlice: undefined,
+            paymentSlice: undefined,
+        }
     }
     return appReducer(state, action);
 }
@@ -59,6 +67,12 @@ export const logout = createAsyncThunk(
     }
 );
 
+export const resetOrder = createAsyncThunk(
+    "auth/logout",
+    async function (_payload, thunkAPI) {
+        thunkAPI.dispatch({ type: 'resetOrder/RESETORDER' });
+    }
+);
 
 export const isLocationAndShipmentFulfill = createSelector(
     getPickUP, getDeliveryAddress, getSelectedVehicle,

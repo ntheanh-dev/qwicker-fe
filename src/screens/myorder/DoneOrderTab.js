@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, RefreshControl } from 'react-native'
+import { View, RefreshControl, FlatList } from 'react-native'
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import OrderItem from './OrderItem'
 import OrderItemNotFound from './OrderItemNotFound'
@@ -7,6 +7,7 @@ import { getBasicUserToken, myJob } from '../../redux/basicUserSlice'
 import { JOBSTATUS } from '../../constants'
 import { unwrapResult } from '@reduxjs/toolkit'
 import { useFetchPaginatedData } from '../../hooks/fetchPaginatedData'
+import { DotIndicator } from 'react-native-indicators'
 const DoneOrderTab = () => {
     const distpatch = useDispatch()
     const { access_token } = useSelector(getBasicUserToken)
@@ -36,28 +37,27 @@ const DoneOrderTab = () => {
                 setRefreshing(false)
             })
     }, []);
-    //------------------Scroll event--------------------
-    const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
-        return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
-    }
     return (
-        <ScrollView
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-            className="flex-1 bg-gray-100 px-2"
-            showsVerticalScrollIndicator={false}
-            onScroll={({ nativeEvent }) => {
-                if (isCloseToBottom(nativeEvent)) {
-                    fetcher.next()
-                }
-            }}
-        >
+        <>
             {fetcher.results.length > 0 ?
-                fetcher.results.map(ele => <OrderItem key={ele.id} {...ele} />
+                (<FlatList
+                    data={fetcher.results}
+                    renderItem={({ item }) => <OrderItem {...item} />}
+                    keyExtractor={item => item.id}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                    }
+                    onEndReached={() => fetcher.next()}
+                />
                 ) : (
                     <OrderItemNotFound />
                 )}
-            <View className="h-80 w-full"></View>
-        </ScrollView>
+            {fetcher.isLoading && (
+                <View className="h-10 flex justify-start items-center">
+                    <DotIndicator size={10} color='#3422F1' />
+                </View>
+            )}
+        </>
     )
 }
 

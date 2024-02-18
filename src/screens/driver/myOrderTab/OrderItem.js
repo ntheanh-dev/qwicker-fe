@@ -27,7 +27,7 @@ const OrderItem = ({ shipment, vehicle, product, payment, title, ...order }) => 
             </View>
 
             {Number(order.status) !== JOBSTATUS.WAITING_SHIPPER &&
-                <View className="flex-row items-center justify-between pt-6 pb-2 px-4">
+                <View className="flex-row items-center justify-between pt-4 pb-2 px-4">
                     <Text className="text-gray-600 text-sm">{`3.65 kilomet`}</Text>
                     <Text className="text-gray-600 text-sm">{`#${order.uuid}`}</Text>
                 </View>

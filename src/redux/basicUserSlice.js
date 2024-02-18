@@ -75,10 +75,10 @@ export const login = createAsyncThunk('user,loginUser',
                     'Content-Type': 'multipart/form-data',
                 },
             })
-            let user = await authAPI(token.data.access_token).get(basicUserEndpoints['current-user'])
+            let user = await authAPI(token?.data?.access_token).get(basicUserEndpoints['current-user'])
             return {
-                user: user.data,
-                token: token.data
+                user: user?.data,
+                token: token?.data
             }
         } catch (err) {
             return rejectWithValue(err?.response.data)

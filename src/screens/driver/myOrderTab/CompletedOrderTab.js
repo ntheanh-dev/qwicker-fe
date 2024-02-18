@@ -1,4 +1,4 @@
-import { View, ScrollView, RefreshControl } from 'react-native'
+import { View, RefreshControl, FlatList } from 'react-native'
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import OrderItem from './OrderItem';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,7 @@ import { JOBSTATUS } from '../../../constants';
 import { unwrapResult } from '@reduxjs/toolkit';
 import OrderItemNotFound from './OrderItemNotFound';
 import { useFetchPaginatedData } from '../../../hooks/fetchPaginatedData';
+import { DotIndicator } from 'react-native-indicators';
 
 const CompletedOrderTab = ({ title }) => {
     const dispatch = useDispatch()
@@ -38,31 +39,26 @@ const CompletedOrderTab = ({ title }) => {
                 setRefreshing(false)
             })
     }, []);
-    //------------------Scroll event--------------------
-    const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
-        return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
-    }
     return (
         <View className="flex-1 bg-gray-100 px-4">
-            <ScrollView
-                showsVerticalScrollIndicator={false}
-                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-                onScroll={({ nativeEvent }) => {
-                    if (isCloseToBottom(nativeEvent)) {
-                        fetcher.next()
+            {fetcher.results.length > 0 ? (
+                <FlatList
+                    data={fetcher.results}
+                    renderItem={({ item }) => <OrderItem {...item} title={title} />}
+                    keyExtractor={item => item.id}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                     }
-                }}
-            >
-                {fetcher.results.length > 0 ? (
-                    fetcher.results.map(ele => <OrderItem key={ele.id} {...ele} title={title} />)
-                ) : (
-                    <>
-                        <View className="h-40 w-full"></View>
-                        <OrderItemNotFound className="pt-40" />
-                    </>
-                )}
-                <View className="h-80 w-full"></View>
-            </ScrollView>
+                    onEndReached={() => fetcher.next()}
+                />
+            ) : (
+                <OrderItemNotFound className="pt-40" />
+            )}
+            {fetcher.isLoading && (
+                <View className="pb-4 py-2">
+                    <DotIndicator size={10} color='#3422F1' />
+                </View>
+            )}
         </View>
     )
 }

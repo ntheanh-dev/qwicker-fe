@@ -9,8 +9,8 @@ import { logout } from '../../redux/store';
 const Setting = ({ navigation }) => {
     const role = useSelector(getRole)
     const dispatch = useDispatch()
-    const login = () => {
-        dispatch(logout())
+    const logout = () => {
+        // dispatch(logout())
         navigation.navigate(ROUTES.LOGIN)
     }
 
@@ -65,7 +65,7 @@ const Setting = ({ navigation }) => {
             </TouchableOpacity>
 
             <TouchableOpacity
-                onPress={login}
+                onPress={logout}
                 className="flex justify-between items-center py-4 bg-white"
                 style={role === ROLE.TRADITIONAL_USER && { position: 'absolute', left: 0, right: 0, bottom: 32 }}
             >
