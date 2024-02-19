@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from 'react'
 import MapView, { Marker } from 'react-native-maps';
 import { MaterialIcons, Ionicons, Entypo, Foundation, AntDesign, } from '@expo/vector-icons';
 import { Easing, } from 'react-native-reanimated';
-import Dialog from "react-native-dialog";
 import { formatCurrency } from '../../features/ultils';
 import { JOBSTATUS, ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,7 +24,6 @@ const OrderStatus = ({ navigation, route }) => {
     const [order, setOrder] = useState({})
     const { payment, product, shipment, vehicle, ...orderData } = order
     const [shipper, setShipper] = useState([])
-    const [selectedShipper, setSelectedShipper] = useState(null)
     const getHeaderTitle = (status) => {
         switch (status) {
             case 'FINDING_SHIPPER':
@@ -151,25 +149,35 @@ const OrderStatus = ({ navigation, route }) => {
     }, []);
     //--------------------------------------------------------
 
-    const handleConfirmShipper = () => {
-        const data = {
-            access_token: access_token,
-            orderId: order.id,
-            shipperId: selectedShipper.id
-        }
-        distpatch(assignJob(data))
-            .then(unwrapResult)
-            .then(res => {
-                setOrder(res)
-            })
-            .catch(e => {
-                Toast.show({
-                    type: ALERT_TYPE.WARNING,
-                    title: `Lựa chọn thất bại`,
-                    textBody: "Hãy thử lại sau một vài phút"
-                })
-            })
-        setSelectedShipper(null)
+    const handleConfirmShipper = (shipperId) => {
+        Alert.alert('Lựa chọn shipper', 'Bạn đã chắc chắn chọn shipper này là người giao đơn hàng của bạn?', [
+            {
+                text: 'Tiếp tục tìm kiếm',
+                style: 'cancel',
+            },
+            {
+                text: 'Chọn', onPress: () => {
+                    const data = {
+                        access_token: access_token,
+                        orderId: order.id,
+                        shipperId: shipperId
+                    }
+                    distpatch(assignJob(data))
+                        .then(unwrapResult)
+                        .then(res => {
+                            setOrder(res)
+                        })
+                        .catch(e => {
+                            Toast.show({
+                                type: ALERT_TYPE.WARNING,
+                                title: `Lựa chọn thất bại`,
+                                textBody: "Hãy thử lại sau một vài phút"
+                            })
+                        })
+                }
+            },
+        ]);
+
     }
 
     return (
@@ -258,7 +266,7 @@ const OrderStatus = ({ navigation, route }) => {
                                                     <TouchableOpacity
                                                         activeOpacity={1}
                                                         className="flex-row flex-1 items-center justify-center"
-                                                        onPress={() => setSelectedShipper(item)}
+                                                        onPress={() => handleConfirmShipper(s.id)}
                                                     >
                                                         <Text className="font-medium">Chọn</Text>
                                                     </TouchableOpacity>
@@ -276,47 +284,6 @@ const OrderStatus = ({ navigation, route }) => {
                             <Text className="text-gray-500">Vui lòng đợi trong ít phút</Text>
                         </>
                     )}
-
-                    {/* -------Dialog confirm choosing shipper */}
-                    <Dialog.Container visible={selectedShipper !== null} className="rounded-3xl relative">
-                        <Dialog.Title>
-                            <Text className="text-2xl">Bạn có chắc chắn không?</Text>
-                        </Dialog.Title>
-                        <View className="flex-row px-3 py-4 items-center">
-                            <View className="basis-2/6 px-3">
-                                <Image
-                                    // source={require('../../assets/logo/user.png')}
-                                    source={{ uri: selectedShipper?.avatar }}
-                                    className="h-14 w-14 "
-                                />
-                            </View>
-                            <View className="basis-4/6 flex-col space-y-1">
-                                <Text>{`${selectedShipper?.last_name} ${selectedShipper?.first_name}`}</Text>
-                                <View className="flex-row items-center space-x-1">
-                                    <AntDesign name="star" size={15} color="#FFB534" />
-                                    <Text className="text-xs text-gray-600">{selectedShipper?.rating}</Text>
-                                </View>
-                                <View className="bg-gray-100 rounded-md px-1">
-                                    <Text className="text-xs text-gray-600 font-semibold">{`${selectedShipper?.more.vehicle_number} ${selectedShipper?.more.vehicle?.name}`}</Text>
-                                </View>
-                            </View>
-                        </View>
-                        <View className="px-3 mt-2">
-                            <TouchableOpacity
-                                activeOpacity={1}
-                                onPress={handleConfirmShipper}
-                                className="w-full bg-[#3422F1] rounded-xl py-2 flex-row justify-center "
-                            >
-                                <Text className="text-lg font-semibold text-white">Chọn</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                className="w-full flex-row justify-center py-4"
-                                onPress={() => setSelectedShipper(null)}
-                            >
-                                <Text className="text-lg font-semibold text-[#3422F1]">Tiếp tục tìm kiếm shipper</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </Dialog.Container>
 
                 </View>
                 {/* ------------ Order sumary---------- */}

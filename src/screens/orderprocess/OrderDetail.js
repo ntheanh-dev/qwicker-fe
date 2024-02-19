@@ -1,9 +1,8 @@
-import { View, Text, TouchableOpacity, ScrollView, TextInput, FlatList, TouchableHighlight } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, TextInput, FlatList, TouchableHighlight, Alert } from 'react-native'
 import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { Feather, AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
 import CheckBox from 'react-native-check-box'
 import * as ImagePicker from 'expo-image-picker';
-import Dialog from "react-native-dialog";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductCategories, getCategories } from '../../redux/appSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -16,9 +15,7 @@ const OrderDetail = ({ navigation }) => {
     const initCategories = useSelector(getCategories)
     const initProduct = useSelector(getProduct)
     const [categories, setCategories] = useState(initCategories)
-
     const inputRef = useRef()
-    const [visible, setVisible] = useState(false);
     const [productDetail, updateProductDetail] = useReducer((prve, next) => ({
         ...prve, ...next
     }), {
@@ -27,12 +24,6 @@ const OrderDetail = ({ navigation }) => {
         quantity: initProduct.quantity,
         image: initProduct.image
     })
-
-    const handleDelete = () => {
-        setVisible(false);
-        dispatch(removeProductData)
-        navigation.goBack()
-    };
 
     const pickImage = async () => {
         let { status } =
@@ -54,13 +45,7 @@ const OrderDetail = ({ navigation }) => {
         const { selectedCategory, checkedMass, quantity, image } = productDetail
         return selectedCategory && checkedMass && image && Number(quantity) > 0
     }
-    const handleBack = () => {
-        if (isFullField()) {
-            setVisible(true)
-        } else {
-            navigation.goBack()
-        }
-    }
+
     useEffect(() => {
         //Fetch Product Categories
         if (categories.length === 0) {
@@ -74,7 +59,7 @@ const OrderDetail = ({ navigation }) => {
         navigation.setOptions({
             headerLeft: () => (
                 <TouchableOpacity
-                    onPress={handleBack}
+                    onPress={() => navigation.goBack()}
                 >
                     <AntDesign name="close" size={24} color="black" />
                 </TouchableOpacity>
@@ -195,39 +180,6 @@ const OrderDetail = ({ navigation }) => {
                         )}
                     </TouchableOpacity>
                 </View>
-
-                {/* -------------------Dialog----------------- */}
-                <Dialog.Container visible={visible} className="rounded-3xl relative">
-                    <Dialog.Title>
-                        <Text className="text-2xl">Bỏ thay đổi?</Text>
-                    </Dialog.Title>
-                    <Dialog.Description>
-                        Thay đổi của bạn sẽ không được lưu.
-                    </Dialog.Description>
-                    <View className="px-3 mt-2">
-                        <TouchableHighlight
-                            onPress={handleDelete}
-                            underlayColor={'rbga(0,0,0,0)'}
-                            className="w-full bg-[#3422F1] rounded-xl py-2 flex-row justify-center "
-                        >
-                            <Text className="text-lg font-semibold text-white">Xoá bỏ</Text>
-                        </TouchableHighlight>
-                        <TouchableHighlight
-                            underlayColor={'rbga(0,0,0,0)'}
-                            onPress={() => setVisible(false)}
-                            className="w-full flex-row justify-center py-4"
-                        >
-                            <Text className="text-lg font-semibold text-[#3422F1]">Tiếp tục chỉnh sửa</Text>
-                        </TouchableHighlight>
-                    </View>
-                    <TouchableOpacity
-                        activeOpacity={1}
-                        onPress={() => setVisible(false)}
-                        className="absolute right-3 top-3"
-                    >
-                        <Feather name="x" size={30} color="#D1D5DB" />
-                    </TouchableOpacity>
-                </Dialog.Container>
             </ScrollView>
             {/* -------------Confirm bottom sheet-------- */}
             <View

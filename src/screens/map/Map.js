@@ -1,4 +1,4 @@
-import { View, Text, Dimensions, TouchableOpacity, TextInput } from 'react-native'
+import { View, Text, Dimensions, TouchableOpacity, TextInput, Alert } from 'react-native'
 import React, { useEffect, useReducer, useRef, useState } from 'react'
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { MaterialIcons, Entypo } from '@expo/vector-icons';
@@ -8,7 +8,6 @@ import { getTypeChoosingLocation } from '../../redux/appSlice';
 import { INITIAL_ADDRESS, addAdditionalDeliveryAddressInfo, addAdditionalPickUpInfo, addDeliveryAddress, addPickUp, getDeliveryAddress, getPickUP, } from '../../redux/shipmentSlice';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import RBSheet from "react-native-raw-bottom-sheet";
-import Dialog from "react-native-dialog";
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -29,7 +28,6 @@ const Map = ({ navigation }) => {
         ...prev, ...next
     }), {
         showBottomSheet: true,
-        showDialog: false,
         phoneNumber: phone_number,
         contactName: contact,
         apartmentNumber: ''
@@ -54,9 +52,13 @@ const Map = ({ navigation }) => {
         if (isFullfil()) {
             goBack()
         } else {
-            updateData({
-                showDialog: true
-            })
+            Alert.alert('Quay trở lại?', 'Địa chỉ bạn đã chọn sẽ không được lưu', [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                { text: 'OK', onPress: () => handleConfirmGoback() },
+            ]);
         }
     }
 
@@ -190,30 +192,6 @@ const Map = ({ navigation }) => {
                     </View>
                 </View>
             </RBSheet>
-            {/* -------------------Dialog----------------- */}
-            <Dialog.Container visible={data.showDialog} className="rounded-3xl relative">
-                <Dialog.Title>
-                    <Text className="">Quay trở lại?</Text>
-                </Dialog.Title>
-                <Dialog.Description>
-                    Địa chỉ bạn đã chọn sẽ không được lưu.
-                </Dialog.Description>
-                <View className="px-3 mt-2">
-                    <TouchableOpacity
-                        onPress={handleConfirmGoback}
-                        className="w-full bg-[#3422F1] rounded-xl py-2 flex-row justify-center "
-                    >
-                        <Text className="text-lg font-semibold text-white">Trở lại</Text>
-                    </TouchableOpacity>
-                </View>
-                <TouchableOpacity
-                    activeOpacity={1}
-                    onPress={() => updateData({ showDialog: false })}
-                    className="absolute right-3 top-3"
-                >
-                    <Feather name="x" size={30} color="#D1D5DB" />
-                </TouchableOpacity>
-            </Dialog.Container>
         </View>
     )
 }
