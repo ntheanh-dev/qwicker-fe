@@ -1,4 +1,4 @@
-import { View, RefreshControl, FlatList } from 'react-native'
+import { RefreshControl, FlatList } from 'react-native'
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import OrderItem from './OrderItem'
 import OrderItemNotFound from './OrderItemNotFound'
@@ -38,27 +38,23 @@ const DoneOrderTab = () => {
             })
     }, []);
     return (
-        <>
-            {fetcher.results.length > 0 ?
-                (<FlatList
-                    data={fetcher.results}
-                    renderItem={({ item }) => <OrderItem {...item} />}
-                    keyExtractor={item => item.id}
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                    }
-                    onEndReached={() => fetcher.next()}
-                />
-                ) : (
-                    <OrderItemNotFound />
-                )}
-            {fetcher.isLoading && (
-                <View className="h-10 flex justify-start items-center">
-                    <DotIndicator size={10} color='#3422F1' />
-                </View>
-            )}
-        </>
-    )
+        <FlatList
+            data={fetcher.results.length > 0 ? fetcher.results : [{ id: 1 }]}
+            className="px-2"
+            renderItem={({ item }) => {
+                if (fetcher.results.length > 0) {
+                    return <OrderItem {...item} />
+                } else {
+                    return <OrderItemNotFound />
+                }
+            }}
+            keyExtractor={item => item.id}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            onEndReached={() => fetcher.next()}
+        />)
+
 }
 
 export default memo(DoneOrderTab)

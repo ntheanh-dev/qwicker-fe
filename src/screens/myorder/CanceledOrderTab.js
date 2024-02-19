@@ -1,4 +1,4 @@
-import { View, ScrollView, RefreshControl } from 'react-native'
+import { RefreshControl, FlatList } from 'react-native'
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import OrderItem from './OrderItem'
 import OrderItemNotFound from './OrderItemNotFound'
@@ -36,28 +36,23 @@ const CanceledOrderTab = () => {
                 setRefreshing(false)
             })
     }, []);
-    //------------------Scroll event--------------------
-    const isCloseToBottom = ({ layoutMeasurement, contentOffset, contentSize }) => {
-        return layoutMeasurement.height + contentOffset.y >= contentSize.height - 20;
-    }
     return (
-        <ScrollView
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-            className="flex-1 bg-gray-100 px-2"
-            showsVerticalScrollIndicator={false}
-            onScroll={({ nativeEvent }) => {
-                if (isCloseToBottom(nativeEvent)) {
-                    fetcher.next()
+        <FlatList
+            data={fetcher.results.length > 0 ? fetcher.results : [{ id: 1 }]}
+            className="px-2"
+            renderItem={({ item }) => {
+                if (fetcher.results.length > 0) {
+                    return <OrderItem {...item} />
+                } else {
+                    return <OrderItemNotFound />
                 }
             }}
-        >
-            {fetcher.results.length > 0 ?
-                fetcher.results.map(ele => <OrderItem key={ele.id} {...ele} />
-                ) : (
-                    <OrderItemNotFound />
-                )}
-            <View className="h-80 w-full"></View>
-        </ScrollView>
+            keyExtractor={item => item.id}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            onEndReached={() => fetcher.next()}
+        />
     )
 }
 

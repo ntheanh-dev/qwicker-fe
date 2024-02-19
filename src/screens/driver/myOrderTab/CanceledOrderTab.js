@@ -1,4 +1,4 @@
-import { View, RefreshControl, FlatList } from 'react-native'
+import { RefreshControl, FlatList } from 'react-native'
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import OrderItem from './OrderItem';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,7 +7,6 @@ import { JOBSTATUS } from '../../../constants';
 import { unwrapResult } from '@reduxjs/toolkit';
 import OrderItemNotFound from './OrderItemNotFound';
 import { useFetchPaginatedData } from '../../../hooks/fetchPaginatedData';
-import { DotIndicator } from 'react-native-indicators';
 
 const CanceledOrderTab = ({ title }) => {
     const dispatch = useDispatch()
@@ -38,28 +37,23 @@ const CanceledOrderTab = ({ title }) => {
                 setRefreshing(false)
             })
     }, []);
-
     return (
-        <>
-            {fetcher.results.length > 0 ?
-                (<FlatList
-                    data={fetcher.results}
-                    renderItem={({ item }) => <OrderItem {...item} />}
-                    keyExtractor={item => item.id}
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                    }
-                    onEndReached={() => fetcher.next()}
-                />
-                ) : (
-                    <OrderItemNotFound />
-                )}
-            {fetcher.isLoading && (
-                <View className="h-10 flex justify-start items-center">
-                    <DotIndicator size={10} color='#3422F1' />
-                </View>
-            )}
-        </>
+        <FlatList
+            className="px-2"
+            data={fetcher.results.length > 0 ? fetcher.results : [{ id: 1 }]}
+            renderItem={({ item }) => {
+                if (fetcher.results.length > 0) {
+                    return <OrderItem {...item} title={title} />
+                } else {
+                    return <OrderItemNotFound />
+                }
+            }}
+            keyExtractor={item => item.id}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            onEndReached={() => fetcher.next()}
+        />
     )
 }
 
