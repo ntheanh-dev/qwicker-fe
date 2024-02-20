@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 import { SHIPMENTYPE } from "../constants";
 import { getCurrentDate, getCurrentDateTime } from "../features/ultils";
-import { fakeAddress } from "../data";
 
 export const INITIAL_ADDRESS = {
     contact: '',

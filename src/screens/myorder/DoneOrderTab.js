@@ -7,7 +7,6 @@ import { getBasicUserToken, myJob } from '../../redux/basicUserSlice'
 import { JOBSTATUS } from '../../constants'
 import { unwrapResult } from '@reduxjs/toolkit'
 import { useFetchPaginatedData } from '../../hooks/fetchPaginatedData'
-import { DotIndicator } from 'react-native-indicators'
 const DoneOrderTab = () => {
     const distpatch = useDispatch()
     const { access_token } = useSelector(getBasicUserToken)

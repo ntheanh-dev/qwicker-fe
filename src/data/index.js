@@ -120,7 +120,7 @@ export const fakeOrders = [
         }, price: 123000, distance: 19.234, uuid: '12892348573', time: "2024-01-17 20:00:00"
     },]
 
-export const fakeAddress = [{
+export const fakePickUpAddress = [{
     id: 1,
     latitude: 10.816674118627507,
     longitude: 106.67741941096348,
@@ -133,6 +133,53 @@ export const fakeAddress = [{
     long_name: '371 Đ. Nguyễn Kiệm, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Nam'
 }, {
     id: 2,
+    latitude: 10.815476543222863,
+    longitude: 106.67795854392419,
+    country: 'Việt Nam',
+    city: 'Hồ Chí Minh',
+    district: 'Phường 3, Gò Vấp',
+    street: 'Nguyễn Thái Sơn',
+    home_number: '3',
+    short_name: '3 Nguyễn Thái Sơn',
+    long_name: '3 Nguyễn Thái Sơn, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Nam'
+}, {
+    id: 3,
+    latitude: 10.816517777190121,
+    longitude: 106.67991177213969,
+    country: 'Việt Nam',
+    city: 'Hồ Chí Minh',
+    district: 'Phường 3, Gò Vấp',
+    street: 'Nguyễn Thái Sơn',
+    home_number: '80 - 90',
+    short_name: '80 - 90 Nguyễn Thái Sơn',
+    long_name: '80 - 90 Nguyễn Thái Sơn, Phường 3, Gò Vấp, Thành phố Hồ Chí Minh, Việt Nam'
+}, {
+    id: 4,
+    latitude: 10.777185178129605,
+    longitude: 106.69524100828986,
+    country: 'Việt Nam',
+    city: 'Hồ Chí Minh',
+    district: 'Bến Nghé, Quận 1',
+    street: 'Công xã Paris',
+    home_number: '01',
+    short_name: '01 - Công xã Paris',
+    long_name: '01 - Công xã Paris, Bến Nghé, Quận 1, Thành phố Hồ Chí Minh, Việt Nam'
+}, {
+    id: 5,
+    latitude: 10.776542261943176,
+    longitude: 106.69019845559328,
+    country: 'Việt Nam',
+    city: 'Hồ Chí Minh',
+    district: 'Phường 6, Quận 3',
+    street: 'Võ Văn Tần',
+    home_number: '97',
+    short_name: '97 - Võ Văn Tần',
+    long_name: '97 - Võ Văn Tần, Phường 6, Quận 3, Thành phố Hồ Chí Minh, Việt Nam'
+}
+]
+
+export const fakeDeliveryAdress = [{
+    id: 1,
     latitude: 10.675584891564835,
     longitude: 106.69065525750209,
     country: 'Việt Nam',
@@ -142,7 +189,52 @@ export const fakeAddress = [{
     home_number: null,
     short_name: 'Nhơn Đức, Nhà Bè',
     long_name: 'Nhơn Đức, Nhà Bè, Thành phố Hồ Chí Minh, Việt Nam'
-}]
+}, {
+    id: 2,
+    latitude: 10.741081276718683,
+    longitude: 106.7017896193598,
+    country: 'Việt Nam',
+    city: 'Hồ Chí Minh',
+    district: 'Tân Hưng, Quận 7',
+    street: 'Nguyễn Phú Thọ',
+    home_number: '469',
+    short_name: '469 Đ. Nguyễn Phú Thọ',
+    long_name: '469 Đ. Nguyễn Phú Thọ, Tân Hưng, Quận 7, Thành phố Hồ Chí Minh, Việt Nam'
+}, {
+    id: 3,
+    latitude: 10.743350393821329,
+    longitude: 106.70153700786972,
+    country: 'Việt Nam',
+    city: 'Hồ Chí Minh',
+    district: 'Tân Hưng, Quận 7',
+    street: 'Nguyễn Phú Thọ',
+    home_number: '3F',
+    short_name: '3F Đ. Nguyễn Phú Thọ',
+    long_name: '3F Đ. Nguyễn Phú Thọ, Tân Hưng, Quận 7, Thành phố Hồ Chí Minh, Việt Nam'
+}, {
+    id: 4,
+    latitude: 10.733101626225203,
+    longitude: 106.69977633440382,
+    country: 'Việt Nam',
+    city: 'Hồ Chí Minh',
+    district: 'Tân Hưng, Quận 7',
+    street: 'Nguyễn Phú Thọ',
+    home_number: '19',
+    short_name: '19 Đ. Nguyễn Phú Thọ',
+    long_name: '19 Đ. Nguyễn Phú Thọ, Tân Hưng, Quận 7, Thành phố Hồ Chí Minh, Việt Nam'
+}, {
+    id: 5,
+    latitude: 10.729632024994975,
+    longitude: 106.69571359091915,
+    country: 'Việt Nam',
+    city: 'Hồ Chí Minh',
+    district: 'Tân Hưng, Quận 7',
+    street: 'Nguyễn Văn Linh',
+    home_number: '702',
+    short_name: '702 Đ. Nguyễn Văn Linh',
+    long_name: '702 Đ. Nguyễn Văn Linh, Tân Hưng, Quận 7, Thành phố Hồ Chí Minh, Việt Nam'
+}
+]
 
 export const fakeOrderData = {
     order: { amount: null, is_poster_pay: true, method: 1, payment_date: null },

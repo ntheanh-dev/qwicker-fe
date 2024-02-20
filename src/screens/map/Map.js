@@ -8,6 +8,7 @@ import { getTypeChoosingLocation } from '../../redux/appSlice';
 import { INITIAL_ADDRESS, addAdditionalDeliveryAddressInfo, addAdditionalPickUpInfo, addDeliveryAddress, addPickUp, getDeliveryAddress, getPickUP, } from '../../redux/shipmentSlice';
 import { AntDesign, Feather } from '@expo/vector-icons';
 import RBSheet from "react-native-raw-bottom-sheet";
+import { useIsFocused } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -37,6 +38,7 @@ const Map = ({ navigation }) => {
             headerShown: show
         });
     }
+
     useEffect(() => {
         setShowHeader(false)
         refRBSheet.current.open()
@@ -45,7 +47,6 @@ const Map = ({ navigation }) => {
     const goBack = () => {
         setShowHeader(true)
         navigation.navigate(ROUTES.HOME_STACK)
-
     }
 
     const handleBack = () => {
@@ -103,7 +104,11 @@ const Map = ({ navigation }) => {
     }
     return (
         <View className="flex-1 relative">
-            <MapView initialRegion={{ ...INIT_REGION, latitude: latitude, longitude: longitude }} className="w-full h-full">
+            <MapView
+                initialRegion={{ ...INIT_REGION, latitude: latitude, longitude: longitude }}
+                className="w-full h-full"
+                provider={PROVIDER_GOOGLE}
+            >
                 <Marker coordinate={{ ...INIT_REGION, latitude: latitude, longitude: longitude }} />
             </MapView>
 

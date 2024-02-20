@@ -61,11 +61,10 @@ const Order = ({ data }) => {
                     <Text className="text-base text-gray-600">{order.descripttion}</Text>
                 </View>}
             <View className="flex-row justify-between items-center p-4 ">
-                <View>
+                <View className="flex-row items-center space-x-1">
                     <Ionicons name="cash-outline" size={24} color="#3422F1" />
                     <Text>{payment.method.name}</Text>
                 </View>
-
                 <Text className="text-xl font-semibold">đ{formatCurrency(shipment.cost)}</Text>
             </View>
         </TouchableOpacity>

@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { findJob, getToken } from '../../../redux/shipperSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useFetchPaginatedData } from '../../../hooks/fetchPaginatedData';
-import { DotIndicator } from 'react-native-indicators';
 
 const FILTER_DATA = [{ id: 1, content: 'Tất cả' }, { id: 2, content: 'Ngay bây giờ' }, { id: 3, content: 'Hôm nay' }, { id: 4, content: 'Khác' },]
 const SORT_DATA = [{ id: 1, content: 'Thời gian' }, { id: 2, content: 'Địa điểm' }]
@@ -119,30 +118,28 @@ const FindOrderTab = ({ navigation }) => {
                 </View>
             </TouchableOpacity>}
             {/* ---------------Data space----------------- */}
-            {fetcher.results.length > 0 ? (
-                <FlatList
-                    data={fetcher.results}
-                    renderItem={({ item }) => <Order data={item} />}
-                    keyExtractor={item => item.id}
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                    }
-                    onEndReached={() => fetcher.next()}
-                />
-            ) : (
-                <View className="flex justify-center items-center mt-24">
-                    <LottieView style={{ width: 250, height: 250 }} source={require('../../../assets/animations/onboarding4.json')} loop autoPlay />
-                    <Text className="text-lg my-3 text-center">Thử xoá tuỳ chọn bộ lọc để xem thêm các đơn hàng</Text>
-                    <TouchableOpacity className="py-3 px-5 rounded-lg bg-[#3422F1]" onPress={handleClearFilter}>
-                        <Text className="text-white font-medium text-xl">Xoá tất cả bộ lọc</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-            {fetcher.isLoading && (
-                <View className="pb-4 py-2">
-                    <DotIndicator size={10} color='#3422F1' />
-                </View>
-            )}
+            <FlatList
+                data={fetcher.results.length > 0 ? fetcher.results : [{ id: 1 }]}
+                renderItem={({ item }) => {
+                    if (fetcher.results.length > 0)
+                        return <Order data={item} />
+                    else
+                        return (
+                            <View className="flex justify-center items-center mt-24">
+                                <LottieView style={{ width: 250, height: 250 }} source={require('../../../assets/animations/onboarding4.json')} loop autoPlay />
+                                <Text className="text-lg my-3 text-center">Thử xoá tuỳ chọn bộ lọc để xem thêm các đơn hàng</Text>
+                                <TouchableOpacity className="py-3 px-5 rounded-lg bg-[#3422F1]" onPress={handleClearFilter}>
+                                    <Text className="text-white font-medium text-xl">Xoá tất cả bộ lọc</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )
+                }}
+                keyExtractor={item => item.id}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+                onEndReached={() => fetcher.next()}
+            />
         </View>
     )
 }

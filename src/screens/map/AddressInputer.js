@@ -6,10 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addDeliveryAddress, addPickUp, getDeliveryAddress, getPickUP } from '../../redux/shipmentSlice';
 import { getTypeChoosingLocation } from '../../redux/appSlice';
 import { LOCATION, ROUTES } from '../../constants';
-import { fakeAddress } from '../../data';
-const fakePickUpData = [...Array(6)].map((ele, index) => Object.assign({}, { ...fakeAddress[0], id: index }))
-const fakeDeliveryAddressData = [...Array(6)].map((ele, index) => Object.assign({}, { ...fakeAddress[1], id: index }))
-
+import { fakeDeliveryAdress, fakePickUpAddress } from '../../data';
 const AddressInputer = ({ navigation }) => {
     const dispatch = useDispatch()
     const type = useSelector(getTypeChoosingLocation)
@@ -23,9 +20,9 @@ const AddressInputer = ({ navigation }) => {
         setTxt(text)
         // using Google API Place here if possible
         if (type === LOCATION.PICK_UP) {
-            setAddress(fakePickUpData)
+            setAddress(fakePickUpAddress)
         } else {
-            setAddress(fakeDeliveryAddressData)
+            setAddress(fakeDeliveryAdress)
         }
     }
     const handleClearText = () => {
@@ -49,7 +46,7 @@ const AddressInputer = ({ navigation }) => {
                 dispatch(addDeliveryAddress(item))
                 break
         }
-        navigation.navigate(ROUTES.MAP_STACK)
+        navigation.navigate(ROUTES.MAP_STACK, { location: item })
     }
     useEffect(() => {
         navigation.getParent().setOptions({
@@ -57,9 +54,9 @@ const AddressInputer = ({ navigation }) => {
         });
         if (txt !== '') {
             if (type === LOCATION.PICK_UP) {
-                setAddress(fakePickUpData)
+                setAddress(fakePickUpAddress)
             } else {
-                setAddress(fakeDeliveryAddressData)
+                setAddress(fakeDeliveryAdress)
             }
         }
     }, [])
