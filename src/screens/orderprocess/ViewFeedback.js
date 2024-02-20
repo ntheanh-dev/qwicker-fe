@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getBasicUserToken, viewFeedback } from '../../redux/basicUserSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
-import { useFetchPaginatedData } from '../../hooks/fetchPaginatedData'
+import { useFetchPaginatedData } from '../../hooks/useFetchPaginatedData'
 import { MaterialIcons, AntDesign, Entypo } from '@expo/vector-icons';
 
 const ViewFeedback = ({ navigation, route }) => {

@@ -6,11 +6,11 @@ import { useNavigation } from '@react-navigation/native';
 import { getDiffBetweenTwoTime, formatMomentDateToVietnamese, formatCurrency } from '../../../features/ultils';
 
 const Order = ({ data }) => {
-    const { time, shipment, payment, product, ...order } = data
+    const { shipment, payment, product, ...order } = data
     const navigation = useNavigation()
     var moment = require('moment-timezone');
     moment.tz.setDefault('Asia/Ho_Chi_Minh')
-    const orderTime = moment(time)
+    const orderTime = moment(shipment?.shipment_date)
 
     const getType = () => {
         if (shipment.type === 'Now') {
@@ -27,7 +27,7 @@ const Order = ({ data }) => {
     }
     const type = getType()
     const headerColor = type === 'now' ? 'bg-orange-500' : type === 'today' ? 'bg-yellow-500' : 'bg-[#3422F1]'
-    const headerTitle = type === 'now' ? 'Giao ngay' : type === 'today' ? 'Hôm nay' : formatMomentDateToVietnamese(time)
+    const headerTitle = type === 'now' ? 'Giao ngay' : type === 'today' ? 'Hôm nay' : formatMomentDateToVietnamese(shipment?.shipment_date)
     const headerTime = orderTime.minute() < 10 ? `${orderTime.hour()}:0${orderTime.minute()}` : `${orderTime.hour()}:${orderTime.minute()}`
     return (
         <TouchableOpacity

@@ -10,6 +10,7 @@ import DriverProfileNavigation from './DriverProfileNavigation';
 import MyOrderTab from '../screens/driver/myOrderTab';
 import FindOrderTab from '../screens/driver/findOrderTab';
 import ReviewOrder from '../screens/driver/hideTab/ReviewOrder';
+import SearchOrder from '../screens/driver/hideTab/SearchOrder';
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
     return (
@@ -99,6 +100,7 @@ const BottomNavigation = () => {
                 headerTitle: route.params?.title,
                 headerTitleAlign: 'center'
             })} />
+            <Tab.Screen name={ROUTES.SEARCH_ORDER_DRIVER_TAB} component={SearchOrder} options={{ headerShown: false }} />
         </Tab.Navigator>
     )
 }
@@ -110,7 +112,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        height: 80
+        height: 100
     },
     tabBarItemStyle: {
         top: 4,

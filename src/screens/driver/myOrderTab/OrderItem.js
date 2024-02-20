@@ -55,7 +55,10 @@ const OrderItem = ({ shipment, vehicle, product, payment, title, ...order }) => 
                 </View>
             }
             <View className="flex-row justify-between items-center p-4">
-                <Ionicons name="cash-outline" size={24} color="#3422F1" />
+                <View className="flex-row items-center space-x-1">
+                    <Ionicons name="cash-outline" size={24} color="#3422F1" />
+                    <Text className="text-base">{payment.method.name}</Text>
+                </View>
                 <Text className="text-xl font-semibold">{formatCurrency(shipment.cost)}</Text>
             </View>
         </TouchableOpacity>

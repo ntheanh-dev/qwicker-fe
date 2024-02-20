@@ -55,7 +55,6 @@ const ReviewOrder = ({ navigation, route }) => {
                     <View className="flex-row space-x-2">
                         <View className="mt-2 relative">
                             <Entypo name="circle" size={18} color="#3422F1" />
-                            <View className="border-l-2 border-dotted border-[#3422F1] flex-1 absolute top-6 bottom-0 left-1/2" style={{ width: 1 }}></View>
                         </View>
 
                         <View className="basis-5/6 flex-col">
@@ -104,7 +103,7 @@ const ReviewOrder = ({ navigation, route }) => {
             {/* -----------Confirm bottom btn---------- */}
             {Number(order.status) === JOBSTATUS.WAITING_SHIPPER && (
                 <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
-                    <Text className="text-base font-medium text-gray-400 text-center ">Xác nhận với khách hàng về các loại phí phát sinh</Text>
+                    <Text className="text-sm font-medium text-gray-400 text-center ">Xác nhận với khách hàng về các loại phí phát sinh</Text>
                     <TouchableOpacity
                         onPress={handleCompelte}
                         className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"

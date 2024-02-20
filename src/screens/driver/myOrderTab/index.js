@@ -1,11 +1,13 @@
 import * as React from 'react';
-import { View, useWindowDimensions, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import { View, useWindowDimensions, TextInput, TouchableOpacity, FlatList, Text } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { Entypo, Feather } from '@expo/vector-icons';
 import { SafeAreaView, ScrollView } from 'react-native-safe-area-context';
 import ProcessingOrderTab from './ProcessingOrderTab';
 import CompletedOrderTab from './CompletedOrderTab';
 import CanceledOrderTab from './CanceledOrderTab';
+import { useNavigation } from '@react-navigation/native';
+import { ROUTES } from '../../../constants';
 
 
 const renderScene = ({ route, jumpTo }) => {
@@ -19,7 +21,7 @@ const renderScene = ({ route, jumpTo }) => {
     }
 };
 
-export default function MyOrderTab() {
+export default function MyOrderTab({ navigation }) {
     const layout = useWindowDimensions();
     const [text, setText] = React.useState("")
 
@@ -32,20 +34,20 @@ export default function MyOrderTab() {
 
     return (
         <SafeAreaView className="flex-1">
-            <View className="bg-white px-3 relative">
-                <TextInput
-                    className="bg-gray-200 rounded-lg text-lg py-2 px-9"
-                    placeholder='Tìm kiếm tất cả các đơn hàng'
-                    onChangeText={txt => setText(txt)}
-                    value={text}
-                />
+            <TouchableOpacity
+                className="bg-white px-3 relative"
+                onPress={() => navigation.navigate(ROUTES.SEARCH_ORDER_DRIVER_TAB, { index: index })}
+            >
+                <View className="bg-gray-200 rounded-lg text-lg px-9 py-2">
+                    <Text className="text-base text-gray-600">Tìm kiếm tất cả các đơn hàng</Text>
+                </View>
                 <View className="flex justify-center items-center absolute left-5 top-2" >
                     <Entypo name="magnifying-glass" size={22} color="gray" />
                 </View>
                 <TouchableOpacity className="flex justify-center items-center absolute right-5 top-2" onPress={() => setText('')}>
                     <Feather name="x" size={22} color="gray" />
                 </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
             <TabView
                 navigationState={{ index, routes }}
                 renderScene={renderScene}

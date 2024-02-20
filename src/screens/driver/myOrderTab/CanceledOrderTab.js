@@ -6,7 +6,7 @@ import { getToken, myJobs } from '../../../redux/shipperSlice';
 import { JOBSTATUS } from '../../../constants';
 import { unwrapResult } from '@reduxjs/toolkit';
 import OrderItemNotFound from './OrderItemNotFound';
-import { useFetchPaginatedData } from '../../../hooks/fetchPaginatedData';
+import { useFetchPaginatedData } from '../../../hooks/useFetchPaginatedData';
 
 const CanceledOrderTab = ({ title }) => {
     const dispatch = useDispatch()

@@ -36,6 +36,7 @@ export default {
     FIND_ORDER_DRIVER_TAB: 'Find order driver tab',
     PICK_ORDER_DRIVER_TAB: 'Order detail driver tab',
     REVIEW_ORDER_DRIVER_TAB: 'Review order driver tab',
+    SEARCH_ORDER_DRIVER_TAB: 'Search order driver tab',
 
     DRIVER_PROFILE_NAVIGATION: 'Driver profile navigation',
     DRIVER_PROFILE_STACK: 'Driver profile stack',
