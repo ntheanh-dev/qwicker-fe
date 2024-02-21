@@ -153,4 +153,5 @@ export const compeleteJob = createAsyncThunk('job, myJobs',
 
 export const { setToken } = shipperSlice.actions
 export const getToken = state => state.shipperSlice.token
+export const getShipperProfile = state => state.shipperSlice.user
 export default shipperSlice.reducer

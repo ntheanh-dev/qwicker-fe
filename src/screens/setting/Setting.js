@@ -1,14 +1,16 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
-import ChangeUserInforBottomSheet from './ChangeUserInforBottomSheet';
 import { ROLE, ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { getRole } from '../../redux/appSlice'
 import { logout } from '../../redux/store';
+import { getBasicUserProfile } from '../../redux/basicUserSlice';
+import { getShipperProfile } from '../../redux/shipperSlice';
 const Setting = ({ navigation }) => {
     const role = useSelector(getRole)
     const dispatch = useDispatch()
+    const { email } = role === ROLE.TRADITIONAL_USER ? useSelector(getBasicUserProfile) : useSelector(getShipperProfile)
     const logout = () => {
         // dispatch(logout())
         navigation.navigate(ROUTES.LOGIN)
@@ -30,7 +32,7 @@ const Setting = ({ navigation }) => {
             >
                 <View>
                     <Text className="text-lg font-semibold">Thay đổi emaill</Text>
-                    <Text className="text-gray-500">theanhmgt66@gmail.com</Text>
+                    <Text className="text-gray-500">{email}</Text>
                 </View>
                 <MaterialIcons name="keyboard-arrow-right" size={24} color="#D1D5DB" />
             </TouchableOpacity>

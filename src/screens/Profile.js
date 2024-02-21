@@ -109,7 +109,7 @@ const Profile = () => {
                     <View><Text className="text-sm text-gray-500">Hình đại diện</Text></View>
                     <View className="flex-row space-x-3 items-center mr-[-12] ">
                         <Image
-                            source={{ uri: avatar }}
+                            source={avatar ? { uri: avatar } : require('../assets/logo/user.png')}
                             className="h-12 w-12 rounded-full"
                         />
                         <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />

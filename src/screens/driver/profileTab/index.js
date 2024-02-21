@@ -2,10 +2,13 @@ import { View, Text, Image, Dimensions, TouchableOpacity, SafeAreaView } from 'r
 import React, { useEffect } from 'react'
 import { MaterialIcons, FontAwesome, AntDesign, Ionicons, Entypo, Feather } from '@expo/vector-icons';
 import { ROUTES } from '../../../constants';
+import { useSelector } from 'react-redux';
+import { getShipperProfile } from '../../../redux/shipperSlice';
 
 const { height } = Dimensions.get('window')
 const top = (height * 25 / 100) - 32
 const ProfileTab = ({ navigation }) => {
+    const { avatar, first_name, last_name, rating } = useSelector(getShipperProfile)
     return (
         <SafeAreaView className="flex-1 flex-col relative items-center">
             <View className="w-40 h-16 bg-white border-2 border-gray-200 shadow-lg absolute z-10 rounded-3xl flex-row justify-center items-center space-x-2"
@@ -19,10 +22,11 @@ const ProfileTab = ({ navigation }) => {
                 className="bg-white basis-3/12 flex-col items-center w-full mb-4"
             >
                 <Image
-                    style={{ height: 80, width: 80, resizeMode: 'center' }}
-                    source={require('../../../assets/logo/user.png')}
+                    style={{ height: 80, width: 80 }}
+                    className="rounded-full"
+                    source={avatar ? { uri: avatar } : require('../../../assets/logo/user.png')}
                 />
-                <Text className="font-semibold text-2xl mt-2 mb-3">Nguyen The Anh</Text>
+                <Text className="font-semibold text-2xl mt-2 mb-3">{`${last_name} ${first_name}`}</Text>
                 <View className="flex-row items-center space-x-4">
                     <FontAwesome name="map-marker" size={20} color="rgb(75, 85, 99)" />
                     <Text className="font-semibold text-lg text-gray-600">TP.HCM và tỉnh lân cận</Text>
@@ -31,7 +35,7 @@ const ProfileTab = ({ navigation }) => {
 
             <View className="bg-white basis-2/12 flex-row justify-between w-full h-full mb-4">
                 <View className="flex-col justify-center items-center basis-1/2">
-                    <Text className="text-xl font-semibold text-red-600">4.88</Text>
+                    <Text className="text-xl font-semibold text-red-600">{parseFloat(rating)}</Text>
                     <Text className="text-xl font-semibold text-gray-600">Đánh giá</Text>
                 </View>
                 <View className="flex-col justify-center items-center basis-1/2">
