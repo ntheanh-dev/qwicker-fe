@@ -44,6 +44,17 @@ const basicUserSlice = createSlice({
             .addCase(login.rejected, (state, action) => {
                 state.status = 'idle'
             })
+
+            .addCase(updateProfile.pending, (state) => {
+                state.status = 'pending'
+            })
+            .addCase(updateProfile.fulfilled, (state, action) => {
+                state.user = action.payload
+                state.status = 'idle'
+            })
+            .addCase(updateProfile.rejected, (state, action) => {
+                state.status = 'idle'
+            })
     }
 })
 
@@ -61,6 +72,7 @@ export const register = createAsyncThunk("user,registerUser",
         }
     }
 )
+
 export const login = createAsyncThunk('user,loginUser',
     async (data, { rejectWithValue }) => {
         try {
@@ -109,6 +121,23 @@ export const googleLogin = createAsyncThunk('user,loginUser',
             console.log(err)
             return rejectWithValue(err?.response?.data)
         }
+    }
+)
+
+export const updateProfile = createAsyncThunk('user,updateUser',
+    async (data, { rejectWithValue }) => {
+        const { access_token, formData } = data
+        try {
+            const user = await authAPI(access_token).put(basicUserEndpoints['current-user'], formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            return user.data
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
     }
 )
 
@@ -219,5 +248,6 @@ export const viewFeedback = createAsyncThunk('feedback,viewFeedback',
 
 export const getBasicUserToken = state => state.basicUserSlice.token
 export const getBasicUserStatus = state => state.basicUserSlice.status
+export const getBasicUserProfile = state => state.basicUserSlice.user
 export const { setToken } = basicUserSlice.actions
 export default basicUserSlice.reducer
