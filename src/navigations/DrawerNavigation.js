@@ -68,7 +68,7 @@ const DrawerNavigation = () => {
                     headerTitle: "Đơn hàng",
                     headerLeft: (props) => (
                         <TouchableOpacity className="ml-3"
-                            onPress={() => navigation.goBack()}
+                            onPress={() => navigation.navigate(ROUTES.HOME_DRAWER)}
                         >
                             <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
                         </TouchableOpacity>
@@ -84,7 +84,7 @@ const DrawerNavigation = () => {
                     ),
                     headerLeft: (props) => (
                         <TouchableOpacity className="ml-3"
-                            onPress={() => navigation.goBack()}
+                            onPress={() => navigation.navigate(ROUTES.HOME_DRAWER)}
                         >
                             <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
                         </TouchableOpacity>
@@ -100,7 +100,7 @@ const DrawerNavigation = () => {
                     ),
                     headerLeft: (props) => (
                         <TouchableOpacity className="ml-3"
-                            onPress={() => navigation.goBack()}
+                            onPress={() => navigation.navigate(ROUTES.HOME_DRAWER)}
                         >
                             <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
                         </TouchableOpacity>
@@ -116,7 +116,7 @@ const DrawerNavigation = () => {
                     ),
                     headerLeft: (props) => (
                         <TouchableOpacity className="ml-3"
-                            onPress={() => navigation.goBack()}
+                            onPress={() => navigation.navigate(ROUTES.HOME_DRAWER)}
                         >
                             <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
                         </TouchableOpacity>
@@ -132,7 +132,7 @@ const DrawerNavigation = () => {
                     ),
                     headerLeft: (props) => (
                         <TouchableOpacity className="ml-3"
-                            onPress={() => navigation.goBack()}
+                            onPress={() => navigation.navigate(ROUTES.HOME_DRAWER)}
                         >
                             <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
                         </TouchableOpacity>
@@ -148,7 +148,7 @@ const DrawerNavigation = () => {
                     ),
                     headerLeft: (props) => (
                         <TouchableOpacity className="ml-3"
-                            onPress={() => navigation.goBack()}
+                            onPress={() => navigation.navigate(ROUTES.HOME_DRAWER)}
                         >
                             <MaterialIcons name="keyboard-arrow-left" size={24} color="black" />
                         </TouchableOpacity>
@@ -223,7 +223,7 @@ const DrawerNavigation = () => {
             <Drawer.Screen
                 name={ROUTES.SEARCH_ORDER_DRAWER}
                 component={SearchOrder}
-                options={{ headerShown: false }}
+                options={{ headerShown: false, drawerItemStyle: { height: 0 }, }}
             />
 
         </Drawer.Navigator>
