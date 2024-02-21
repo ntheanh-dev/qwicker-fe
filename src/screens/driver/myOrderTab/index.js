@@ -1,12 +1,11 @@
 import * as React from 'react';
-import { View, useWindowDimensions, TextInput, TouchableOpacity, FlatList, Text } from 'react-native';
+import { View, useWindowDimensions, TouchableOpacity, Text } from 'react-native';
 import { TabView, TabBar } from 'react-native-tab-view';
 import { Entypo, Feather } from '@expo/vector-icons';
-import { SafeAreaView, ScrollView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ProcessingOrderTab from './ProcessingOrderTab';
 import CompletedOrderTab from './CompletedOrderTab';
 import CanceledOrderTab from './CanceledOrderTab';
-import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../../../constants';
 
 

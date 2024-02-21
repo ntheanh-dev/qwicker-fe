@@ -5,6 +5,7 @@ import { Entypo, Feather } from '@expo/vector-icons';
 import ProcessingOrderTab from './ProcessingOrderTab';
 import DoneOrderTab from './DoneOrderTab';
 import CanceledOrderTab from './CanceledOrderTab';
+import { ROUTES } from '../../constants';
 
 
 const renderScene = ({ route, jumpTo }) => {
@@ -18,7 +19,7 @@ const renderScene = ({ route, jumpTo }) => {
     }
 };
 
-export default function MyOrder() {
+export default function MyOrder({ navigation }) {
     const layout = useWindowDimensions();
     const [text, setText] = React.useState("")
 
@@ -31,20 +32,20 @@ export default function MyOrder() {
 
     return (
         <View className="flex-1">
-            <View className="bg-white px-3 relative">
-                <TextInput
-                    className="bg-gray-200 rounded-lg text-lg py-2 px-9"
-                    placeholder='Tìm kiếm tất cả các đơn hàng'
-                    onChangeText={txt => setText(txt)}
-                    value={text}
-                />
+            <TouchableOpacity
+                className="bg-white px-3 relative"
+                onPress={() => navigation.navigate(ROUTES.SEARCH_ORDER_DRAWER, { index: index })}
+            >
+                <View className="bg-gray-200 rounded-lg text-lg px-9 py-2">
+                    <Text className="text-base text-gray-600">Tìm kiếm tất cả các đơn hàng</Text>
+                </View>
                 <View className="flex justify-center items-center absolute left-5 top-2" >
                     <Entypo name="magnifying-glass" size={22} color="gray" />
                 </View>
                 <TouchableOpacity className="flex justify-center items-center absolute right-5 top-2" onPress={() => setText('')}>
                     <Feather name="x" size={22} color="gray" />
                 </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
             <TabView
                 navigationState={{ index, routes }}
                 renderScene={renderScene}

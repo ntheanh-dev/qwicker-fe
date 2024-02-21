@@ -14,6 +14,7 @@ import HomeNavigation from './HomeNavigation.js'
 import Setting from '../screens/setting/Setting.js'
 import MyOrder from '../screens/myorder/MyOrder.js'
 import ReviewOrder from '../screens/myorder/ReviewOrder.js'
+import SearchOrder from '../screens/myorder/SearchOrder.js'
 const Drawer = createDrawerNavigator()
 const DrawerNavigation = () => {
     const navigation = useNavigation()
@@ -218,6 +219,11 @@ const DrawerNavigation = () => {
                         </TouchableOpacity>
                     ),
                 })}
+            />
+            <Drawer.Screen
+                name={ROUTES.SEARCH_ORDER_DRAWER}
+                component={SearchOrder}
+                options={{ headerShown: false }}
             />
 
         </Drawer.Navigator>

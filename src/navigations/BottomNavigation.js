@@ -100,7 +100,7 @@ const BottomNavigation = () => {
                 headerTitle: route.params?.title,
                 headerTitleAlign: 'center'
             })} />
-            <Tab.Screen name={ROUTES.SEARCH_ORDER_DRIVER_TAB} component={SearchOrder} options={{ headerShown: false }} />
+            <Tab.Screen name={ROUTES.SEARCH_ORDER_DRIVER_TAB} component={SearchOrder} options={{ headerShown: false, tabBarButton: () => null }} />
         </Tab.Navigator>
     )
 }
