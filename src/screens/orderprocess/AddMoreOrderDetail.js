@@ -127,9 +127,10 @@ const AddMoreOrderDetail = ({ navigation }) => {
             .then(unwrapResult)
             .then(res => {
                 placeOrderBTS.current.close()
-                if (res.id) {
+                if (paymentMethod == 1.1 || paymentMethod == 1.2)
                     navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: res.id, status: res.status })
-                }
+                else
+                    navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: res.id })
             })
             .catch(e => {
                 Toast.show({

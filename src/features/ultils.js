@@ -1,3 +1,4 @@
+import { JOBSTATUS } from '../constants';
 
 export const formatDate = (date, time) => {
     const dayOfWeek = date.getUTCDay() === 7 ? "CN" : date.getUTCDay() + 1
@@ -118,4 +119,19 @@ export const formatCurrency = amount => {
     });
 
     return formatter.format(amount);
+}
+
+export const getTitleDependStatus = (status) => {
+    switch (Number(status)) {
+        case JOBSTATUS.FINDING_SHIPPER:
+            return 'Đang tìm shipper'
+        case JOBSTATUS.WAITING_SHIPPER:
+            return 'Đang đợi shipper'
+        case JOBSTATUS.WAITING_PAY:
+            return 'Chờ thanh toán'
+        case JOBSTATUS.DONE:
+            return 'Hoàn thành'
+        case JOBSTATUS.CANCELED:
+            return 'Đã huỷ'
+    }
 }

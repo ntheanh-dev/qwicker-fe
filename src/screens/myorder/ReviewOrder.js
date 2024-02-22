@@ -15,6 +15,7 @@ const ReviewOrder = ({ navigation, route }) => {
     const { orderId } = route.params
     const [orderData, setOrderData] = useState({})
     const { shipment, vehicle, product, payment, winner, status, ...order } = orderData
+    console.log(status == JOBSTATUS.WAITING_PAY)
     useEffect(() => {
         dispatch(retrieve({ access_token: access_token, orderId: orderId }))
             .then(unwrapResult)
@@ -95,37 +96,39 @@ const ReviewOrder = ({ navigation, route }) => {
         <View className="p-2 flex-1 flex-col relative">
             <ScrollView>
                 {/* ---------Driver infor---------- */}
-                <View className="bg-white p-4 flex-col mb-4">
-                    <View className="flex-row space-x-4">
-                        <View className="basis-1/6 px-3 ">
-                            <Image
-                                source={{ uri: winner?.avatar }}
-                                className="h-12 w-12 rounded-full"
-                            />
-                        </View>
-                        <View className="basis-5/6 flex-col space-y-1">
-                            <Text>{`${winner?.first_name} ${winner?.last_name}`}</Text>
-                            <View className="bg-gray-100 rounded-md px-1" style={{ alignSelf: 'flex-start' }}>
-                                <Text className="text-xs text-gray-600 font-semibold">{`${winner?.more.vehicle_number} ${winner?.more.vehicle.name}`}</Text>
+                {Number(status) !== JOBSTATUS.WAITING_PAY && (
+                    <View className="bg-white p-4 flex-col mb-4">
+                        <View className="flex-row space-x-4">
+                            <View className="basis-1/6 px-3 ">
+                                <Image
+                                    source={{ uri: winner?.avatar }}
+                                    className="h-12 w-12 rounded-full"
+                                />
                             </View>
+                            <View className="basis-5/6 flex-col space-y-1">
+                                <Text>{`${winner?.first_name} ${winner?.last_name}`}</Text>
+                                <View className="bg-gray-100 rounded-md px-1" style={{ alignSelf: 'flex-start' }}>
+                                    <Text className="text-xs text-gray-600 font-semibold">{`${winner?.more.vehicle_number} ${winner?.more.vehicle.name}`}</Text>
+                                </View>
 
-                            <View className="flex-row items-center space-x-1">
-                                <AntDesign name="star" size={20} color="yellow" />
-                                <Text className="text-sm text-gray-600 font-semibold">{parseFloat(winner?.rating)}</Text>
+                                <View className="flex-row items-center space-x-1">
+                                    <AntDesign name="star" size={20} color="yellow" />
+                                    <Text className="text-sm text-gray-600 font-semibold">{parseFloat(winner?.rating)}</Text>
+                                </View>
+                            </View>
+                        </View>
+                        <View className="flex-row pt-4">
+                            <View className="flex-1 flex-row space-x-2 justify-center items-center">
+                                <MaterialCommunityIcons name="android-messages" size={24} color="#3422F1" />
+                                <Text className="text-base font-semibold">Nhắn ngay</Text>
+                            </View>
+                            <View className="flex-1 flex-row space-x-2 justify-center items-center">
+                                <Feather name="phone" size={24} color="#3422F1" />
+                                <Text className="text-base font-semibold">Gọi ngay</Text>
                             </View>
                         </View>
                     </View>
-                    <View className="flex-row pt-4">
-                        <View className="flex-1 flex-row space-x-2 justify-center items-center">
-                            <MaterialCommunityIcons name="android-messages" size={24} color="#3422F1" />
-                            <Text className="text-base font-semibold">Nhắn ngay</Text>
-                        </View>
-                        <View className="flex-1 flex-row space-x-2 justify-center items-center">
-                            <Feather name="phone" size={24} color="#3422F1" />
-                            <Text className="text-base font-semibold">Gọi ngay</Text>
-                        </View>
-                    </View>
-                </View>
+                )}
                 {/* ---------  Price-------------- */}
                 <View className="flex-row bg-white p-4 space-x-4 items-center mb-4">
                     <Ionicons name="cash-outline" size={24} color="#3422F1" />

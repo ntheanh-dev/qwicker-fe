@@ -11,11 +11,10 @@ const ProcessingOrderTab = () => {
     const distpatch = useDispatch()
     const { access_token } = useSelector(getBasicUserToken)
     const [refreshing, setRefreshing] = useState(false);
-    const [order, setOrder] = useState()
     const fetcher = useFetchPaginatedData(access_token)
 
     useEffect(() => {
-        const form = { access_token: access_token, params: `status=${JOBSTATUS.FINDING_SHIPPER},${JOBSTATUS.WAITING_PAY}` }
+        const form = { access_token: access_token, params: `status=${JOBSTATUS.FINDING_SHIPPER},${JOBSTATUS.WAITING_PAY},${JOBSTATUS.WAITING_SHIPPER}` }
         distpatch(myJob(form))
             .then(unwrapResult)
             .then(res => {
@@ -26,7 +25,7 @@ const ProcessingOrderTab = () => {
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
-        const form = { access_token: access_token, params: `status=${JOBSTATUS.FINDING_SHIPPER},${JOBSTATUS.WAITING_PAY}` }
+        const form = { access_token: access_token, params: `status=${JOBSTATUS.FINDING_SHIPPER},${JOBSTATUS.WAITING_PAY},${JOBSTATUS.WAITING_SHIPPER}` }
         distpatch(myJob(form))
             .then(unwrapResult)
             .then(res => {
