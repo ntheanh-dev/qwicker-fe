@@ -1,6 +1,7 @@
 import axios from "axios";
 // const BASE_URL = "http://10.0.2.2:8000/"
 const BASE_URL = "http://192.168.1.207:8000/"
+// const BASE_URL = "http://192.168.100.14:8000/"
 
 export const baseEndpoints = {
     'product-categories': '/product-categories/',
@@ -36,6 +37,12 @@ export const ShipperJobEndpoints = {
     'join-job': (jobId) => `/shipper-jobs/${jobId}/join/`,
     'my-jobs': (pagrams) => `/shipper-jobs/my-jobs/?${pagrams}`,
     'complete': (jobId) => `/shipper-jobs/${jobId}/complete/`,
+}
+
+export const paymentEndpoints = {
+    'vnpay-payment-url': '/vnpay/payment_url/',
+    'vnpay-payment-ipn': '/vnpay/payment_ipn/',
+    'checkout-success': (paymentId) => `payments/${paymentId}/checkout/`
 }
 
 export const authAPI = (access_token) => axios.create({

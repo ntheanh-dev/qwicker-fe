@@ -15,6 +15,7 @@ import Setting from '../screens/setting/Setting.js'
 import MyOrder from '../screens/myorder/MyOrder.js'
 import ReviewOrder from '../screens/myorder/ReviewOrder.js'
 import SearchOrder from '../screens/myorder/SearchOrder.js'
+import VnPay from '../screens/payment/VnPay.js'
 const Drawer = createDrawerNavigator()
 const DrawerNavigation = () => {
     const navigation = useNavigation()
@@ -223,6 +224,11 @@ const DrawerNavigation = () => {
             <Drawer.Screen
                 name={ROUTES.SEARCH_ORDER_DRAWER}
                 component={SearchOrder}
+                options={{ headerShown: false, drawerItemStyle: { height: 0 }, }}
+            />
+            <Drawer.Screen
+                name={ROUTES.VNPAY_WEBVIEW_DRAWER}
+                component={VnPay}
                 options={{ headerShown: false, drawerItemStyle: { height: 0 }, }}
             />
 

@@ -19,11 +19,12 @@ const renderScene = ({ route, jumpTo }) => {
     }
 };
 
-export default function MyOrder({ navigation }) {
+export default function MyOrder({ navigation, route }) {
+    const tabIndex = route?.params?.tabIndex || 0
     const layout = useWindowDimensions();
     const [text, setText] = React.useState("")
 
-    const [index, setIndex] = React.useState(0);
+    const [index, setIndex] = React.useState(tabIndex);
     const [routes] = React.useState([
         { key: 1, title: 'Đang tải' },
         { key: 2, title: 'Đã hoàn thành' },

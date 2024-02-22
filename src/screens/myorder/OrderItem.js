@@ -13,7 +13,7 @@ const OrderItem = ({ shipment, vehicle, ...order }) => {
         if (Number(order.status) == JOBSTATUS.DONE) {
             navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: order.id })
         } else if (Number(order.status) == JOBSTATUS.WAITING_PAY) {
-            // navigate to handle pay by momo or vnpay
+            navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: order.id })
         } else {
             navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: order.id, status: order.status })
         }

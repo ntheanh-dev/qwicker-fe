@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
-import API, { authAPI, baseEndpoints, basicUserEndpoints, jobEndpoints } from "../configs/API";
+import API, { authAPI, baseEndpoints, basicUserEndpoints, jobEndpoints, paymentEndpoints } from "../configs/API";
 
 const basicUserSlice = createSlice({
     name: 'basicUserSlice',
@@ -238,6 +238,42 @@ export const viewFeedback = createAsyncThunk('feedback,viewFeedback',
         const { access_token, shipperId } = data
         try {
             const res = await authAPI(access_token).get(basicUserEndpoints['view_feedbacks'](shipperId))
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
+export const vnPayCreatePaymentUrl = createAsyncThunk('vnPay,vnPayCreatePayment',
+    async (data, { rejectWithValue }) => {
+        const { access_token, formData } = data
+        try {
+            const res = await authAPI(access_token).post(paymentEndpoints['vnpay-payment-url'], formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
+export const checkOutSuccess = createAsyncThunk('payment,Payment',
+    async (data, { rejectWithValue }) => {
+        const { access_token, orderId, paymentId } = data
+        const formData = new FormData()
+        formData.append('order_id', orderId)
+        try {
+            const res = await authAPI(access_token).post(paymentEndpoints['checkout-success'](paymentId), formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
             return res.data
         } catch (err) {
             return rejectWithValue(err?.response.data)

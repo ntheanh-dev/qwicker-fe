@@ -5,15 +5,16 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import { Feather, MaterialCommunityIcons, Ionicons, Foundation, Octicons, Entypo, FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { formatCurrency, formatMomentDateToVietnamese2 } from '../../features/ultils';
 import { useDispatch, useSelector } from 'react-redux';
-import { getBasicUserToken, retrieve, sendFeedback } from '../../redux/basicUserSlice';
+import { getBasicUserToken, retrieve, sendFeedback, vnPayCreatePaymentUrl } from '../../redux/basicUserSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
+import { JOBSTATUS, ROUTES } from '../../constants';
 const comments = [{ id: 1, content: 'Thái độ tốt' }, { id: 2, content: 'Tình trạng phương tiện tốt' }, { id: 3, content: 'Rất đúng giờ' }, { id: 4, content: 'Phản hồi nhanh chóng' }]
 const ReviewOrder = ({ navigation, route }) => {
     const dispatch = useDispatch()
     const { orderId } = route.params
     const [orderData, setOrderData] = useState({})
-    const { shipment, vehicle, product, payment, winner, ...order } = orderData
+    const { shipment, vehicle, product, payment, winner, status, ...order } = orderData
     useEffect(() => {
         dispatch(retrieve({ access_token: access_token, orderId: orderId }))
             .then(unwrapResult)
@@ -78,6 +79,18 @@ const ReviewOrder = ({ navigation, route }) => {
 
     }
 
+    const handlePayment = () => {
+        const formData = new FormData()
+        formData.append('amount', shipment?.cost)
+        formData.append('order_info', order?.id)
+        dispatch(vnPayCreatePaymentUrl({ access_token: access_token, formData: formData }))
+            .then(unwrapResult)
+            .then(res => {
+                navigation.navigate(ROUTES.VNPAY_WEBVIEW_DRAWER, { paymentURL: res.payment_url, orderId: orderId, paymentId: payment.id })
+            })
+            .catch(e => console.log(e))
+    }
+
     return (
         <View className="p-2 flex-1 flex-col relative">
             <ScrollView>
@@ -92,13 +105,13 @@ const ReviewOrder = ({ navigation, route }) => {
                         </View>
                         <View className="basis-5/6 flex-col space-y-1">
                             <Text>{`${winner?.first_name} ${winner?.last_name}`}</Text>
-                            <View className="bg-gray-100 rounded-md px-1 w-28">
+                            <View className="bg-gray-100 rounded-md px-1" style={{ alignSelf: 'flex-start' }}>
                                 <Text className="text-xs text-gray-600 font-semibold">{`${winner?.more.vehicle_number} ${winner?.more.vehicle.name}`}</Text>
                             </View>
 
                             <View className="flex-row items-center space-x-1">
                                 <AntDesign name="star" size={20} color="yellow" />
-                                <Text className="text-xs text-gray-600 font-semibold">{winner?.rating}</Text>
+                                <Text className="text-sm text-gray-600 font-semibold">{parseFloat(winner?.rating)}</Text>
                             </View>
                         </View>
                     </View>
@@ -131,7 +144,7 @@ const ReviewOrder = ({ navigation, route }) => {
                     <View className="flex-row space-x-2">
                         <View className="mt-2 relative">
                             <Entypo name="circle" size={18} color="#3422F1" />
-                            <View className="border-l-2 border-dotted border-[#3422F1] flex-1 absolute top-6 bottom-0 left-1/2" style={{ width: 1 }}></View>
+                            {/* <View className="border-l-2 border-dotted border-[#3422F1] flex-1 absolute top-6 bottom-0 left-1/2" style={{ width: 1 }}></View> */}
                         </View>
 
                         <View className="basis-5/6 flex-col">
@@ -184,14 +197,26 @@ const ReviewOrder = ({ navigation, route }) => {
                 <View className="h-40"></View>
             </ScrollView>
 
-            {/* --------------Place order again----------- */}
             <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
-                <TouchableOpacity
-                    className={`rounded-lg w-full flex justify-center items-center h-14 bg-[#3422F1]`}
-                >
-                    <Text className="text-lg font-medium text-white" >Đặt lại đơn hàng</Text>
-                </TouchableOpacity>
+                {/* --------------Place order again----------- */}
+                {status == JOBSTATUS.DONE && (
+                    <TouchableOpacity
+                        className={`rounded-lg w-full flex justify-center items-center h-14 bg-[#3422F1]`}
+                    >
+                        <Text className="text-lg font-medium text-white" >Đặt lại đơn hàng</Text>
+                    </TouchableOpacity>
+                )}
+                {/* --------------Payment------------------- */}
+                {status == JOBSTATUS.WAITING_PAY && (
+                    <TouchableOpacity
+                        onPress={handlePayment}
+                        className={`rounded-lg w-full flex justify-center items-center h-14 bg-[#3422F1]`}
+                    >
+                        <Text className="text-lg font-medium text-white" >Thanh toán ngay</Text>
+                    </TouchableOpacity>
+                )}
             </View>
+
             {/* --------------Feadback bottom sheet---------- */}
             <RBSheet
                 ref={refRBSheet}

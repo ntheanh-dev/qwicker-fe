@@ -40,6 +40,7 @@ const ProcessingOrderTab = () => {
     return (
         <FlatList
             className="px-2"
+            showsVerticalScrollIndicator={false}
             data={fetcher.results.length > 0 ? fetcher.results : [{ id: 1 }]}
             renderItem={({ item }) => {
                 if (fetcher.results.length > 0) {
