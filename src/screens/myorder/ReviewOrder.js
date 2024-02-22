@@ -5,7 +5,7 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import { Feather, MaterialCommunityIcons, Ionicons, Foundation, Octicons, Entypo, FontAwesome, AntDesign, MaterialIcons } from '@expo/vector-icons';
 import { formatCurrency, formatMomentDateToVietnamese2 } from '../../features/ultils';
 import { useDispatch, useSelector } from 'react-redux';
-import { getBasicUserToken, retrieve, sendFeedback, vnPayCreatePaymentUrl } from '../../redux/basicUserSlice';
+import { getBasicUserToken, myFeedback, retrieve, sendFeedback, vnPayCreatePaymentUrl } from '../../redux/basicUserSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 import { JOBSTATUS, ROUTES } from '../../constants';
@@ -13,44 +13,64 @@ const comments = [{ id: 1, content: 'Thái độ tốt' }, { id: 2, content: 'T�
 const ReviewOrder = ({ navigation, route }) => {
     const dispatch = useDispatch()
     const { orderId } = route.params
+    const { access_token } = useSelector(getBasicUserToken)
+
+    const [feedback, setFeedback] = useState()
+    var moment = require('moment-timezone');
+    moment.tz.setDefault('Asia/Ho_Chi_Minh')
+    const date = moment(feedback?.created_at).format('yy-MM-d')
+
     const [orderData, setOrderData] = useState({})
     const { shipment, vehicle, product, payment, winner, status, ...order } = orderData
-    console.log(status == JOBSTATUS.WAITING_PAY)
     useEffect(() => {
         dispatch(retrieve({ access_token: access_token, orderId: orderId }))
             .then(unwrapResult)
             .then(res => {
                 setOrderData(res)
+
+                dispatch(myFeedback({ access_token: access_token, orderId: orderId }))
+                    .then(unwrapResult)
+                    .then(res => {
+                        setFeedback(res)
+                    })
             })
             .catch(e => console.log(e))
-    }, [])
-    const { access_token } = useSelector(getBasicUserToken)
+    }, [orderId])
+
     const refRBSheet = useRef();
-    const [isReviewed, setIsReviewed] = useState(false)
     const [star, setStar] = useState(0)
     const [text, setText] = useState('')
-    const renderStars = () => {
+    const renderStars = (star, type) => {
         const arr = []
         for (let i = 1; i <= 5; i++) {
-            if (i <= star) {
-                arr.push(<TouchableOpacity key={i} onPress={() => setStar(i)}>
-                    <MaterialIcons name="star" size={34} color="yellow" />
-                </TouchableOpacity>
-                )
+            if (type === 'STATIC') {
+                if (i <= star) {
+                    arr.push(
+                        <MaterialIcons name="star" key={i} size={16} color="yellow" />
+                    )
+                } else {
+                    arr.push(
+                        <MaterialIcons name="star-border" key={i} size={16} color="black" />
+                    )
+                }
             } else {
-                arr.push(<TouchableOpacity key={i} onPress={() => setStar(i)}>
-                    <MaterialIcons name="star-border" size={34} color="black" />
-                </TouchableOpacity>
-                )
+                if (i <= star) {
+                    arr.push(<TouchableOpacity key={i} onPress={() => setStar(i)}>
+                        <MaterialIcons name="star" size={34} color="yellow" />
+                    </TouchableOpacity>
+                    )
+                } else {
+                    arr.push(<TouchableOpacity key={i} onPress={() => setStar(i)}>
+                        <MaterialIcons name="star-border" size={34} color="black" />
+                    </TouchableOpacity>
+                    )
+                }
             }
+
         }
         return arr
     }
-    const handlePressBottomBTN = () => {
-        if (!isReviewed) {
-            refRBSheet.current.open()
-        }
-    }
+
     const handleChooseRecommedFeadback = (comment) => {
         if (text === '') {
             setText(comment)
@@ -73,11 +93,11 @@ const ReviewOrder = ({ navigation, route }) => {
                         type: ALERT_TYPE.SUCCESS,
                         title: `Đánh giá thành công`,
                     })
+                    setFeedback(res)
                     refRBSheet.current.close()
                 })
                 .catch(e => console.log(e))
         }
-
     }
 
     const handlePayment = () => {
@@ -191,13 +211,35 @@ const ReviewOrder = ({ navigation, route }) => {
                         <Text className="text-xl font-semibold">{product?.category?.name}</Text>
                     </View>
                 </View>
-                {/* -----------Feedback Button----------- */}
-                <TouchableOpacity
-                    onPress={handlePressBottomBTN}
-                >
-                    <Text className="text-md font-medium text-[#3422F1] text-center py-2 underline">Đánh giá</Text>
-                </TouchableOpacity>
-                <View className="h-40"></View>
+                {/* -----------Feedback Space----------- */}
+                {Number(status) !== JOBSTATUS.WAITING_PAY &&
+                    (feedback ?
+                        <>
+                            <View className="flex-col bg-white p-4 border-b border-gray-300">
+                                <Text className="font-semibold text-xl">Đánh giá của bạn</Text>
+                                <View className="flex-row py-2">{renderStars(feedback?.rating, "STATIC")}</View>
+                                <Text className="text-base font-normal py-1">
+                                    {feedback?.comment}
+                                </Text>
+                                <View className="flex-row justify-between mt-2">
+                                    <Text className="text-xs font-normal text-gray-500">{date}</Text>
+                                    <View className="flex-row space-x-5 justify-center items-center">
+                                        <Entypo name="dots-three-horizontal" size={20} color="gray" />
+                                    </View>
+                                </View>
+                            </View>
+                            <View className="h-40"></View>
+                        </>
+                        :
+                        <>
+                            <TouchableOpacity
+                                onPress={() => refRBSheet.current.open()}
+                            >
+                                <Text className="text-md font-medium text-[#3422F1] text-center py-2 underline">Đánh giá</Text>
+                            </TouchableOpacity>
+                            <View className="h-40"></View>
+                        </>)
+                }
             </ScrollView>
 
             <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
@@ -246,7 +288,7 @@ const ReviewOrder = ({ navigation, route }) => {
                         </TouchableOpacity>
                     </View>
                     <View className="flex-row justify-center space-x-2 py-4">
-                        {renderStars().map(ele => ele)}
+                        {renderStars(star, "DINAMIC").map(ele => ele)}
                     </View>
                     <View className="flex-row flex-wrap justify-center">
                         {comments.map(ele => (

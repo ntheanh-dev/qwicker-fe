@@ -210,7 +210,7 @@ const DrawerNavigation = () => {
                 component={ReviewOrder}
                 options={({ navigation }) => ({
                     drawerItemStyle: { height: 0 },
-                    headerTitle: "",
+                    headerTitle: "Xem lại đơn hàng",
                     headerLeft: () => (
                         <TouchableOpacity
                             onPress={() => navigation.navigate('Đơn hàng')}

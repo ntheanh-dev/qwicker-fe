@@ -246,6 +246,23 @@ export const viewFeedback = createAsyncThunk('feedback,viewFeedback',
     }
 )
 
+export const myFeedback = createAsyncThunk('feedback,myFeedback',
+    async (data, { rejectWithValue }) => {
+        const { access_token, orderId } = data
+        try {
+            const res = await authAPI(access_token).get(basicUserEndpoints['my_feedback'](orderId))
+            if (res.status === 204) {
+                return null
+            } else {
+                return res.data
+            }
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
 export const vnPayCreatePaymentUrl = createAsyncThunk('vnPay,vnPayCreatePayment',
     async (data, { rejectWithValue }) => {
         const { access_token, formData } = data
