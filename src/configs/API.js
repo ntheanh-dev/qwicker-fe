@@ -8,7 +8,8 @@ export const baseEndpoints = {
     'vehicles': '/vehicles/',
     'product-categories': '/product-categories/',
     'payment-method': '/payment-method/',
-    'convert-token': '/auth/convert-token'
+    'convert-token': '/auth/convert-token',
+    'change-password': '/users/change-password/'
 }
 export const basicUserEndpoints = {
     'basic-user-register': '/users/',

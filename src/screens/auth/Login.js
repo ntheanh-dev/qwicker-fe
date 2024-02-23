@@ -2,7 +2,6 @@ import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants'
-import { AntDesign, EvilIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { getRole } from '../../redux/appSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -11,14 +10,7 @@ import { Entypo } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import * as Shipper from '../../redux/shipperSlice'
 import * as BasicUser from '../../redux/basicUserSlice'
-import API, { authAPI, jobEndpoints } from '../../configs/API';
-import { fakeFullOrderData } from '../../data';
-import { objectToFormData } from '../../features/ultils';
-import {
-    GoogleSignin,
-    GoogleSigninButton,
-    statusCodes,
-} from "@react-native-google-signin/google-signin";
+import { GoogleSignin, GoogleSigninButton, } from "@react-native-google-signin/google-signin";
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -40,7 +32,9 @@ const Login = ({ navigation }) => {
                 .then(unwrapResult)
                 .then(res => {
                     setLoading(false)
-                    navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.HOME : ROUTES.DRIVER_NAVIGATION)
+                    navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.HOME : ROUTES.DRIVER_NAVIGATION, {
+                        screen: role === ROLE.TRADITIONAL_USER ? ROUTES.HOME_DRAWER : ROUTES.FIND_ORDER_DRIVER_TAB
+                    })
                 })
                 .catch(e => {
                     console.log(e)
@@ -56,19 +50,16 @@ const Login = ({ navigation }) => {
     }
 
     useEffect(() => {
-        configureGoogleSignIn();
+        (function () {
+            GoogleSignin.configure({
+                webClientId: "297909054584-ec2ra6tq46trk2gvj9ubqsf1rq20q335.apps.googleusercontent.com",
+                androidClientId: "297909054584-2tm4tc03cuv9iqp3vdmtlusbcrukof88.apps.googleusercontent.com",
+                iosClientId: "297909054584-gdp0dd9vhljuo9n6sk0q59lope7i0r4v.apps.googleusercontent.com",
+            });
+        })()
     }, []);
 
-    const configureGoogleSignIn = () => {
-        GoogleSignin.configure({
-            webClientId: "297909054584-ec2ra6tq46trk2gvj9ubqsf1rq20q335.apps.googleusercontent.com",
-            androidClientId: "297909054584-2tm4tc03cuv9iqp3vdmtlusbcrukof88.apps.googleusercontent.com",
-            iosClientId: "297909054584-gdp0dd9vhljuo9n6sk0q59lope7i0r4v.apps.googleusercontent.com",
-        });
-    };
-
     const handleGoogleSignIn = async () => {
-
         const handleErr = () => {
             setLoading(false)
             Toast.show({
@@ -77,18 +68,28 @@ const Login = ({ navigation }) => {
                 textBody: "Hãy thử lại sau ít phút"
             })
         }
-
         setLoading(true)
         try {
             await GoogleSignin.hasPlayServices();
-            const res = await GoogleSignin.getTokens();
-            dispatch(BasicUser.googleLogin(res.accessToken))
-                .then(unwrapResult)
-                .then(res => {
-                    navigation.navigate(ROUTES.HOME)
-                })
-                .catch(e => handleErr())
+            const userInfo = await GoogleSignin.signIn();
+            if (userInfo) {
+                const res = await GoogleSignin.getTokens();
+                dispatch(BasicUser.googleLogin(res.accessToken))
+                    .then(unwrapResult)
+                    .then(res => {
+
+                        navigation.navigate(ROUTES.HOME)
+                    })
+                    .catch(e => {
+                        setLoading(false)
+                        handleErr()
+                    })
+            } else {
+                handleErr()
+            }
+            setLoading(false)
         } catch (e) {
+            setLoading(false)
             handleErr()
         }
     };
@@ -111,10 +112,10 @@ const Login = ({ navigation }) => {
                     </View>
                     <View className="rounded-lg border-2 border-[#D1D1D1] px-4 bg-white relative">
                         <TextInput className="my-4" placeholderTextColor={'#A5A5A5'} placeholder="Mật khẩu" value={password} onChangeText={txt => setPassword(txt)} secureTextEntry={!showPassword} />
-                        {showPassword ? <TouchableOpacity onPress={() => setShowPassword(!showPassword)} className="absolute right-3 top-0 translate-y-5">
+                        {showPassword ? <TouchableOpacity onPress={() => setShowPassword(!showPassword)} className="absolute right-3 top-0 translate-y-4">
                             <Entypo name="eye" size={20} color="#A5A5A5" />
                         </TouchableOpacity> :
-                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} className="absolute right-3 top-0 translate-y-5">
+                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} className="absolute right-3 top-0 translate-y-4">
                                 <Entypo name="eye-with-line" size={20} color="#A5A5A5" />
                             </TouchableOpacity>
                         }
@@ -128,14 +129,6 @@ const Login = ({ navigation }) => {
                     </TouchableOpacity>
                     {role === ROLE.TRADITIONAL_USER && <View className="flex-col space-y-3">
                         <Text className="text-center text-gray-500 font-medium text-sm py-2">hoặc đăng nhập bằng</Text>
-                        {/* <View className="flex-row justify-center space-x-4">
-                            <TouchableOpacity className="border-2 border-gray-400 rounded-full p-3">
-                                <AntDesign name="googleplus" size={28} color="black" />
-                            </TouchableOpacity>
-                            <TouchableOpacity className="border-2 border-gray-400 rounded-full p-3">
-                                <EvilIcons name="sc-facebook" size={28} color="#316FF6" />
-                            </TouchableOpacity>
-                        </View> */}
                         <View className="flex items-center">
                             <GoogleSigninButton
                                 size={GoogleSigninButton.Size.Icon}

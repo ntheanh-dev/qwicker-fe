@@ -49,6 +49,7 @@
     "react-native-safe-area-view": "^1.1.1",
     "react-native-screens": "~3.22.0",
     "react-native-tab-view": "^3.5.2",
+    "react-native-webview": "^13.8.1",
     "react-redux": "^9.0.4",
     "redux-persist": "^6.0.0"
   },
