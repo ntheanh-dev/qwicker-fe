@@ -10,7 +10,7 @@ import { Entypo } from '@expo/vector-icons';
 import Spinner from 'react-native-loading-spinner-overlay';
 import * as Shipper from '../../redux/shipperSlice'
 import * as BasicUser from '../../redux/basicUserSlice'
-import { GoogleSignin, GoogleSigninButton, } from "@react-native-google-signin/google-signin";
+// import { GoogleSignin, GoogleSigninButton, } from "@react-native-google-signin/google-signin";
 const Login = ({ navigation }) => {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
@@ -49,50 +49,50 @@ const Login = ({ navigation }) => {
 
     }
 
-    useEffect(() => {
-        (function () {
-            GoogleSignin.configure({
-                webClientId: "297909054584-ec2ra6tq46trk2gvj9ubqsf1rq20q335.apps.googleusercontent.com",
-                androidClientId: "297909054584-2tm4tc03cuv9iqp3vdmtlusbcrukof88.apps.googleusercontent.com",
-                iosClientId: "297909054584-gdp0dd9vhljuo9n6sk0q59lope7i0r4v.apps.googleusercontent.com",
-            });
-        })()
-    }, []);
+    // useEffect(() => {
+    //     (function () {
+    //         GoogleSignin.configure({
+    //             webClientId: "297909054584-ec2ra6tq46trk2gvj9ubqsf1rq20q335.apps.googleusercontent.com",
+    //             androidClientId: "297909054584-2tm4tc03cuv9iqp3vdmtlusbcrukof88.apps.googleusercontent.com",
+    //             iosClientId: "297909054584-gdp0dd9vhljuo9n6sk0q59lope7i0r4v.apps.googleusercontent.com",
+    //         });
+    //     })()
+    // }, []);
 
-    const handleGoogleSignIn = async () => {
-        const handleErr = () => {
-            setLoading(false)
-            Toast.show({
-                type: ALERT_TYPE.WARNING,
-                title: "Đăng nhập thất bại",
-                textBody: "Hãy thử lại sau ít phút"
-            })
-        }
-        setLoading(true)
-        try {
-            await GoogleSignin.hasPlayServices();
-            const userInfo = await GoogleSignin.signIn();
-            if (userInfo) {
-                const res = await GoogleSignin.getTokens();
-                dispatch(BasicUser.googleLogin(res.accessToken))
-                    .then(unwrapResult)
-                    .then(res => {
+    // const handleGoogleSignIn = async () => {
+    //     const handleErr = () => {
+    //         setLoading(false)
+    //         Toast.show({
+    //             type: ALERT_TYPE.WARNING,
+    //             title: "Đăng nhập thất bại",
+    //             textBody: "Hãy thử lại sau ít phút"
+    //         })
+    //     }
+    //     setLoading(true)
+    //     try {
+    //         await GoogleSignin.hasPlayServices();
+    //         const userInfo = await GoogleSignin.signIn();
+    //         if (userInfo) {
+    //             const res = await GoogleSignin.getTokens();
+    //             dispatch(BasicUser.googleLogin(res.accessToken))
+    //                 .then(unwrapResult)
+    //                 .then(res => {
 
-                        navigation.navigate(ROUTES.HOME)
-                    })
-                    .catch(e => {
-                        setLoading(false)
-                        handleErr()
-                    })
-            } else {
-                handleErr()
-            }
-            setLoading(false)
-        } catch (e) {
-            setLoading(false)
-            handleErr()
-        }
-    };
+    //                     navigation.navigate(ROUTES.HOME)
+    //                 })
+    //                 .catch(e => {
+    //                     setLoading(false)
+    //                     handleErr()
+    //                 })
+    //         } else {
+    //             handleErr()
+    //         }
+    //         setLoading(false)
+    //     } catch (e) {
+    //         setLoading(false)
+    //         handleErr()
+    //     }
+    // };
 
     return (
         <SafeAreaView className="flex-1 flex-col justify-around h-full relative">
@@ -127,7 +127,7 @@ const Login = ({ navigation }) => {
                     >
                         <Text className="text-lg font-normal text-white">Đăng nhập</Text>
                     </TouchableOpacity>
-                    {role === ROLE.TRADITIONAL_USER && <View className="flex-col space-y-3">
+                    {/* {role === ROLE.TRADITIONAL_USER && <View className="flex-col space-y-3">
                         <Text className="text-center text-gray-500 font-medium text-sm py-2">hoặc đăng nhập bằng</Text>
                         <View className="flex items-center">
                             <GoogleSigninButton
@@ -136,11 +136,14 @@ const Login = ({ navigation }) => {
                                 onPress={handleGoogleSignIn}
                             />
                         </View>
-                    </View>}
+                    </View>} */}
                 </View>
             </View>
             <View className='basis-1/6 pb-2 flex justify-end'>
-                <TouchableOpacity className='w-ful flex p-1 items-center'>
+                <TouchableOpacity
+                    className='w-ful flex p-1 items-center'
+                    onPress={() => navigation.navigate(ROUTES.RESETPASSWORD, { screen: ROUTES.INPUT_EMAIL_RESETPASSWORD })}
+                >
                     <Text className="text-lg font-bold text-[#3422F1]">Quên mật khẩu?</Text>
                 </TouchableOpacity>
                 <TouchableOpacity

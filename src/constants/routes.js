@@ -12,6 +12,11 @@ export default {
     AVATAR_REGISTER: 'Avatar register',
     COMPELETE_REGISTER: 'Complete register',
 
+    RESETPASSWORD: 'Resetpassword',
+    INPUT_EMAIL_RESETPASSWORD: 'Input email reset password',
+    INPUT_OTP_RESETPASSWORD: 'Input otp reset password',
+    INPUT_NEWPASSWORD: 'Input new password',
+
     HOME_DRAWER: 'Home Drawer',
     WALLET_DRAWER: 'Wallet Drawer',
     ORDER_DRAWER: 'Order Drawer',

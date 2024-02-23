@@ -9,7 +9,7 @@ import { getBasicUserProfile, getBasicUserToken } from '../../redux/basicUserSli
 import { getShipperProfile, getToken } from '../../redux/shipperSlice';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
-import { authAPI, baseEndpoints } from '../../configs/API';
+import { authAPI, accountEndpoints } from '../../configs/API';
 const Setting = ({ navigation }) => {
     const role = useSelector(getRole)
     const access_token = role === ROLE.TRADITIONAL_USER ? useSelector(getBasicUserToken).access_token : useSelector(getToken).access_token
@@ -47,7 +47,7 @@ const Setting = ({ navigation }) => {
                 formData.append('old_password', data.oldPassword)
                 formData.append('new_password', data.newPassword)
                 try {
-                    const res = await authAPI(access_token).post(baseEndpoints['change-password'], formData, {
+                    const res = await authAPI(access_token).post(accountEndpoints['change-password'], formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data'
                         }

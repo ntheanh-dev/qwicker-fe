@@ -11,6 +11,7 @@ import Login from '../screens/auth/Login';
 import BottomNavigation from './BottomNavigation';
 import { getBasicUserToken } from '../redux/basicUserSlice';
 import { getToken } from '../redux/shipperSlice';
+import ResetPasswordNavigation from './ResetPasswordNavigation';
 const Stack = createNativeStackNavigator();
 const AuthNavigation = () => {
     const useAppBefore = useSelector(getIsUseAppBefore)
@@ -49,6 +50,11 @@ const AuthNavigation = () => {
             <Stack.Screen
                 name={ROUTES.REGISTER_NAVIGATE}
                 component={RegisterNavigation}
+                options={{ title: '' }}
+            />
+            <Stack.Screen
+                name={ROUTES.RESETPASSWORD}
+                component={ResetPasswordNavigation}
                 options={{ title: '' }}
             />
             <Stack.Screen

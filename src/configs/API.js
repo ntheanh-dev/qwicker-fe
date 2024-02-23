@@ -9,7 +9,12 @@ export const baseEndpoints = {
     'product-categories': '/product-categories/',
     'payment-method': '/payment-method/',
     'convert-token': '/auth/convert-token',
-    'change-password': '/users/change-password/'
+}
+export const accountEndpoints = {
+    'change-password': '/account/change-password/',
+    'sent-otp': '/account/sent-otp/',
+    'verify-email': '/account/verify-email/',
+    'reset-password': '/account/reset-password/',
 }
 export const basicUserEndpoints = {
     'basic-user-register': '/users/',
