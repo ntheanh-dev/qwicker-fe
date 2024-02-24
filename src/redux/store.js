@@ -84,18 +84,13 @@ export const isLocationAndShipmentFulfill = createSelector(
 export const orderForm = createSelector(
     getShipMentForm, getProduct, getPayment, getOrder,
     (shipment, prod, pay, ord) => {
-        /// Order
-        const vehicle = ord.vehicle?.id
-        const order = {
-            ...ord,
-            vehicle_id: vehicle
-        }
-        const formData = objectToFormData({
-            shipment: shipment,
-            product: prod,
-            payment: pay,
-            order: order
-        })
+        const { vehicle, ...order } = ord
+        order.vehicle_id = vehicle?.id
+        const formData = new FormData()
+        formData.append('shipment', JSON.stringify(shipment))
+        formData.append('product', JSON.stringify(prod))
+        formData.append('payment', JSON.stringify(pay))
+        formData.append('order', JSON.stringify(order))
         return formData
     }
 )
