@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API, { ShipperJobEndpoints, accountEndpoints, authAPI, shipperEndpoints } from "../configs/API";
+import { objectToFormData } from "../features/ultils";
 
 const INIT_STATE = {
     user: {},
@@ -28,7 +29,8 @@ const shipperSlice = createSlice({
             })
             .addCase(register.fulfilled, (state, action) => {
                 if (action.payload) {
-                    state.user = action.payload
+                    state.user = action.payload.user
+                    state.token = action.payload.token
                 }
                 state.status = 'idle'
             })
@@ -53,14 +55,27 @@ const shipperSlice = createSlice({
 })
 
 export const register = createAsyncThunk("user,registerUser",
-    async (form, { rejectWithValue }) => {
+    async (obj, { rejectWithValue }) => {
+        const formData = objectToFormData(obj)
         try {
-            let account = await API.post(accountEndpoints['register-shipper'], form, {
+            let user = await API.post(accountEndpoints['register-shipper'], formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
             })
-            return account.data
+            const token = await API.post(accountEndpoints['login'], {
+                "username": obj.username,
+                "password": obj.password,
+                "grant_type": "password"
+            }, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+            return {
+                user: user?.data,
+                token: token?.data
+            }
         } catch (e) {
             return rejectWithValue(e.response.data)
         }

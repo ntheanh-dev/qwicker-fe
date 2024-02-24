@@ -22,10 +22,10 @@ const AuthNavigation = () => {
         if (!useAppBefore) {
             return ROUTES.ONBOARDING
         }
-        if (role === ROLE.TRADITIONAL_USER && basisUserToken?.access_token) {
+        if (role === ROLE.TRADITIONAL_USER && basisUserToken) {
             return ROUTES.HOME
         }
-        if (role === ROLE.DRIVER && shipperToken?.access_token) {
+        if (role === ROLE.DRIVER && shipperToken) {
             return ROUTES.DRIVER_NAVIGATION
         }
         return ROUTES.LOGIN

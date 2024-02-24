@@ -57,13 +57,13 @@ const AvatarRegister = ({ navigation }) => {
     const handleSignUp = () => {
         if (image) {
             setLoading(true)
-            const form = objectToFormData(basicAccountInfo)
             if (role === ROLE.TRADITIONAL_USER) {
-                dispatch(BasicUser.register(form))
+                dispatch(BasicUser.register(basicAccountInfo))
                     .then(unwrapResult)
                     .then(res => {
                         setLoading(false)
                         navigation.navigate(ROUTES.HOME)
+                        dispatch(resetFormRegisterSlice())
                     })
                     .catch(e => {
                         console.log(e)
@@ -77,13 +77,12 @@ const AvatarRegister = ({ navigation }) => {
                         }
                     })
             } else {
-                const shipperFormData = objectToFormData({ ...basicAccountInfo, ...additionalInfo })
-                dispatch(Shipper.register(shipperFormData))
+                dispatch(Shipper.register({ ...basicAccountInfo, ...additionalInfo }))
                     .then(unwrapResult)
                     .then(res => {
                         setLoading(false)
-                        navigation.navigate(ROUTES.COMPELETE_REGISTER)
                         dispatch(resetFormRegisterSlice())
+                        navigation.navigate(ROUTES.COMPELETE_REGISTER)
                     }
                     )
                     .catch(e => {
