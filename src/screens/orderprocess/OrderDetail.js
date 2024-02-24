@@ -3,10 +3,11 @@ import React, { useEffect, useReducer, useRef, useState } from 'react'
 import { Feather, AntDesign, Ionicons, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
 import CheckBox from 'react-native-check-box'
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from "expo-file-system";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductCategories, getCategories } from '../../redux/appSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { getProduct, removeProductData, setProduct } from '../../redux/productSlice';
+import { getProduct, setProduct } from '../../redux/productSlice';
 
 const massType = [{ id: 1, name: 'Nhẹ hơn 10 kg' }, { id: 2, name: '10 kg đến 30 kg' }, { id: 3, name: '30 kg đến 50 kg' }]
 
@@ -37,7 +38,20 @@ const OrderDetail = ({ navigation }) => {
                 base64: true,
             });
             if (!result.canceled) {
-                updateProductDetail({ image: result.assets[0].uri })
+                const uri = result.assets[0]?.uri;
+                if (uri) {
+                    try {
+                        const base64 = await FileSystem.readAsStringAsync(uri, {
+                            encoding: FileSystem.EncodingType.Base64,
+                        });
+                        updateProductDetail({ image: `data:image/jpeg;base64,${base64}` })
+
+                    } catch (readError) {
+                        console.error("Error reading image as base64:", readError);
+                    }
+                } else {
+                    console.log("Invalid avatar_user data:", result);
+                }
             }
         }
     }

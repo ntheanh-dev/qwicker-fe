@@ -5,6 +5,9 @@ const orderSlice = createSlice({
     initialState: {
     },
     reducers: {
+        resetOrderSlice: (state, action) => {
+            Object.assign(state, {});
+        },
         addVehicle: (state, action) => {
             state.vehicle = action.payload
         },
@@ -15,5 +18,5 @@ const orderSlice = createSlice({
 })
 export const getSelectedVehicle = state => state.order.vehicle
 export const getOrder = state => state.order
-export const { addVehicle, addDescription } = orderSlice.actions
+export const { addVehicle, addDescription, resetOrderSlice } = orderSlice.actions
 export default orderSlice.reducer

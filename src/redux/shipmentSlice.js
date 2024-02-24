@@ -16,19 +16,24 @@ export const INITIAL_ADDRESS = {
     longitude: '',
 }
 
+export const INIT_STATE = {
+    pick_up: INITIAL_ADDRESS,
+    delivery_address: INITIAL_ADDRESS,
+    type: SHIPMENTYPE.NOW,
+    shipment_date: {
+        date: null,
+        time: '00:00'
+    },
+    cost: null,
+}
+
 const shipmentSlice = createSlice({
     name: 'shipment',
-    initialState: {
-        pick_up: INITIAL_ADDRESS,
-        delivery_address: INITIAL_ADDRESS,
-        type: SHIPMENTYPE.NOW,
-        shipment_date: {
-            date: null,
-            time: '00:00'
-        },
-        cost: null,
-    },
+    initialState: INIT_STATE,
     reducers: {
+        resetShipmentSlice: (state, action) => {
+            Object.assign(state, INIT_STATE);
+        },
         addPickUp: (state, action) => {
             for (var key in action.payload) {
                 if (state.pick_up.hasOwnProperty(key)) {
@@ -81,7 +86,7 @@ export const isDateTimeFulFill = createSelector(
 )
 
 export const { addPickUp, addDeliveryAddress, addAdditionalPickUpInfo,
-    addAdditionalDeliveryAddressInfo, addDate, addTime, setShipmentTypeToNow, addCost } = shipmentSlice.actions
+    addAdditionalDeliveryAddressInfo, addDate, addTime, setShipmentTypeToNow, addCost, resetShipmentSlice } = shipmentSlice.actions
 export const getShipmentType = state => state.shipment.type
 export const getPickUP = state => state.shipment.pick_up
 export const getDeliveryAddress = state => state.shipment.delivery_address

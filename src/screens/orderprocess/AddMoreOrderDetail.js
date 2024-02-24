@@ -6,14 +6,15 @@ import RBSheet from "react-native-raw-bottom-sheet";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchPaymentMethods, getPaymentMethods } from '../../redux/appSlice';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { INIT_PAYMENT, addPayment } from '../../redux/paymentSlice';
+import { INIT_PAYMENT, addPayment, resetPaymentSlice } from '../../redux/paymentSlice';
 import { formatCurrency, formatDateTimeToVietnamese } from '../../features/ultils';
-import { getShipment } from '../../redux/shipmentSlice';
-import { getSelectedVehicle } from '../../redux/orderSlice';
+import { getShipment, resetShipmentSlice } from '../../redux/shipmentSlice';
+import { getSelectedVehicle, resetOrderSlice } from '../../redux/orderSlice';
 import { orderForm, resetOrder } from '../../redux/store';
-import { isProductFulFill } from '../../redux/productSlice';
+import { isProductFulFill, resetProductSlice } from '../../redux/productSlice';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 import { getBasicUserToken, postJob } from '../../redux/basicUserSlice';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const AddMoreOrderDetail = ({ navigation }) => {
     const dispatch = useDispatch()
@@ -28,6 +29,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
     const initPaymentMethod = useSelector(getPaymentMethods)
     const [paymentMethod, setPaymentMethod] = useState(initPaymentMethod)
     const [showPayer, setShowPayer] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(1.1)
     // -1: init , 0: Momo, 1.1 sender, 1.2: receiver
     const getPaymentMethodUI = (selectedPaymentMethod) => {
@@ -39,7 +41,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                 break
             case 0:
                 result.icon = <AntDesign name="creditcard" size={24} color="#3422F1" />
-                result.text = 'Mono'
+                result.text = 'VnPay'
                 result.subtext = 'Thanh toán sau khi hoàn thành đặt hàng'
                 break
             case 1.1:
@@ -119,6 +121,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
     }
 
     const handlePlaceOrder = () => {
+        setLoading(true)
         const data = {
             access_token: access_token,
             formData: order
@@ -126,8 +129,13 @@ const AddMoreOrderDetail = ({ navigation }) => {
         dispatch(postJob(data))
             .then(unwrapResult)
             .then(res => {
+                setLoading(false)
                 placeOrderBTS.current.close()
-                if (paymentMethod == 1.1 || paymentMethod == 1.2)
+                dispatch(resetOrderSlice())
+                dispatch(resetPaymentSlice())
+                dispatch(resetProductSlice())
+                dispatch(resetShipmentSlice())
+                if (selectedPaymentMethod === 1.1 || selectedPaymentMethod === 1.2)
                     navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: res.id, status: res.status })
                 else
                     navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: res.id })
@@ -139,12 +147,14 @@ const AddMoreOrderDetail = ({ navigation }) => {
                     textBody: 'Vui lòng thử lại'
                 })
                 console.log(e)
+                setLoading(false)
             })
     }
 
 
     return (
         <View className="bg-white flex-1 py-4 relative">
+            <Spinner visible={loading} size='large' animation='fade' />
             <View className="bg-white flex-col px-4">
                 {/* ----------------Order Detail------------- */}
                 <TouchableOpacity

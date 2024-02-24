@@ -5,14 +5,15 @@ import { ROLE, ROUTES } from '../../constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { getRole } from '../../redux/appSlice'
 import { logout } from '../../redux/store';
-import { getBasicUserProfile, getBasicUserToken } from '../../redux/basicUserSlice';
+import { getBasicUserProfile, getBasicUserToken, resetBasicUserSlice } from '../../redux/basicUserSlice';
 import { getShipperProfile, getToken } from '../../redux/shipperSlice';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
 import { authAPI, accountEndpoints } from '../../configs/API';
+import { resetShipmentSlice } from '../../redux/shipmentSlice';
 const Setting = ({ navigation }) => {
     const role = useSelector(getRole)
-    const access_token = role === ROLE.TRADITIONAL_USER ? useSelector(getBasicUserToken).access_token : useSelector(getToken).access_token
+    const { access_token } = role === ROLE.TRADITIONAL_USER ? useSelector(getBasicUserToken) : useSelector(getToken)
     const dispatch = useDispatch()
     const changePasswordRef = useRef()
     const { email } = role === ROLE.TRADITIONAL_USER ? useSelector(getBasicUserProfile) : useSelector(getShipperProfile)
@@ -28,6 +29,8 @@ const Setting = ({ navigation }) => {
     })
     const logout = () => {
         // dispatch(logout())
+        dispatch(resetBasicUserSlice())
+        dispatch(resetShipmentSlice())
         navigation.navigate(ROUTES.LOGIN)
     }
 

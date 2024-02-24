@@ -1,15 +1,19 @@
-import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API, { ShipperJobEndpoints, accountEndpoints, authAPI, shipperEndpoints } from "../configs/API";
-import { JOBSTATUS } from "../constants";
+
+const INIT_STATE = {
+    user: {},
+    status: 'idle',
+    token: null,
+}
 
 const shipperSlice = createSlice({
     name: 'shipperSlice',
-    initialState: {
-        user: {},
-        status: 'idle',
-        token: null,
-    },
+    initialState: INIT_STATE,
     reducers: {
+        resetShipperSlice: (state, action) => {
+            Object.assign(state, INIT_STATE);
+        },
         setUserInfo: (state, action) => {
             state.user = action.payload
         },
@@ -152,7 +156,7 @@ export const compeleteJob = createAsyncThunk('job, myJobs',
     }
 )
 
-export const { setToken } = shipperSlice.actions
+export const { setToken, resetShipperSlice } = shipperSlice.actions
 export const getToken = state => state.shipperSlice.token
 export const getShipperProfile = state => state.shipperSlice.user
 export default shipperSlice.reducer

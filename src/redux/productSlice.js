@@ -14,6 +14,9 @@ const productSlice = createSlice({
         status: 'idle'
     },
     reducers: {
+        resetProductSlice: (state, action) => {
+            Object.assign(state, INIT_PRODUCT);
+        },
         removeProductData: (state, action) => {
             state.product = INIT_PRODUCT
         },
@@ -38,5 +41,5 @@ export const isProductFulFill = createSelector(
         return category_id && mass && quantity && image
     }
 )
-export const { removeProductData, setProduct } = productSlice.actions
+export const { removeProductData, setProduct, resetProductSlice } = productSlice.actions
 export default productSlice.reducer

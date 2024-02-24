@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { addBasicField, getAdditionalInfo, getBasicAccountInfo } from '../../redux/formRegisterSlice'
+import { addBasicField, getAdditionalInfo, getBasicAccountInfo, resetFormRegisterSlice } from '../../redux/formRegisterSlice'
 import * as FileSystem from "expo-file-system";
 import * as Shipper from '../../redux/shipperSlice'
 import * as BasicUser from '../../redux/basicUserSlice'
@@ -83,6 +83,7 @@ const AvatarRegister = ({ navigation }) => {
                     .then(res => {
                         setLoading(false)
                         navigation.navigate(ROUTES.COMPELETE_REGISTER)
+                        dispatch(resetFormRegisterSlice())
                     }
                     )
                     .catch(e => {

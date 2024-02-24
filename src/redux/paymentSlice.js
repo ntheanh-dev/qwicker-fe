@@ -14,6 +14,9 @@ const paymentSlice = createSlice({
         status: 'idle'
     },
     reducers: {
+        resetPaymentSlice: (state, action) => {
+            Object.assign(state, INIT_PAYMENT);
+        },
         addPayment: (state, action) => {
             state.payment = action.payload
         },
@@ -23,5 +26,5 @@ const paymentSlice = createSlice({
     }
 })
 export const getPayment = state => state.paymentSlice.payment
-export const { addPayment, initPayment } = paymentSlice.actions
+export const { addPayment, initPayment, resetPaymentSlice } = paymentSlice.actions
 export default paymentSlice.reducer

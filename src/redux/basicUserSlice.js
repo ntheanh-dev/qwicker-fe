@@ -1,14 +1,19 @@
 import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
 import API, { accountEndpoints, authAPI, baseEndpoints, basicUserEndpoints, jobEndpoints, paymentEndpoints } from "../configs/API";
 
+const INIT_STATE = {
+    user: {},
+    status: 'idle',
+    token: null
+}
+
 const basicUserSlice = createSlice({
     name: 'basicUserSlice',
-    initialState: {
-        user: {},
-        status: 'idle',
-        token: null
-    },
+    initialState: INIT_STATE,
     reducers: {
+        resetBasicUserSlice: (state, action) => {
+            Object.assign(state, INIT_STATE);
+        },
         setUserInfo: (state, action) => {
             state.user = action.payload
         },
@@ -302,5 +307,5 @@ export const checkOutSuccess = createAsyncThunk('payment,Payment',
 export const getBasicUserToken = state => state.basicUserSlice.token
 export const getBasicUserStatus = state => state.basicUserSlice.status
 export const getBasicUserProfile = state => state.basicUserSlice.user
-export const { setToken } = basicUserSlice.actions
+export const { setToken, resetBasicUserSlice } = basicUserSlice.actions
 export default basicUserSlice.reducer
