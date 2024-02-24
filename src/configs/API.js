@@ -13,8 +13,12 @@ export const baseEndpoints = {
 export const accountEndpoints = {
     'change-password': '/account/change-password/',
     'sent-otp': '/account/sent-otp/',
+    'sent-otp-to-valid-email': '/account/register/sent-otp/',
     'verify-email': '/account/verify-email/',
     'reset-password': '/account/reset-password/',
+    'check-account': '/account/check-account/',
+    'register-user': '/account/user/register/',
+    'register-shipper': '/account/shipper/register/',
 }
 export const basicUserEndpoints = {
     'basic-user-register': '/users/',

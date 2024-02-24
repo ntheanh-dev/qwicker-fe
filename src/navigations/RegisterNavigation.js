@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ROUTES } from '../constants';
+import { ROLE, ROUTES } from '../constants';
 import BasicInfoRegister from '../screens/auth/BasicInfoRegister';
 import AccountRegister from '../screens/auth/AccountRegister';
 import DriverInfoRegister from '../screens/auth/DriverInfoRegister';
@@ -9,14 +9,18 @@ import AvatarRegister from '../screens/auth/AvatarRegister';
 import { MaterialIcons, Feather } from '@expo/vector-icons';
 import CompleteRegister from '../screens/auth/CompleteRegister';
 import ConfimOtpRegister from '../screens/auth/ConfimOtpRegister';
+import { useSelector } from 'react-redux';
+import { getRole } from '../redux/appSlice';
 const Stack = createNativeStackNavigator();
 
 const RegisterNavigation = () => {
+    const role = useSelector(getRole)
+    const title = role === ROLE.TRADITIONAL_USER ? 'Đăng ký tài khoản thường' : 'Đăng ký làm shipper'
     return (
         <Stack.Navigator initialRouteName={ROUTES.BASIC_INFO_REGISTER} screenOptions={({ navigation }) => ({
             headerTitleAlign: 'center',
             headerTitle: () => (
-                <Text className="text-xl text-gray-600">Đăng ký</Text>
+                <Text className="text-xl text-gray-600">{title}</Text>
             ),
             headerBackVisible: false,
             headerLeft: () => (

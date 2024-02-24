@@ -6,11 +6,13 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { ROLE, ROUTES } from '../../constants';
 import { addBasicField } from '../../redux/formRegisterSlice'
 import Spinner from 'react-native-loading-spinner-overlay';
+import API, { accountEndpoints } from '../../configs/API'
+import { ALERT_TYPE, Toast } from 'react-native-alert-notification'
 
 const AccountRegister = ({ navigation }) => {
-    const [username, setUsername] = useState('a')
-    const [password, setPassword] = useState('c')
-    const [email, setEmail] = useState('a')
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const [email, setEmail] = useState('')
     const [loading, setLoading] = useState(false)
 
     const role = useSelector(getRole)
@@ -19,14 +21,40 @@ const AccountRegister = ({ navigation }) => {
         return username.length > 0 && password.length > 0 && email.length > 0
     }
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (isFullfil()) {
-            dispatch(addBasicField({
-                username: username,
-                password: password,
-                email: email
-            }))
-            navigation.navigate(ROUTES.CONFIRM_OTP_REGISTER)
+            try {
+                const formData = new FormData()
+                formData.append('email', email)
+                formData.append('username', username)
+                const res = await API.post(accountEndpoints['check-account'], formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                if (res.data?.code === '01') {
+                    Toast.show({
+                        type: ALERT_TYPE.WARNING,
+                        title: 'Tài khoản đã tồn tại',
+                        textBody: 'Hãy thử lại với tài khoản khác'
+                    })
+                } else if (res.data?.code === '02') {
+                    Toast.show({
+                        type: ALERT_TYPE.WARNING,
+                        title: 'Email đã tồn tại',
+                        textBody: 'Hãy thử lại với Email khác'
+                    })
+                } else if (res.data?.code === '00') {
+                    dispatch(addBasicField({
+                        username: username,
+                        password: password,
+                        email: email
+                    }))
+                    navigation.navigate(ROUTES.CONFIRM_OTP_REGISTER, { email: email, username: username })
+                }
+            } catch (err) {
+
+            }
         }
     }
 

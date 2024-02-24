@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
-import API, { authAPI, baseEndpoints, basicUserEndpoints, jobEndpoints, paymentEndpoints } from "../configs/API";
+import API, { accountEndpoints, authAPI, baseEndpoints, basicUserEndpoints, jobEndpoints, paymentEndpoints } from "../configs/API";
 
 const basicUserSlice = createSlice({
     name: 'basicUserSlice',
@@ -61,7 +61,7 @@ const basicUserSlice = createSlice({
 export const register = createAsyncThunk("user,registerUser",
     async (form, { rejectWithValue }) => {
         try {
-            let res = await API.post(basicUserEndpoints['basic-user-register'], form, {
+            let res = await API.post(accountEndpoints['register-user'], form, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

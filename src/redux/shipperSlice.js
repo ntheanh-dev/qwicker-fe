@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
-import API, { ShipperJobEndpoints, authAPI, shipperEndpoints } from "../configs/API";
+import API, { ShipperJobEndpoints, accountEndpoints, authAPI, shipperEndpoints } from "../configs/API";
 import { JOBSTATUS } from "../constants";
 
 const shipperSlice = createSlice({
@@ -51,7 +51,7 @@ const shipperSlice = createSlice({
 export const register = createAsyncThunk("user,registerUser",
     async (form, { rejectWithValue }) => {
         try {
-            let account = await API.post(shipperEndpoints['shipper-register'], form, {
+            let account = await API.post(accountEndpoints['register-shipper'], form, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -62,6 +62,7 @@ export const register = createAsyncThunk("user,registerUser",
         }
     }
 )
+
 export const login = createAsyncThunk('user,loginUser',
     async (data, { rejectWithValue }) => {
         try {

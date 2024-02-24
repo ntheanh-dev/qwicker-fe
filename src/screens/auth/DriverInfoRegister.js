@@ -7,6 +7,7 @@ import { ROLE, ROUTES } from '../../constants';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from "expo-file-system";
 import { addAdditionalField } from '../../redux/formRegisterSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
 
@@ -28,8 +29,22 @@ const DriverInfoRegister = ({ navigation }) => {
                 quality: 1,
                 base64: true,
             });
-            if (!result.canceled)
+            if (!result.canceled) {
                 setImage(result.assets[0].uri)
+                const uri = result.assets[0]?.uri;
+                if (uri) {
+                    try {
+                        const base64 = await FileSystem.readAsStringAsync(uri, {
+                            encoding: FileSystem.EncodingType.Base64,
+                        });
+                        setImage(`data:image/jpeg;base64,${base64}`);
+                    } catch (readError) {
+                        console.error("Error reading image as base64:", readError);
+                    }
+                } else {
+                    console.log("Invalid avatar_user data:", result);
+                }
+            }
         }
     }
     const role = useSelector(getRole)

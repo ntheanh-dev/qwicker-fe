@@ -4,8 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 import { getRole } from '../../redux/appSlice'
 import { ROLE, ROUTES } from '../../constants'
+import API, { accountEndpoints } from '../../configs/API'
+import { ALERT_TYPE, Toast } from 'react-native-alert-notification'
 
-const ConfimOtpRegister = ({ navigation }) => {
+const ConfimOtpRegister = ({ navigation, route }) => {
+    const { email, username } = route.params
     const [num1, setNum1] = useState('')
     const [num2, setNum2] = useState('')
     const [num3, setNum3] = useState('')
@@ -18,25 +21,24 @@ const ConfimOtpRegister = ({ navigation }) => {
     let isFullfil = () => {
         return num1.length === 1 && num2.length === 1 && num3.length === 1 && num4.length
     }
-    const handleNext = () => {
+    const handleNext = async () => {
         if (isFullfil()) {
-            const verified = true
-            if (verified) {
+            try {
+                const formData = new FormData()
+                formData.append('email', email)
+                formData.append('otp', Number(`${num1}${num2}${num3}${num4}`))
+                const res = await API.post(accountEndpoints['verify-email'], formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
                 navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.AVATAR_REGISTER : ROUTES.DRIVER_INFO_REGISTER)
-
-            } else {
-                Alert.alert(
-                    'Mã OTP không hợp lệ',
-                    'Hãy nhập mã OTP đã được gửi đến email của bạn trước đó.',
-                    [
-                        {
-                            text: 'Không nhận được mã',
-                            onPress: () => Alert.alert('Mã OTP mới đã được gửi đến email của bạn.'),
-                            style: 'cancel',
-                        },
-                    ],)
+            } catch (err) {
+                Toast.show({
+                    type: ALERT_TYPE.WARNING,
+                    title: `Mã OTP không đúng`,
+                })
             }
-
         }
     }
 
@@ -62,6 +64,24 @@ const ConfimOtpRegister = ({ navigation }) => {
                 break
         }
     }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const formData = new FormData()
+                formData.append('email', email)
+                formData.append('username', username)
+                const res = await API.post(accountEndpoints['sent-otp-to-valid-email'], formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+            } catch (err) {
+                console.log(err.responce)
+            }
+        }
+        fetchData()
+    }, [email])
 
     return (
         <SafeAreaView className="flex-1 flex-col px-4 py-6">

@@ -32,9 +32,15 @@ const Login = ({ navigation }) => {
                 .then(unwrapResult)
                 .then(res => {
                     setLoading(false)
-                    navigation.navigate(role === ROLE.TRADITIONAL_USER ? ROUTES.HOME : ROUTES.DRIVER_NAVIGATION, {
-                        screen: role === ROLE.TRADITIONAL_USER ? ROUTES.HOME_DRAWER : ROUTES.FIND_ORDER_DRIVER_TAB
-                    })
+                    if (role === ROLE.TRADITIONAL_USER) {
+                        navigation.navigate(ROUTES.HOME, { screen: ROUTES.HOME_DRAWER })
+                    } else {
+                        if (res.user.verified) {
+                            navigation.navigate(ROUTES.DRIVER_NAVIGATION, { screen: ROUTES.FIND_ORDER_DRIVER_TAB })
+                        } else {
+                            navigation.navigate(ROUTES.REGISTER_NAVIGATE, { screen: ROUTES.COMPELETE_REGISTER })
+                        }
+                    }
                 })
                 .catch(e => {
                     console.log(e)

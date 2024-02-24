@@ -7,6 +7,7 @@ import { ROLE, ROUTES } from '../../constants';
 import { Ionicons, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { addBasicField, getAdditionalInfo, getBasicAccountInfo } from '../../redux/formRegisterSlice'
+import * as FileSystem from "expo-file-system";
 import * as Shipper from '../../redux/shipperSlice'
 import * as BasicUser from '../../redux/basicUserSlice'
 import { unwrapResult } from '@reduxjs/toolkit'
@@ -30,11 +31,25 @@ const AvatarRegister = ({ navigation }) => {
         } else {
             const result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                quality: 1,
+                quality: 0.5,
                 base64: true,
             });
             if (!result.canceled) {
-                setImage(result.assets[0].uri)
+                const uri = result.assets[0]?.uri;
+                if (uri) {
+                    try {
+                        const base64 = await FileSystem.readAsStringAsync(uri, {
+                            encoding: FileSystem.EncodingType.Base64,
+                        });
+                        setImage(`data:image/jpeg;base64,${base64}`);
+                        dispatch(addBasicField({ avatar: `data:image/jpeg;base64,${base64}` }))
+
+                    } catch (readError) {
+                        console.error("Error reading image as base64:", readError);
+                    }
+                } else {
+                    console.log("Invalid avatar_user data:", result);
+                }
             }
         }
     }
@@ -42,7 +57,6 @@ const AvatarRegister = ({ navigation }) => {
     const handleSignUp = () => {
         if (image) {
             setLoading(true)
-            dispatch(addBasicField({ avatar: image }))
             const form = objectToFormData(basicAccountInfo)
             if (role === ROLE.TRADITIONAL_USER) {
                 dispatch(BasicUser.register(form))
@@ -50,9 +64,9 @@ const AvatarRegister = ({ navigation }) => {
                     .then(res => {
                         setLoading(false)
                         navigation.navigate(ROUTES.HOME)
-                    }
-                    )
+                    })
                     .catch(e => {
+                        console.log(e)
                         setLoading(false)
                         if (e.username) {
                             Toast.show({
