@@ -70,7 +70,7 @@ const BottomNavigation = () => {
                 tabBarStyle: { display: 'none' },
                 headerLeft: () => (
                     <TouchableOpacity
-                        onPress={() => navigation.goBack()}
+                        onPress={() => navigation.navigate(ROUTES.FIND_ORDER_DRIVER_TAB)}
                         className="ml-4"
                     >
                         <Ionicons name="arrow-back-sharp" size={24} color="white" />

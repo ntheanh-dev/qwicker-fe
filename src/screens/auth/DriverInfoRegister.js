@@ -64,7 +64,7 @@ const DriverInfoRegister = ({ navigation }) => {
         if (isFullfil()) {
             dispatch(addAdditionalField({
                 cmnd: image,
-                vehicle: selectedVehicle,
+                vehicle_id: selectedVehicle,
                 vehicle_number: vehicleNumber
             }))
             navigation.navigate(ROUTES.AVATAR_REGISTER)

@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 
 const INIT_PRODUCT = {
     category_id: null,
@@ -15,7 +15,7 @@ const productSlice = createSlice({
     },
     reducers: {
         resetProductSlice: (state, action) => {
-            Object.assign(state, INIT_PRODUCT);
+            Object.assign(state.product, INIT_PRODUCT);
         },
         removeProductData: (state, action) => {
             state.product = INIT_PRODUCT
@@ -25,14 +25,6 @@ const productSlice = createSlice({
         }
     }
 })
-const isFulFill = (obj) => {
-    Object.entries(obj).forEach(([key, value]) => {
-        if (value === null || value <= 0) {
-            return false
-        }
-    })
-    return true
-}
 export const getProduct = state => state.productSlice.product
 export const isProductFulFill = createSelector(
     getProduct,

@@ -5,7 +5,7 @@ import { objectToFormData } from "../features/ultils";
 const INIT_STATE = {
     user: {},
     status: 'idle',
-    token: null
+    token: { access_token: '' }
 }
 
 const basicUserSlice = createSlice({

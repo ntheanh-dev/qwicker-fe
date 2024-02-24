@@ -71,6 +71,7 @@ const ViewFeedback = ({ navigation, route }) => {
                     fetcher.next()
                 }
             }}
+            scrollEventThrottle={1}
         >
             {fetcher.results.length > 0 ?
                 fetcher.results.map(ele => {

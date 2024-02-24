@@ -20,20 +20,11 @@ const { height } = Dimensions.get('window')
 const OrderStatus = ({ navigation, route }) => {
     const distpatch = useDispatch()
     const { access_token } = useSelector(getBasicUserToken)
-    const { orderId, status } = route.params
+    let { orderId, status } = route.params
     const [order, setOrder] = useState({})
     const { payment, product, shipment, vehicle, ...orderData } = order
+    status = orderData?.status || status
     const [shipper, setShipper] = useState([])
-    const getHeaderTitle = (status) => {
-        switch (status) {
-            case 'FINDING_SHIPPER':
-                return 'Đang tìm shipper'
-            case 'WAITING_SHIPPER':
-                return 'Đang đợi shipper'
-            default:
-                return
-        }
-    }
     // ---------------Marker Animation--------------
     const animatedColor = useRef(new Animated.Value(0)).current;
     const color = animatedColor.interpolate({
@@ -53,7 +44,6 @@ const OrderStatus = ({ navigation, route }) => {
         });
         navigation.navigate(ROUTES.HOME_STACK)
     }
-
     useEffect(() => {
         if (orderId) {
             const form = {
@@ -106,14 +96,13 @@ const OrderStatus = ({ navigation, route }) => {
         });
 
         navigation.setOptions({
-            headerTitle: "Thông tin đơn hàng",
             headerLeft: () =>
                 <TouchableOpacity onPress={handleBack}>
                     <AntDesign name="left" size={16} color="black" />
                 </TouchableOpacity>
         })
 
-    }, [])
+    }, [orderId])
     // ---------------------Refesh shipper data--------------
     const [refreshing, setRefreshing] = React.useState(false);
     const onRefresh = React.useCallback(() => {
@@ -124,7 +113,6 @@ const OrderStatus = ({ navigation, route }) => {
                 .then(res => {
                     setRefreshing(false)
                     setShipper(res)
-                    console.log(res)
                     const countShipper = res.length
                     if (countShipper === 0) {
                         Toast.show({
@@ -166,6 +154,7 @@ const OrderStatus = ({ navigation, route }) => {
                         .then(unwrapResult)
                         .then(res => {
                             setOrder(res)
+                            navigation.navigate('Đơn hàng')
                         })
                         .catch(e => {
                             Toast.show({
@@ -225,10 +214,7 @@ const OrderStatus = ({ navigation, route }) => {
                                     horizontal={true}
                                     showsHorizontalScrollIndicator={false}
                                     renderItem={({ item }) => {
-                                        const { more, ...s } = item
-                                        const { vehicle_number, vehicle } = more
-                                        const title = `${vehicle_number} ${vehicle?.name}`
-                                        const fullName = `${s?.last_name} ${s?.first_name}`
+                                        const fullName = `${item?.last_name} ${item?.first_name}`
                                         return (
                                             <View
                                                 key={item.id}
@@ -237,7 +223,7 @@ const OrderStatus = ({ navigation, route }) => {
                                                 <View className="flex-row px-3 py-4">
                                                     <View className="basis-2/6 px-3">
                                                         <Image
-                                                            source={{ uri: s?.avatar }}
+                                                            source={{ uri: item?.avatar }}
                                                             className="h-12 w-12 "
                                                         />
                                                     </View>
@@ -245,10 +231,10 @@ const OrderStatus = ({ navigation, route }) => {
                                                         <Text>{fullName}</Text>
                                                         <View className="flex-row items-center space-x-1">
                                                             <AntDesign name="star" size={15} color="#FFB534" />
-                                                            <Text className="text-xs text-gray-600">{s.rating}</Text>
+                                                            <Text className="text-xs text-gray-600">{item?.rating}</Text>
                                                         </View>
                                                         <View className="bg-gray-100 rounded-md px-1">
-                                                            <Text className="text-xs text-gray-600 font-semibold">{title}</Text>
+                                                            <Text className="text-xs text-gray-600 font-semibold">{`${item?.more?.vehicle_number} ${item?.more?.vehicle?.name}`}</Text>
                                                         </View>
                                                     </View>
                                                 </View>
@@ -266,7 +252,7 @@ const OrderStatus = ({ navigation, route }) => {
                                                     <TouchableOpacity
                                                         activeOpacity={1}
                                                         className="flex-row flex-1 items-center justify-center"
-                                                        onPress={() => handleConfirmShipper(s.id)}
+                                                        onPress={() => handleConfirmShipper(item.id)}
                                                     >
                                                         <Text className="font-medium">Chọn</Text>
                                                     </TouchableOpacity>

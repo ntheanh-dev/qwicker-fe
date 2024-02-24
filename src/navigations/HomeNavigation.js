@@ -69,8 +69,8 @@ const HomeNavigation = () => {
                     ),
                 })}
             />
-            <Stack.Screen name={ROUTES.ORDER_STATUS_STACK} component={OrderStatus} />
-            <Stack.Screen name={ROUTES.VIEW_FEEDBACK_STACK} component={ViewFeedback} />
+            <Stack.Screen name={ROUTES.ORDER_STATUS_STACK} component={OrderStatus} options={{ headerTitle: 'Thông tin đơn hàng của bạn', headerTitleAlign: 'center' }} />
+            <Stack.Screen name={ROUTES.VIEW_FEEDBACK_STACK} component={ViewFeedback} options={{ headerTitleAlign: 'center', headerTitle: 'Đánh giá' }} />
 
         </Stack.Navigator>
     )

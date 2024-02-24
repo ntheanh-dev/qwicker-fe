@@ -121,7 +121,10 @@ const AddMoreOrderDetail = ({ navigation }) => {
     }
 
     const handlePlaceOrder = () => {
-        setLoading(true)
+        placeOrderBTS.current.close()
+        setTimeout(() => {
+            setLoading(true)
+        }, 500)
         const data = {
             access_token: access_token,
             formData: order
@@ -154,7 +157,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
 
     return (
         <View className="bg-white flex-1 py-4 relative">
-            <Spinner visible={loading} size='large' animation='fade' />
+            <Spinner visible={loading} size='large' animation='fade' className="z-50" />
             <View className="bg-white flex-col px-4">
                 {/* ----------------Order Detail------------- */}
                 <TouchableOpacity
@@ -230,7 +233,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                         >
                             <View className="px-4"><AntDesign name="wallet" size={24} color="#3422F1" /></View>
                             <View className="flex-col border-b border-gray-300 py-4 flex-1">
-                                <Text className="text-base font-medium">Momo</Text>
+                                <Text className="text-base font-medium">VnPay</Text>
                                 <Text className="text-gray-500">Thanh toán sau khi hoàn thành đặt hàng</Text>
                             </View>
                             {selectedPaymentMethod === 0 && <View><MaterialIcons name="check-circle" size={24} color="#3422F1" /></View>}

@@ -29,13 +29,10 @@ const PickOrder = ({ route, navigation }) => {
             .then(unwrapResult)
             .then(res => {
                 Toast.show({
-                    type: ALERT_TYPE.WARNING,
+                    type: ALERT_TYPE.SUCCESS,
                     title: "Tham gia thành công",
                     textBody: "Hãy chờ cho đến khi chủ đơn hàng chấp nhận bạn"
                 })
-                setTimeout(() => {
-                    navigation.goBack()
-                }, 2500)
             })
             .catch(resp => {
                 if (resp.status === 400) {

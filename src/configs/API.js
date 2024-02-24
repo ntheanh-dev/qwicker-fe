@@ -57,19 +57,16 @@ export const paymentEndpoints = {
 
 export const authAPI = (access_token) => axios.create({
     baseURL: BASE_URL,
-    timeout: 6000,
     headers: {
         "Authorization": `Bearer ${access_token}`
-    }
+    },
 })
 export const urlAuthAPI = (access_token, url) => axios.create({
     baseURL: url,
-    timeout: 5000,
     headers: {
         "Authorization": `Bearer ${access_token}`
     }
 })
 export default axios.create({
     baseURL: BASE_URL,
-    timeout: 6000,
 })
