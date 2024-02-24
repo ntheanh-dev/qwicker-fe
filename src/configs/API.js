@@ -8,10 +8,11 @@ export const baseEndpoints = {
     'vehicles': '/vehicles/',
     'product-categories': '/product-categories/',
     'payment-method': '/payment-method/',
-    'convert-token': '/auth/convert-token',
 }
 export const accountEndpoints = {
     'change-password': '/account/change-password/',
+    'login': '/auth/token/',
+    'convert-token': '/auth/convert-token/',
     'sent-otp': '/account/sent-otp/',
     'sent-otp-to-valid-email': '/account/register/sent-otp/',
     'verify-email': '/account/verify-email/',
@@ -22,7 +23,6 @@ export const accountEndpoints = {
 }
 export const basicUserEndpoints = {
     'basic-user-register': '/users/',
-    'login': '/auth/token/',
     'current-user': 'users/current-user/',
     'my-jobs': (pagrams) => `/jobs/?${pagrams}`,
     'job-retrieve': (jobId) => `/jobs/${jobId}/`,
@@ -33,7 +33,6 @@ export const basicUserEndpoints = {
 }
 export const shipperEndpoints = {
     'shipper-register': '/shippers/',
-    'login': '/auth/token/',
     'current-user': 'shippers/current-user/'
 }
 export const jobEndpoints = {

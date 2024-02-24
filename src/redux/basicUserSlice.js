@@ -81,11 +81,9 @@ export const register = createAsyncThunk("user,registerUser",
 export const login = createAsyncThunk('user,loginUser',
     async (data, { rejectWithValue }) => {
         try {
-            const token = await API.post(basicUserEndpoints['login'], {
+            const token = await API.post(accountEndpoints['login'], {
                 "username": data?.username,
                 "password": data?.password,
-                "client_id": "RiYOr07gNa0xh6dbcnQKySftZ8KHnip88Cps9Jk8",
-                "client_secret": "et1xaPdvN7jDXyPLN45Axnbj1irvoHjItxJUwqXA42Pnd5fevezK96118PvwHgw5wFr9fLOwz985lW4eRkTk6VdHsj8zLbdHHiPGt0csWlqbNEGdvkRgTKS3CaWyxPPE",
                 "grant_type": "password"
             }, {
                 headers: {
@@ -106,11 +104,9 @@ export const login = createAsyncThunk('user,loginUser',
 export const googleLogin = createAsyncThunk('user,loginUser',
     async (access_token, { rejectWithValue }) => {
         try {
-            const res = await API.post(baseEndpoints['convert-token'], {
+            const res = await API.post(accountEndpoints['convert-token'], {
                 "token": access_token,
                 "backend": 'google-oauth2',
-                "client_id": "RiYOr07gNa0xh6dbcnQKySftZ8KHnip88Cps9Jk8",
-                "client_secret": "et1xaPdvN7jDXyPLN45Axnbj1irvoHjItxJUwqXA42Pnd5fevezK96118PvwHgw5wFr9fLOwz985lW4eRkTk6VdHsj8zLbdHHiPGt0csWlqbNEGdvkRgTKS3CaWyxPPE",
                 "grant_type": "convert_token"
             }, {
                 headers: {
