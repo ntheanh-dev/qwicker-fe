@@ -1,5 +1,6 @@
 import axios from "axios";
 // const BASE_URL = "http://10.0.2.2:8000/"
+// const BASE_URL = "http://10.17.50.43:8000/"
 const BASE_URL = "http://192.168.1.207:8000/"
 // const BASE_URL = "http://192.168.100.14:8000/"
 
@@ -8,6 +9,7 @@ export const baseEndpoints = {
     'vehicles': '/vehicles/',
     'product-categories': '/product-categories/',
     'payment-method': '/payment-method/',
+    'my-coupon': '/coupon/my-coupon/'
 }
 export const accountEndpoints = {
     'change-password': '/account/change-password/',

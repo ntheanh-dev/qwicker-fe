@@ -226,11 +226,11 @@ const DrawerNavigation = () => {
                 component={SearchOrder}
                 options={{ headerShown: false, drawerItemStyle: { height: 0 }, }}
             />
-            <Drawer.Screen
+            {/* <Drawer.Screen
                 name={ROUTES.VNPAY_WEBVIEW_DRAWER}
                 component={VnPay}
                 options={{ headerShown: false, drawerItemStyle: { height: 0 }, }}
-            />
+            /> */}
 
         </Drawer.Navigator>
     )

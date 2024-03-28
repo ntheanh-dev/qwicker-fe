@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { MaterialIcons, Feather, AntDesign, MaterialCommunityIcons, Ionicons, Entypo, Foundation } from '@expo/vector-icons';
 import { ROUTES, SHIPMENTYPE } from '../../constants';
@@ -13,7 +13,7 @@ import { getSelectedVehicle, resetOrderSlice } from '../../redux/orderSlice';
 import { orderForm, resetOrder } from '../../redux/store';
 import { isProductFulFill, resetProductSlice } from '../../redux/productSlice';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
-import { getBasicUserToken, postJob } from '../../redux/basicUserSlice';
+import { getBasicUserToken, getCoupon, postJob } from '../../redux/basicUserSlice';
 import Spinner from 'react-native-loading-spinner-overlay';
 
 const AddMoreOrderDetail = ({ navigation }) => {
@@ -79,6 +79,41 @@ const AddMoreOrderDetail = ({ navigation }) => {
                 break
         }
         return data
+    }
+    //coupon
+    const couponBTS = useRef()
+    const [coupon, setCoupon] = useState('')
+    const handleAddCoupon = () => {
+        if (coupon.length > 0) {
+            dispatch(getCoupon({ access_token: access_token, key: coupon }))
+                .then(unwrapResult)
+                .then(res => {
+                    const { code } = res
+                    if (code == '00') {
+                        Toast.show({
+                            type: ALERT_TYPE.WARNING,
+                            title: "Thêm discount thất bại",
+                            textBody: 'Không tìm thấy discount'
+                        })
+                    } else if (code == '02') {
+                        Toast.show({
+                            type: ALERT_TYPE.WARNING,
+                            title: "Thêm discount thất bại",
+                            textBody: 'Discount này đã hết hạn'
+                        })
+                    } else if (code == '01') {
+                        const { discount } = res
+
+                    }
+                })
+                .catch(res => {
+                    Toast.show({
+                        type: ALERT_TYPE.SUCCESS,
+                        title: "Thêm discount thất bại",
+                        textBody: 'Hãy thử lại sau'
+                    })
+                })
+        }
     }
     // Place order
     const placeOrderBTS = useRef()
@@ -281,16 +316,53 @@ const AddMoreOrderDetail = ({ navigation }) => {
                 </RBSheet>
 
                 {/* ---------------------Discount------------------- */}
-                <TouchableOpacity className="flex-row justify-between items-center py-4 pr-4  border-b border-gray-300">
+                <TouchableOpacity className="flex-row justify-between items-center py-4 pr-4  border-b border-gray-300"
+                    onPress={() => couponBTS.current.open()}
+                >
                     <View className="flex-row items-center space-x-3">
-                        <MaterialCommunityIcons name="tag-plus-outline" size={24} color="#D1D5DB" />
+                        <MaterialCommunityIcons name="tag-plus-outline" size={24} color="#3422F1" />
                         <Text className="text-sm text-gray-500">Thêm coupon</Text>
                     </View>
                     <View className="flex-row space-x-3 items-center mr-[-12]">
                         <MaterialIcons name="keyboard-arrow-right" size={24} color="black" />
                     </View>
                 </TouchableOpacity>
-
+                <RBSheet
+                    ref={couponBTS}
+                    customStyles={{
+                        wrapper: {
+                            backgroundColor: "rgba(0,0,0,0.3)"
+                        },
+                        draggableIcon: {
+                            backgroundColor: "#000"
+                        },
+                        container: {
+                            borderTopLeftRadius: 20,
+                            borderTopRightRadius: 20,
+                            overflow: 'hidden',
+                            height: 210
+                        }
+                    }}
+                >
+                    <View className="h-full w-full px-4 pt-5 pb-8 flex-col">
+                        <Text className="text-lg font-bold">Nhập mã coupon để được giảm giá</Text>
+                        <TextInput
+                            placeholder='Coupon'
+                            placeholderTextColor={'#4B5563'}
+                            className="p-3 rounded-md border border-gray-300 my-4"
+                            value={coupon}
+                            onChangeText={t => setCoupon(t)}
+                            autoFocus={true}
+                        />
+                        <TouchableOpacity
+                            className="bg-gray-600 rounded-lg w-full flex justify-center items-center h-14 mt-2"
+                            style={coupon.length > 0 && { backgroundColor: '#3422F1' }}
+                            onPress={handleAddCoupon}
+                        >
+                            <Text className="text-lg font-medium text-white" >Thêm</Text>
+                        </TouchableOpacity>
+                    </View>
+                </RBSheet>
                 {/*---------------Place order bottom sheet------------ */}
                 <RBSheet
                     ref={placeOrderBTS}

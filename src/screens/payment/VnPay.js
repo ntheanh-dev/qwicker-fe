@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useCallback, useEffect } from 'react'
 import WebView from 'react-native-webview'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ALERT_TYPE, Toast } from 'react-native-alert-notification';
@@ -13,7 +13,7 @@ export default function VnPay({ navigation, route }) {
     const dispatch = useDispatch()
     const { paymentURL, orderId, paymentId } = route.params
     const { access_token } = useSelector(getBasicUserToken)
-    const handleNavigationChange = (newNav) => {
+    const handleNavigationChange = useCallback((newNav) => {
         const { title, url } = newNav;
         if (title === "Kết quả thanh toán") {
             if (url.includes('vnp_ResponseCode=00')) {
@@ -40,14 +40,21 @@ export default function VnPay({ navigation, route }) {
                 }, 3000)
             }
         }
-    }
+    }, [paymentURL])
+
+    useEffect(() => {
+        navigation.getParent().setOptions({
+            headerShown: false
+        });
+    })
+
     return (
-        <SafeAreaView className="flex-1">
+        <View className="flex-1">
             <WebView
-                className="h-[80%]"
+                className="flex-1"
                 source={{ uri: paymentURL }}
                 onNavigationStateChange={newNav => handleNavigationChange(newNav)}
             />
-        </SafeAreaView>
+        </View>
     )
 }

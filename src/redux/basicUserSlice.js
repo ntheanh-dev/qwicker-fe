@@ -315,6 +315,25 @@ export const checkOutSuccess = createAsyncThunk('payment,Payment',
     }
 )
 
+export const getCoupon = createAsyncThunk('coupon,getCoupon',
+    async (data, { rejectWithValue }) => {
+        const { access_token, key } = data
+        const formData = new FormData()
+        formData.append('key', key)
+        try {
+            const res = await authAPI(access_token).post(baseEndpoints['my-coupon'], formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            return res.data
+        } catch (err) {
+            return rejectWithValue(err?.response.data)
+        }
+
+    }
+)
+
 export const getBasicUserToken = state => state.basicUserSlice.token
 export const getBasicUserStatus = state => state.basicUserSlice.status
 export const getBasicUserProfile = state => state.basicUserSlice.user

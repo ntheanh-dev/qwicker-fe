@@ -72,6 +72,10 @@ const shipmentSlice = createSlice({
         },
         addCost: (state, action) => {
             state.cost = action.payload
+        },
+        addDiscount: (state, action) => {
+            const discount = action.payload
+            state.cost / 100 * discount;
         }
     }
 })
@@ -86,7 +90,7 @@ export const isDateTimeFulFill = createSelector(
 )
 
 export const { addPickUp, addDeliveryAddress, addAdditionalPickUpInfo,
-    addAdditionalDeliveryAddressInfo, addDate, addTime, setShipmentTypeToNow, addCost, resetShipmentSlice } = shipmentSlice.actions
+    addAdditionalDeliveryAddressInfo, addDate, addTime, setShipmentTypeToNow, addCost, resetShipmentSlice, addDiscount } = shipmentSlice.actions
 export const getShipmentType = state => state.shipment.type
 export const getPickUP = state => state.shipment.pick_up
 export const getDeliveryAddress = state => state.shipment.delivery_address

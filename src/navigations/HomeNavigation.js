@@ -11,6 +11,7 @@ import { MaterialIcons, Feather, AntDesign, MaterialCommunityIcons } from '@expo
 import AddCommentForCourier from '../screens/orderprocess/AddCommentForCourier';
 import OrderStatus from '../screens/orderprocess/OrderStatus';
 import ViewFeedback from '../screens/orderprocess/ViewFeedback';
+import VnPay from '../screens/payment/VnPay';
 
 const Stack = createNativeStackNavigator();
 
@@ -71,7 +72,23 @@ const HomeNavigation = () => {
             />
             <Stack.Screen name={ROUTES.ORDER_STATUS_STACK} component={OrderStatus} options={{ headerTitle: 'Thông tin đơn hàng của bạn', headerTitleAlign: 'center' }} />
             <Stack.Screen name={ROUTES.VIEW_FEEDBACK_STACK} component={ViewFeedback} options={{ headerTitleAlign: 'center', headerTitle: 'Đánh giá' }} />
-
+            <Stack.Screen
+                name={ROUTES.VNPAY_WEBVIEW_DRAWER}
+                component={VnPay}
+                options={({ navigation }) => ({
+                    headerTitle: () => (
+                        <Text className="text-lg font-semibold">Thanh toán online</Text>
+                    ),
+                    headerBackVisible: false,
+                    headerLeft: () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.goBack()}
+                        >
+                            <AntDesign name="close" size={24} color="black" />
+                        </TouchableOpacity>
+                    ),
+                })}
+            />
         </Stack.Navigator>
     )
 }

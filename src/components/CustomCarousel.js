@@ -54,7 +54,7 @@ const CustomCarousel = () => {
                 loop
                 width={width}
                 height={width / 2}
-                autoPlay={false}
+                autoPlay={true}
                 pagingEnabled={true}
                 mode='parallax'
                 data={data}
