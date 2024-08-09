@@ -1,11 +1,11 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { ROUTES } from './src/constants';
-import OnbroadingScreen from './src/screens/OnbroadingScreen';
-import AuthNavigation from './src/navigations/AuthNavigation';
-import { Provider } from 'react-redux';
-import { AlertNotificationRoot } from 'react-native-alert-notification';
-import { persistor, store } from './src/redux/store';
-import { PersistGate } from 'redux-persist/integration/react';
+import { NavigationContainer } from "@react-navigation/native";
+import { ROUTES } from "./src/constants";
+import OnbroadingScreen from "./src/screens/OnbroadingScreen";
+import AuthNavigation from "./src/navigations/AuthNavigation";
+import { Provider } from "react-redux";
+import { AlertNotificationRoot } from "react-native-alert-notification";
+import { persistor, store } from "./src/redux/store";
+import { PersistGate } from "redux-persist/integration/react";
 
 function App() {
   return (
