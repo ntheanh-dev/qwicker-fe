@@ -1,6 +1,4 @@
 import { NavigationContainer } from "@react-navigation/native";
-import { ROUTES } from "./src/constants";
-import OnbroadingScreen from "./src/screens/OnbroadingScreen";
 import AuthNavigation from "./src/navigations/AuthNavigation";
 import { Provider } from "react-redux";
 import { AlertNotificationRoot } from "react-native-alert-notification";
