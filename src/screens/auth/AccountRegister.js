@@ -10,9 +10,9 @@ import API, { accountEndpoints } from "../../configs/API";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 
 const AccountRegister = ({ navigation }) => {
-  const [username, setUsername] = useState("theanh");
-  const [password, setPassword] = useState("12345678");
-  const [email, setEmail] = useState("theanhmgt66@gmail.com");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
   const role = useSelector(getRole);

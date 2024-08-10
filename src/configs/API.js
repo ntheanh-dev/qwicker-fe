@@ -31,7 +31,7 @@ export const basicUserEndpoints = {
 };
 export const shipperEndpoints = {
   "shipper-register": "/shippers/",
-  "current-user": "shippers/current-user/",
+  "my-info": "/shippers/my-info",
 };
 export const jobEndpoints = {
   jobs: "/jobs/",

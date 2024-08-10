@@ -67,7 +67,7 @@ const AvatarRegister = ({ navigation }) => {
           .then(unwrapResult)
           .then((res) => {
             setLoading(false);
-            // navigation.navigate(ROUTES.HOME);
+            navigation.navigate(ROUTES.HOME);
             dispatch(resetFormRegisterSlice());
           })
           .catch((e) => {

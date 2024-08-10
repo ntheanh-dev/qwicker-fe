@@ -102,28 +102,22 @@ export const login = createAsyncThunk(
   "user,loginUser",
   async (data, { rejectWithValue }) => {
     try {
-      const token = await API.post(
-        accountEndpoints["login"],
-        {
-          username: data?.username,
-          password: data?.password,
-          grant_type: "password",
-        },
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+      const token = await API.post(accountEndpoints["login"], {
+        username: data?.username,
+        password: data?.password,
+      });
+
+      let user = await authAPI(token.data?.result?.accessToken).get(
+        shipperEndpoints["my-info"]
       );
-      let user = await authAPI(token?.data?.access_token).get(
-        basicUserEndpoints["current-user"]
-      );
+
       return {
-        user: user?.data,
-        token: token?.data,
+        user: user?.data?.result,
+        token: token?.data?.result,
       };
     } catch (err) {
-      return rejectWithValue(err?.response.data);
+      console.log(err);
+      return rejectWithValue(err?.response?.data);
     }
   }
 );

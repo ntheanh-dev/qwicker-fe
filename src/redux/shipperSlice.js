@@ -10,7 +10,7 @@ import { objectToFormData } from "../features/ultils";
 const INIT_STATE = {
   user: {},
   status: "idle",
-  token: { access_token: "" },
+  token: { access_token: "", refresh_token: "" },
 };
 
 const shipperSlice = createSlice({
@@ -49,7 +49,8 @@ const shipperSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         if (action.payload) {
           state.user = action.payload.user;
-          state.token = action.payload.token;
+          state.token.access_token = action.payload.token.accessToken;
+          state.token.refresh_token = action.payload.token.refreshToken;
         }
         state.status = "idle";
       })
@@ -84,25 +85,18 @@ export const login = createAsyncThunk(
   "user,loginUser",
   async (data, { rejectWithValue }) => {
     try {
-      const token = await API.post(
-        accountEndpoints["login"],
-        {
-          username: data?.username,
-          password: data?.password,
-          grant_type: "password",
-        },
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+      const token = await API.post(accountEndpoints["login"], {
+        username: data?.username,
+        password: data?.password,
+      });
+
+      let user = await authAPI(token.data?.result?.accessToken).get(
+        shipperEndpoints["my-info"]
       );
-      let user = await authAPI(token.data.access_token).get(
-        shipperEndpoints["current-user"]
-      );
+
       return {
-        user: user?.data,
-        token: token?.data,
+        user: user?.data?.result,
+        token: token?.data?.result,
       };
     } catch (err) {
       console.log(err);
