@@ -108,7 +108,7 @@ export const login = createAsyncThunk(
       });
 
       let user = await authAPI(token.data?.result?.accessToken).get(
-        shipperEndpoints["my-info"]
+        basicUserEndpoints["my-info"]
       );
 
       return {
