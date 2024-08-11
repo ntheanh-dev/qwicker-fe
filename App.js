@@ -8,13 +8,11 @@ import { PersistGate } from "redux-persist/integration/react";
 function App() {
   return (
     <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <AlertNotificationRoot>
-          <NavigationContainer>
-            <AuthNavigation />
-          </NavigationContainer>
-        </AlertNotificationRoot>
-      </PersistGate>
+      <AlertNotificationRoot>
+        <NavigationContainer>
+          <AuthNavigation />
+        </NavigationContainer>
+      </AlertNotificationRoot>
     </Provider>
   );
 }
