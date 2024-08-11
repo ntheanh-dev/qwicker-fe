@@ -77,7 +77,8 @@ export const fetchProductCategories = createAsyncThunk(
   async (form, { rejectWithValue }) => {
     try {
       const res = await API.get(baseEndpoints["product-categories"]);
-      return res.data;
+
+      return res.data.result;
     } catch (e) {
       return rejectWithValue(e.response.data);
     }
@@ -89,7 +90,7 @@ export const fetchPaymentMethods = createAsyncThunk(
   async (form, { rejectWithValue }) => {
     try {
       const res = await API.get(baseEndpoints["payment-method"]);
-      return res.data;
+      return res.data.result;
     } catch (e) {
       return rejectWithValue(e.response.data);
     }

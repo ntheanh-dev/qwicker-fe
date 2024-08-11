@@ -2,10 +2,9 @@ import axios from "axios";
 const BASE_URL = "http://192.168.100.16:8080/api";
 
 export const baseEndpoints = {
-  "product-categories": "/product-categories/",
+  "product-categories": "/products/categories",
   vehicles: "/vehicles",
-  "product-categories": "/product-categories/",
-  "payment-method": "/payment-method/",
+  "payment-method": "/payment/methods",
   "my-coupon": "/coupon/my-coupon/",
 };
 export const accountEndpoints = {
@@ -21,7 +20,7 @@ export const accountEndpoints = {
 };
 export const basicUserEndpoints = {
   "basic-user-register": "/users/",
-  "current-user": "users/current-user/",
+  "my-info": "/users/my-info",
   "my-jobs": (pagrams) => `/jobs/?${pagrams}`,
   "job-retrieve": (jobId) => `/jobs/${jobId}/`,
   "assign-job": (jobId) => `/jobs/${jobId}/assign/`,
@@ -65,6 +64,17 @@ export const urlAuthAPI = (access_token, url) =>
       Authorization: `Bearer ${access_token}`,
     },
   });
+
+export const virtualearthLocation = (query) =>
+  axios.create({
+    baseURL: `https://dev.virtualearth.net/REST/v1/Locations?query=${query}&key=AiG0p7k1VuqiubVqZ22aZXS6HEih9Yg95wRzucCj_gRvT0HeaMMuanyX13L4qGfd`,
+  });
+
+export const virtualearthAutoSuggest = (query) =>
+  axios.create({
+    baseURL: `https://dev.virtualearth.net/REST/v1/Autosuggest?query=${query}&key=AiG0p7k1VuqiubVqZ22aZXS6HEih9Yg95wRzucCj_gRvT0HeaMMuanyX13L4qGfd`,
+  });
+
 export default axios.create({
   baseURL: BASE_URL,
 });

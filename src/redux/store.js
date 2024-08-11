@@ -88,7 +88,9 @@ export const isLocationAndShipmentFulfill = createSelector(
   getDeliveryAddress,
   getSelectedVehicle,
   (pickUp, deliveryAddress, vehicle) => {
-    return pickUp.short_name && deliveryAddress.short_name && vehicle;
+    return (
+      pickUp.formattedAddress && deliveryAddress.formattedAddress && vehicle
+    );
   }
 );
 

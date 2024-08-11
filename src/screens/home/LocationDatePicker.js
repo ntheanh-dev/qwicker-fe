@@ -35,8 +35,6 @@ const LocationDatePicker = () => {
   const navigation = useNavigation();
   const pickUp = useSelector(getPickUP);
   const deliveryAddress = useSelector(getDeliveryAddress);
-  console.log(pickUp);
-  console.log(deliveryAddress);
 
   const handleChooseLocation = (type) => {
     dispath(setTypeChoosingLocation(type));

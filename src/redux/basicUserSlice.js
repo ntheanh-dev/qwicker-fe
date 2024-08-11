@@ -385,7 +385,8 @@ export const getCoupon = createAsyncThunk(
   }
 );
 
-export const getBasicUserToken = (state) => state.basicUserSlice.token;
+export const getBasicUserToken = (state) =>
+  state.basicUserSlice.token.access_token;
 export const getBasicUserStatus = (state) => state.basicUserSlice.status;
 export const getBasicUserProfile = (state) => state.basicUserSlice.user;
 export const { setToken, resetBasicUserSlice } = basicUserSlice.actions;
