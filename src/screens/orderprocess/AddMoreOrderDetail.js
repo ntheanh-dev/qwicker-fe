@@ -100,7 +100,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
       case 1.2:
         let c = paymentMethod.find((ele) => ele?.name === "Tiền Mặt");
         data.method = c.id;
-        data.is_poster_pay = false;
+        data.isPosterPay = false;
         break;
     }
     return data;
@@ -151,7 +151,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
 
   // Fetch payment method
   useEffect(() => {
-    if (paymentMethod.length === 0) {
+    if (paymentMethod === undefined || paymentMethod.length === 0) {
       dispatch(fetchPaymentMethods())
         .then(unwrapResult)
         .then((res) => {
@@ -181,39 +181,44 @@ const AddMoreOrderDetail = ({ navigation }) => {
 
   const handlePlaceOrder = () => {
     placeOrderBTS.current.close();
-    setTimeout(() => {
-      setLoading(true);
-    }, 500);
+    // setTimeout(() => {
+    //   setLoading(true);
+    // }, 500);
+
     const data = {
       access_token: access_token,
       formData: order,
     };
-    dispatch(postJob(data))
-      .then(unwrapResult)
-      .then((res) => {
-        setLoading(false);
-        placeOrderBTS.current.close();
-        dispatch(resetOrderSlice());
-        dispatch(resetPaymentSlice());
-        dispatch(resetProductSlice());
-        dispatch(resetShipmentSlice());
-        if (selectedPaymentMethod === 1.1 || selectedPaymentMethod === 1.2)
-          navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
-            orderId: res.id,
-            status: res.status,
-          });
-        else
-          navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: res.id });
-      })
-      .catch((e) => {
-        Toast.show({
-          type: ALERT_TYPE.WARNING,
-          title: "Đăng bài thất bại",
-          textBody: "Vui lòng thử lại",
-        });
-        console.log(e);
-        setLoading(false);
-      });
+    dispatch(postJob(data)).catch((e) => {
+      console.log(e);
+    });
+
+    // dispatch(postJob(data))
+    //   .then(unwrapResult)
+    //   .then((res) => {
+    //     setLoading(false);
+    //     placeOrderBTS.current.close();
+    //     dispatch(resetOrderSlice());
+    //     dispatch(resetPaymentSlice());
+    //     dispatch(resetProductSlice());
+    //     dispatch(resetShipmentSlice());
+    //     if (selectedPaymentMethod === 1.1 || selectedPaymentMethod === 1.2)
+    //       navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
+    //         orderId: res.id,
+    //         status: res.status,
+    //       });
+    //     else
+    //       navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: res.id });
+    //   })
+    //   .catch((e) => {
+    //     Toast.show({
+    //       type: ALERT_TYPE.WARNING,
+    //       title: "Đăng bài thất bại",
+    //       textBody: "Vui lòng thử lại",
+    //     });
+    //     console.log(e);
+    //     setLoading(false);
+    //   });
   };
 
   return (
@@ -368,7 +373,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                   <View>
                     <Text className="text-lg font-semibold">Người gửi</Text>
                     <Text className="text-base text-gray-500">
-                      {shipmentData.pick_up.addressLine}
+                      {shipmentData.pickupLocation.addressLine}
                     </Text>
                   </View>
                   {selectedPaymentMethod === 1.1 && (
@@ -389,7 +394,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                   <View>
                     <Text className="text-lg font-semibold">Người nhận</Text>
                     <Text className="text-base text-gray-500">
-                      {shipmentData.delivery_address.addressLine}
+                      {shipmentData.dropLocation.addressLine}
                     </Text>
                   </View>
                   {selectedPaymentMethod === 1.2 && (
@@ -495,8 +500,8 @@ const AddMoreOrderDetail = ({ navigation }) => {
                 {shipmentData.type === SHIPMENTYPE.NOW
                   ? "Ngay bây giờ"
                   : formatDateTimeToVietnamese(
-                      shipmentData.shipment_date.date,
-                      shipmentData.shipment_date.time
+                      shipmentData.pickupDatetime.date,
+                      shipmentData.pickupDatetime.time
                     )}
               </Text>
             </View>
@@ -507,7 +512,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                   <Entypo name="circle" size={15} color="#3422F1" />
                 </View>
                 <Text className="text-lg font-bold ml-4">
-                  {shipmentData.pick_up.addressLine}
+                  {shipmentData.pickupLocation.addressLine}
                 </Text>
               </View>
               <View className="flex-row items-center ">
@@ -515,7 +520,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                   <Foundation name="marker" size={18} color="#3422F1" />
                 </View>
                 <Text className="text-lg font-bold ml-4">
-                  {shipmentData.delivery_address.addressLine}
+                  {shipmentData.dropLocation.addressLine}
                 </Text>
               </View>
             </View>

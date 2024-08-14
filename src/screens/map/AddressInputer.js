@@ -33,7 +33,7 @@ const AddressInputer = ({ navigation }) => {
     setAddressSuggest([]);
   };
   const handleBack = () => {
-    if (pickUp.short_name === null || deliveryAddress.short_name === null) {
+    if (pickUp.addressLine === null || deliveryAddress.addressLine === null) {
       navigation.getParent().setOptions({
         headerShown: true,
       });
@@ -42,10 +42,10 @@ const AddressInputer = ({ navigation }) => {
   };
   const handleChooseLocation = (item) => {
     switch (type) {
-      case LOCATION.PICK_UP:
+      case LOCATION.pickupLocation:
         dispatch(addPickUp(item));
         break;
-      case LOCATION.DELIVERY_ADDRESS:
+      case LOCATION.dropLocation:
         dispatch(addDeliveryAddress(item));
         break;
     }
@@ -88,7 +88,9 @@ const AddressInputer = ({ navigation }) => {
           value={txt}
           onChangeText={setTxt}
           placeholder={
-            type === LOCATION.PICK_UP ? "Địa điểm lấy hàng" : "Địa chỉ trả hàng"
+            type === LOCATION.pickupLocation
+              ? "Địa điểm lấy hàng"
+              : "Địa chỉ trả hàng"
           }
           autoFocus={true}
         />

@@ -37,6 +37,10 @@ export const jobEndpoints = {
   listShipper: (jobId) => `/jobs/${jobId}/list-shipper/`,
 };
 
+export const POST_ENDPOINTS = {
+  posts: "/posts",
+};
+
 export const ShipperJobEndpoints = {
   "find-job": `/shipper-jobs/find/?page=1`,
   "job-retrieve": (jobId) => `/shipper-jobs/${jobId}/`,

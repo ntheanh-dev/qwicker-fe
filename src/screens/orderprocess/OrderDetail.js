@@ -61,13 +61,12 @@ const OrderDetail = ({ navigation }) => {
       });
       if (!result.canceled) {
         const uri = result.assets[0]?.uri;
-        const mintype = result.assets[0]?.mimeType;
         if (uri) {
           try {
             const base64 = await FileSystem.readAsStringAsync(uri, {
               encoding: FileSystem.EncodingType.Base64,
             });
-            updateProductDetail({ image: `data:${mintype};base64,${base64}` });
+            updateProductDetail({ image: base64 });
           } catch (readError) {
             console.error("Error reading image as base64:", readError);
           }
@@ -200,7 +199,7 @@ const OrderDetail = ({ navigation }) => {
                 underlayColor={"white"}
                 className="rounded-3xl py-3 px-8 border border-gray-600 ml-5"
                 style={
-                  productDetail.checkedMass === c.item.id && {
+                  productDetail.checkedMass === c.item.name && {
                     borderBlockColor: "#3422F1",
                     backgroundColor: "rgba(134, 182, 246, 0.4)",
                   }
@@ -208,16 +207,16 @@ const OrderDetail = ({ navigation }) => {
                 onPress={() =>
                   updateProductDetail({
                     checkedMass:
-                      productDetail.checkedMass === c.item.id
+                      productDetail.checkedMass === c.item.name
                         ? null
-                        : c.item.id,
+                        : c.item.name,
                   })
                 }
               >
                 <Text
                   className="text-black font-medium"
                   style={
-                    productDetail.checkedMass === c.item.id && {
+                    productDetail.checkedMass === c.item.name && {
                       color: "#3422F1",
                     }
                   }

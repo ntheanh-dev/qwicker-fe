@@ -6,6 +6,7 @@ import API, {
   basicUserEndpoints,
   jobEndpoints,
   paymentEndpoints,
+  POST_ENDPOINTS,
 } from "../configs/API";
 import { objectToFormData } from "../features/ultils";
 
@@ -52,7 +53,8 @@ const basicUserSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         if (action.payload) {
           state.user = action.payload.user;
-          state.token = action.payload.token;
+          state.token.access_token = action.payload.token.accessToken;
+          state.token.refresh_token = action.payload.token.refreshToken;
         }
         state.status = "idle";
       })
@@ -180,15 +182,11 @@ export const postJob = createAsyncThunk(
     const { access_token, formData } = data;
     try {
       const res = await authAPI(access_token).post(
-        jobEndpoints["jobs"],
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        POST_ENDPOINTS["posts"],
+        formData
       );
-      return res.data;
+
+      return res.data.result;
     } catch (err) {
       return rejectWithValue(err?.response.data);
     }
@@ -385,8 +383,7 @@ export const getCoupon = createAsyncThunk(
   }
 );
 
-export const getBasicUserToken = (state) =>
-  state.basicUserSlice.token.access_token;
+export const getBasicUserToken = (state) => state.basicUserSlice.token;
 export const getBasicUserStatus = (state) => state.basicUserSlice.status;
 export const getBasicUserProfile = (state) => state.basicUserSlice.user;
 export const { setToken, resetBasicUserSlice } = basicUserSlice.actions;

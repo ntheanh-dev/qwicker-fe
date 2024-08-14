@@ -101,12 +101,13 @@ export const orderForm = createSelector(
   getOrder,
   (shipment, prod, pay, ord) => {
     const { vehicle, ...order } = ord;
-    order.vehicle_id = vehicle?.id;
-    const formData = new FormData();
-    formData.append("shipment", JSON.stringify(shipment));
-    formData.append("product", JSON.stringify(prod));
-    formData.append("payment", JSON.stringify(pay));
-    formData.append("order", JSON.stringify(order));
+    order.vehicleId = vehicle?.id;
+    const formData = {
+      shipment: shipment,
+      product: prod,
+      payment: pay,
+      order: order,
+    };
     return formData;
   }
 );

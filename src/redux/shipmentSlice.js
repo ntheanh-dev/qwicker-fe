@@ -8,7 +8,7 @@ import { getCurrentDate, getCurrentDateTime } from "../features/ultils";
 
 export const INITIAL_ADDRESS = {
   contact: "",
-  phone_number: "",
+  phoneNumber: "",
 
   postalCode: "",
   addressLine: "",
@@ -18,10 +18,10 @@ export const INITIAL_ADDRESS = {
 };
 
 export const INIT_STATE = {
-  pick_up: INITIAL_ADDRESS,
-  delivery_address: INITIAL_ADDRESS,
+  pickupLocation: INITIAL_ADDRESS,
+  dropLocation: INITIAL_ADDRESS,
   type: SHIPMENTYPE.NOW,
-  shipment_date: {
+  pickupDatetime: {
     date: null,
     time: "00:00",
   },
@@ -37,39 +37,39 @@ const shipmentSlice = createSlice({
     },
     addPickUp: (state, action) => {
       for (var key in action.payload) {
-        if (state.pick_up.hasOwnProperty(key)) {
-          state.pick_up[key] = action.payload[key];
+        if (state.pickupLocation.hasOwnProperty(key)) {
+          state.pickupLocation[key] = action.payload[key];
         }
       }
     },
     addDeliveryAddress: (state, action) => {
       for (var key in action.payload) {
-        if (state.delivery_address.hasOwnProperty(key)) {
-          state.delivery_address[key] = action.payload[key];
+        if (state.dropLocation.hasOwnProperty(key)) {
+          state.dropLocation[key] = action.payload[key];
         }
       }
     },
     addAdditionalPickUpInfo: (state, action) => {
-      state.pick_up.contact = action.payload.contact;
-      state.pick_up.phone_number = action.payload.phone_number;
+      state.pickupLocation.contact = action.payload.contact;
+      state.pickupLocation.phoneNumber = action.payload.phoneNumber;
     },
     addAdditionalDeliveryAddressInfo: (state, action) => {
-      state.delivery_address.contact = action.payload.contact;
-      state.delivery_address.phone_number = action.payload.phone_number;
+      state.dropLocation.contact = action.payload.contact;
+      state.dropLocation.phoneNumber = action.payload.phoneNumber;
     },
 
     addDate: (state, action) => {
-      state.shipment_date.date = action.payload;
+      state.pickupDatetime.date = action.payload;
       state.type = SHIPMENTYPE.LATTER;
     },
     addTime: (state, action) => {
-      state.shipment_date.time = action.payload;
+      state.pickupDatetime.time = action.payload;
       state.type = SHIPMENTYPE.LATTER;
     },
     setShipmentTypeToNow: (state, action) => {
-      state.shipment_date.type = SHIPMENTYPE.NOW;
-      state.shipment_date.date = null;
-      state.shipment_date.time = null;
+      state.pickupDatetime.type = SHIPMENTYPE.NOW;
+      state.pickupDatetime.date = null;
+      state.pickupDatetime.time = null;
     },
     addCost: (state, action) => {
       state.cost = action.payload;
@@ -81,8 +81,8 @@ const shipmentSlice = createSlice({
   },
 });
 
-export const getDate = (state) => state.shipment.shipment_date.date;
-export const getTime = (state) => state.shipment.shipment_date.time;
+export const getDate = (state) => state.shipment.pickupDatetime.date;
+export const getTime = (state) => state.shipment.pickupDatetime.time;
 export const isDateTimeFulFill = createSelector(
   getDate,
   getTime,
@@ -104,36 +104,36 @@ export const {
   addDiscount,
 } = shipmentSlice.actions;
 export const getShipmentType = (state) => state.shipment.type;
-export const getPickUP = (state) => state.shipment.pick_up;
-export const getDeliveryAddress = (state) => state.shipment.delivery_address;
+export const getPickUP = (state) => state.shipment.pickupLocation;
+export const getDeliveryAddress = (state) => state.shipment.dropLocation;
 export const getCost = (state) => state.shipment.cost;
 export const getShipment = (state) => state.shipment;
 export const getShipMentForm = createSelector(
   (state) => state.shipment,
   (s) => {
-    let { shipment_date, pick_up, delivery_address, ...rest } = s;
-    pick_up = Object.fromEntries(
-      Object.entries(pick_up).filter(
-        ([key, value]) => key !== "short_name" && key !== "long_name"
+    let { pickupDatetime, pickupLocation, dropLocation, ...rest } = s;
+    pickupLocation = Object.fromEntries(
+      Object.entries(pickupLocation).filter(
+        ([key, value]) => key !== "addressLine" && key !== "formattedAddress"
       )
     );
-    delivery_address = Object.fromEntries(
-      Object.entries(delivery_address).filter(
-        ([key, value]) => key !== "short_name" && key !== "long_name"
+    dropLocation = Object.fromEntries(
+      Object.entries(dropLocation).filter(
+        ([key, value]) => key !== "addressLine" && key !== "formattedAddress"
       )
     );
     let shipmentDateTime = "";
     if (s.type === SHIPMENTYPE.NOW) {
       shipmentDateTime = getCurrentDateTime();
     } else {
-      shipmentDateTime = `${shipment_date.date.replaceAll("/", "-")} ${
-        shipment_date.time
+      shipmentDateTime = `${pickupDatetime.date.replaceAll("/", "-")} ${
+        pickupDatetime.time
       }`;
     }
     return {
-      pick_up: pick_up,
-      delivery_address: delivery_address,
-      shipment_date: shipmentDateTime,
+      pickupLocation: pickupLocation,
+      dropLocation: dropLocation,
+      pickupDatetime: shipmentDateTime,
       ...rest,
     };
   }

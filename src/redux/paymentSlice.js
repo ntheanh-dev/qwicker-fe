@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const INIT_PAYMENT = {
-  method: null,
+  method: 1,
   price: null,
-  is_poster_pay: true,
+  isPosterPay: true,
   paid_at: null,
 };
 

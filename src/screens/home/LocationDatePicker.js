@@ -39,14 +39,14 @@ const LocationDatePicker = () => {
   const handleChooseLocation = (type) => {
     dispath(setTypeChoosingLocation(type));
     switch (type) {
-      case LOCATION.PICK_UP:
+      case LOCATION.pickupLocation:
         navigation.navigate(
           pickUp.formattedAddress
             ? ROUTES.MAP_STACK
             : ROUTES.ADDRESS_INPUTER_STACK
         );
         break;
-      case LOCATION.DELIVERY_ADDRESS:
+      case LOCATION.dropLocation:
         navigation.navigate(
           deliveryAddress.formattedAddress
             ? ROUTES.MAP_STACK
@@ -122,7 +122,7 @@ const LocationDatePicker = () => {
           <View className="basis-5/6 ml-[-12] ">
             <View className="flex-row justify-between items-center border-b border-gray-300 py-2">
               <TouchableOpacity
-                onPress={() => handleChooseLocation(LOCATION.PICK_UP)}
+                onPress={() => handleChooseLocation(LOCATION.pickupLocation)}
               >
                 {pickUp?.addressLine ? (
                   <Text className="font-medium text-sm">
@@ -149,7 +149,7 @@ const LocationDatePicker = () => {
               )}
             </View>
             <TouchableOpacity
-              onPress={() => handleChooseLocation(LOCATION.DELIVERY_ADDRESS)}
+              onPress={() => handleChooseLocation(LOCATION.dropLocation)}
               className="py-2 flex-row justify-between items-center "
             >
               {deliveryAddress?.addressLine ? (

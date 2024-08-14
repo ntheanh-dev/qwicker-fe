@@ -46,10 +46,8 @@ const AvatarRegister = ({ navigation }) => {
             const base64 = await FileSystem.readAsStringAsync(uri, {
               encoding: FileSystem.EncodingType.Base64,
             });
-            setImage(`data:${mintype};base64,${base64}`);
-            dispatch(
-              addBasicField({ file: `data:${mintype};base64,${base64}` })
-            );
+            setImage(base64);
+            dispatch(addBasicField({ file: base64 }));
           } catch (readError) {
             console.error("Error reading image as base64:", readError);
           }

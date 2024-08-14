@@ -46,8 +46,8 @@ const Map = ({ navigation }) => {
   const dispatch = useDispatch();
   const refRBSheet = useRef();
   const type = useSelector(getTypeChoosingLocation);
-  const { contact, phone_number, addressLine, formattedAddress } = useSelector(
-    type === LOCATION.PICK_UP ? getPickUP : getDeliveryAddress
+  const { contact, phoneNumber, addressLine, formattedAddress } = useSelector(
+    type === LOCATION.pickupLocation ? getPickUP : getDeliveryAddress
   );
 
   const [data, updateData] = useReducer(
@@ -57,7 +57,7 @@ const Map = ({ navigation }) => {
     }),
     {
       showBottomSheet: true,
-      phoneNumber: phone_number,
+      phoneNumber: phoneNumber,
       contactName: contact,
       apartmentNumber: "",
     }
@@ -114,18 +114,18 @@ const Map = ({ navigation }) => {
 
   const handleConfirm = () => {
     if (isFullfil()) {
-      if (type === LOCATION.PICK_UP) {
+      if (type === LOCATION.pickupLocation) {
         dispatch(
           addAdditionalPickUpInfo({
             contact: data.contactName,
-            phone_number: data.phoneNumber,
+            phoneNumber: data.phoneNumber,
           })
         );
       } else {
         dispatch(
           addAdditionalDeliveryAddressInfo({
             contact: data.contactName,
-            phone_number: data.phoneNumber,
+            phoneNumber: data.phoneNumber,
           })
         );
       }
@@ -134,7 +134,7 @@ const Map = ({ navigation }) => {
   };
 
   const handleConfirmGoback = () => {
-    if (type === LOCATION.PICK_UP) {
+    if (type === LOCATION.pickupLocation) {
       dispatch(addPickUp(INITIAL_ADDRESS));
     } else {
       dispatch(addDeliveryAddress(INITIAL_ADDRESS));
