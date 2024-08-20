@@ -19,6 +19,7 @@ import shipmentSlice, {
 import { objectToFormData } from "../features/ultils";
 import { persistReducer, persistStore } from "redux-persist";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import socketSlice from "./socketSlice";
 
 const appReducer = combineReducers({
   order: orderSlice,
@@ -29,6 +30,7 @@ const appReducer = combineReducers({
   shipperSlice: shipperSlice,
   productSlice: productSlice,
   paymentSlice: paymentSlice,
+  socketSlice: socketSlice,
 });
 
 const reducerProxy = (state, action) => {
