@@ -1,6 +1,6 @@
 import axios from "axios";
 export const BASE_URL = "http://192.168.100.16:8080";
-export const webSocketUrl = "ws://192.168.100.16:8080/ws";
+export const webSocketUrl = "http://192.168.100.16:8080/api/ws";
 export const baseEndpoints = {
   "product-categories": "/api/products/categories",
   vehicles: "/api/vehicles",
