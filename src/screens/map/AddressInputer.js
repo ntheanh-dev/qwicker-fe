@@ -5,7 +5,7 @@ import {
   TextInput,
   FlatList,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons, Entypo, Feather, Foundation } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,7 +17,6 @@ import {
 } from "../../redux/shipmentSlice";
 import { getTypeChoosingLocation } from "../../redux/appSlice";
 import { LOCATION, ROUTES } from "../../constants";
-import { fakeDeliveryAdress, fakePickUpAddress } from "../../data";
 import { virtualearth, virtualearthAutoSuggest } from "../../configs/API";
 import useDebounce from "../../hooks/useDebouce";
 const AddressInputer = ({ navigation }) => {
@@ -27,7 +26,7 @@ const AddressInputer = ({ navigation }) => {
   const deliveryAddress = useSelector(getDeliveryAddress);
   const [addressSuggest, setAddressSuggest] = useState([]);
   const [txt, setTxt] = useState("");
-  const debounceValue = useDebounce(txt, 800);
+  const debounceValue = useDebounce(txt, 500);
   const handleClearText = () => {
     setTxt("");
     setAddressSuggest([]);
@@ -40,7 +39,7 @@ const AddressInputer = ({ navigation }) => {
     }
     navigation.goBack();
   };
-  const handleChooseLocation = (item) => {
+  const handleChooseLocation = useCallback((item) => {
     switch (type) {
       case LOCATION.pickupLocation:
         dispatch(addPickUp(item));
@@ -50,7 +49,8 @@ const AddressInputer = ({ navigation }) => {
         break;
     }
     navigation.navigate(ROUTES.MAP_STACK, { location: item });
-  };
+  }, []);
+
   const fetchData = async () => {
     try {
       const response = await virtualearthAutoSuggest(debounceValue).get();
@@ -59,12 +59,14 @@ const AddressInputer = ({ navigation }) => {
       console.log(e);
     }
   };
+
   useEffect(() => {
     if (!debounceValue.trim()) {
       return;
     }
     fetchData();
   }, [debounceValue]);
+
   useEffect(() => {
     navigation.getParent().setOptions({
       headerShown: false,

@@ -4,11 +4,12 @@ import {
   createSelector,
 } from "@reduxjs/toolkit";
 import { SHIPMENTYPE } from "../constants";
-import { getCurrentDate, getCurrentDateTime } from "../features/ultils";
+import { getCurrentDateTime } from "../features/ultils";
 
 export const INITIAL_ADDRESS = {
-  contact: "",
+  contactName: "",
   phoneNumber: "",
+  apartmentNumber: "",
 
   postalCode: "",
   addressLine: "",
@@ -112,16 +113,6 @@ export const getShipMentForm = createSelector(
   (state) => state.shipment,
   (s) => {
     let { pickupDatetime, pickupLocation, dropLocation, ...rest } = s;
-    pickupLocation = Object.fromEntries(
-      Object.entries(pickupLocation).filter(
-        ([key, value]) => key !== "addressLine" && key !== "formattedAddress"
-      )
-    );
-    dropLocation = Object.fromEntries(
-      Object.entries(dropLocation).filter(
-        ([key, value]) => key !== "addressLine" && key !== "formattedAddress"
-      )
-    );
     let shipmentDateTime = "";
     if (s.type === SHIPMENTYPE.NOW) {
       shipmentDateTime = getCurrentDateTime();

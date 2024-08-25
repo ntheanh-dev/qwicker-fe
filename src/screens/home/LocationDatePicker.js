@@ -36,24 +36,24 @@ const LocationDatePicker = () => {
   const pickUp = useSelector(getPickUP);
   const deliveryAddress = useSelector(getDeliveryAddress);
 
-  const handleChooseLocation = (type) => {
-    dispath(setTypeChoosingLocation(type));
+  const displayLocation = (type) => {
     switch (type) {
       case LOCATION.pickupLocation:
-        navigation.navigate(
-          pickUp.formattedAddress
-            ? ROUTES.MAP_STACK
-            : ROUTES.ADDRESS_INPUTER_STACK
-        );
-        break;
+        if (pickUp.addressLine) return pickUp.addressLine;
+        if (pickUp.formattedAddress) return pickUp.formattedAddress;
       case LOCATION.dropLocation:
-        navigation.navigate(
-          deliveryAddress.formattedAddress
-            ? ROUTES.MAP_STACK
-            : ROUTES.ADDRESS_INPUTER_STACK
-        );
-        break;
+        if (deliveryAddress.addressLine) return deliveryAddress.addressLine;
+        if (deliveryAddress.formattedAddress)
+          return deliveryAddress.formattedAddress;
     }
+    return "";
+  };
+
+  const handleChooseLocation = (type) => {
+    dispath(setTypeChoosingLocation(type));
+    navigation.navigate(
+      displayLocation(type) ? ROUTES.MAP_STACK : ROUTES.ADDRESS_INPUTER_STACK
+    );
   };
   //    Date time
   const refRBSheet = useRef();
@@ -124,9 +124,9 @@ const LocationDatePicker = () => {
               <TouchableOpacity
                 onPress={() => handleChooseLocation(LOCATION.pickupLocation)}
               >
-                {pickUp?.addressLine ? (
+                {displayLocation(LOCATION.pickupLocation) ? (
                   <Text className="font-medium text-sm">
-                    {pickUp?.addressLine}
+                    {displayLocation(LOCATION.pickupLocation)}
                   </Text>
                 ) : (
                   <Text className="font-medium text-sm text-gray-600">
@@ -152,9 +152,9 @@ const LocationDatePicker = () => {
               onPress={() => handleChooseLocation(LOCATION.dropLocation)}
               className="py-2 flex-row justify-between items-center "
             >
-              {deliveryAddress?.addressLine ? (
+              {displayLocation(LOCATION.dropLocation) ? (
                 <Text className="font-medium text-sm">
-                  {deliveryAddress?.addressLine}
+                  {displayLocation(LOCATION.dropLocation)}
                 </Text>
               ) : (
                 <Text className="font-medium text-sm text-gray-600">

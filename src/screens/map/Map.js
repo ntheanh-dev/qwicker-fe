@@ -46,7 +46,13 @@ const Map = ({ navigation }) => {
   const dispatch = useDispatch();
   const refRBSheet = useRef();
   const type = useSelector(getTypeChoosingLocation);
-  const { contact, phoneNumber, addressLine, formattedAddress } = useSelector(
+  const {
+    contactName,
+    phoneNumber,
+    addressLine,
+    formattedAddress,
+    apartmentNumber,
+  } = useSelector(
     type === LOCATION.pickupLocation ? getPickUP : getDeliveryAddress
   );
 
@@ -58,8 +64,8 @@ const Map = ({ navigation }) => {
     {
       showBottomSheet: true,
       phoneNumber: phoneNumber,
-      contactName: contact,
-      apartmentNumber: "",
+      contactName: contactName,
+      apartmentNumber: apartmentNumber,
     }
   );
   const [selectedRegion, setSelectedRegion] = useState(INIT_REGION);
@@ -81,6 +87,13 @@ const Map = ({ navigation }) => {
         longitude: longitude,
         latitudeDelta: LATITUDE_DELTA,
         longitudeDelta: LONGITUDE_DELTA,
+      });
+      updateData({
+        postalCode: firstLocation.address.postalCode,
+        addressLine: firstLocation.address.addressLine,
+        formattedAddress: firstLocation.address.formattedAddress,
+        latitude: latitude,
+        longitude: longitude,
       });
     } catch (e) {
       console.log(e);
@@ -115,19 +128,9 @@ const Map = ({ navigation }) => {
   const handleConfirm = () => {
     if (isFullfil()) {
       if (type === LOCATION.pickupLocation) {
-        dispatch(
-          addAdditionalPickUpInfo({
-            contact: data.contactName,
-            phoneNumber: data.phoneNumber,
-          })
-        );
+        dispatch(addPickUp(data));
       } else {
-        dispatch(
-          addAdditionalDeliveryAddressInfo({
-            contact: data.contactName,
-            phoneNumber: data.phoneNumber,
-          })
-        );
+        dispatch(addDeliveryAddress(data));
       }
       goBack();
     }
