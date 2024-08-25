@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { ROUTES } from "../constants";
 import Wallet from "../screens/Wallet";
@@ -17,28 +17,45 @@ import MyOrderTab from "../screens/driver/myOrderTab";
 import FindOrderTab from "../screens/driver/findOrderTab";
 import ReviewOrder from "../screens/driver/hideTab/ReviewOrder";
 import SearchOrder from "../screens/driver/hideTab/SearchOrder";
-import { useDispatch, useSelector } from "react-redux";
-import { getToken } from "../redux/shipperSlice";
-import { getSocket, initWebSocket } from "../redux/socketSlice";
-import SocketClient from "../socket/SocketClient";
-import { BASE_URL } from "../configs/API";
+import { useSelector } from "react-redux";
+import { getSocket } from "../redux/socketSlice";
+import * as Location from "expo-location";
+
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
-  const dispatch = useDispatch();
-  const { access_token } = useSelector(getToken);
+  const [oldLocation, setOldLocation] = useState({
+    latitude: 0,
+    longitude: 0,
+  });
   const ws = useSelector(getSocket);
+  let intervalId;
   useEffect(() => {
-    const connectSocket = async () => {
-      const socketClient = new SocketClient(BASE_URL + "/ws", access_token);
-      await socketClient.awaitConnect();
-      //   dispatch(initWebSocket(socketClient));
-    };
-    if (access_token && !ws?.connected()) {
-      try {
-        connectSocket();
-      } catch (error) {
-        console.error("Connection failed:", error);
-      }
+    if (!intervalId) {
+      intervalId = setInterval(async () => {
+        if (ws.connected) {
+          const currentLocation = await Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.High,
+            maximumAge: 10000,
+          });
+          const { latitude, longitude } = oldLocation;
+          ws.publish({
+            destination: "/app/locations",
+            body: {
+              messageType: "CURRENT_LOCATION",
+              userId: "1",
+              latitude: latitude,
+              longitude: longitude,
+              prevLatitude: currentLocation.coords.latitude,
+              prevLongitude: currentLocation.coords.longitude,
+              timestamp: currentLocation.timestamp,
+            },
+          });
+          setOldLocation((loc) => {
+            loc.latitude = currentLocation.coords.latitude;
+            loc.longitude = currentLocation.coords.longitude;
+          });
+        }
+      }, 4000);
     }
   }, []);
 
