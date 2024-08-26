@@ -182,13 +182,13 @@ export const postJob = createAsyncThunk(
     const { access_token, formData } = data;
     try {
       const res = await authAPI(access_token).post(
-        POST_ENDPOINTS["posts"],
+        POST_ENDPOINTS["create-post"],
         formData
       );
 
-      return res.data.result;
+      return res?.data?.result;
     } catch (err) {
-      return rejectWithValue(err?.response.data);
+      return rejectWithValue(err?.response?.data);
     }
   }
 );
@@ -199,9 +199,9 @@ export const myJob = createAsyncThunk(
     const { access_token, params } = data;
     try {
       const res = await authAPI(access_token).get(
-        basicUserEndpoints["my-jobs"](params)
+        POST_ENDPOINTS["posts"](params)
       );
-      return res.data;
+      return res.data.result;
     } catch (err) {
       return rejectWithValue(err?.response.data);
     }

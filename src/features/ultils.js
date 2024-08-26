@@ -137,17 +137,21 @@ export const formatCurrency = (amount) => {
 };
 
 export const getTitleDependStatus = (status) => {
-  switch (Number(status)) {
-    case JOBSTATUS.FINDING_SHIPPER:
+  switch (status) {
+    case JOBSTATUS.PENDING:
       return "Đang tìm shipper";
     case JOBSTATUS.WAITING_SHIPPER:
       return "Đang đợi shipper";
     case JOBSTATUS.WAITING_PAY:
       return "Chờ thanh toán";
-    case JOBSTATUS.DONE:
+    case JOBSTATUS.SHIPPED:
+      return "Đang giao";
+    case JOBSTATUS.DELIVERED:
       return "Hoàn thành";
-    case JOBSTATUS.CANCELED:
+    case JOBSTATUS.CANCELLED:
       return "Đã huỷ";
+    default:
+      return "Undefine";
   }
 };
 
