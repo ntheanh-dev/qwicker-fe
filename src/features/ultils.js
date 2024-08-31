@@ -160,15 +160,9 @@ export const getCurrentLocation = async () => {
     accuracy: Location.Accuracy.High,
     maximumAge: 10000,
   });
-  console.log({
-    latitude: currentLocation.coords.latitude,
-    longitude: currentLocation.coords.longitude,
-    timestamp: currentLocation.coords.timestamp,
-  });
-
   return {
     latitude: currentLocation.coords.latitude,
     longitude: currentLocation.coords.longitude,
-    timestamp: currentLocation.coords.timestamp,
+    timestamp: currentLocation.timestamp,
   };
 };

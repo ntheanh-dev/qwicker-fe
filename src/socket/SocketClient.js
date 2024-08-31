@@ -4,6 +4,7 @@ class SocketClient {
   constructor(url, jwt) {
     this.url = url;
     this.jwt = jwt;
+    this.state = {};
     this.client = new Client();
     const socket = new SockJS(url + `?token=${jwt}`);
 
@@ -40,12 +41,13 @@ class SocketClient {
 
   subscribe = (topic, callback, ...forMessageTypes) => {
     return this.client.subscribe(topic, (message) => {
-      if (
-        !forMessageTypes ||
-        forMessageTypes.includes(JSON.parse(message.body).messageType)
-      ) {
-        callback(message);
-      }
+      // if (
+      //   !forMessageTypes ||
+      //   forMessageTypes.includes(JSON.parse(message.body).messageType)
+      // ) {
+      //   callback(message);
+      // }
+      callback(message);
     });
   };
 
@@ -81,6 +83,12 @@ class SocketClient {
   get jwt() {
     return this.jwt;
   }
+
+  get state() {
+    return this.state;
+  }
+
+  set state(value) {}
 
   set jwt(value) {}
 }

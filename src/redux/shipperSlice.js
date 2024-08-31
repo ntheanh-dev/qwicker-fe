@@ -5,12 +5,14 @@ import API, {
   authAPI,
   shipperEndpoints,
 } from "../configs/API";
-import { objectToFormData } from "../features/ultils";
+import { getCurrentLocation, objectToFormData } from "../features/ultils";
 
 const INIT_STATE = {
   user: {},
   status: "idle",
   token: { access_token: "", refresh_token: "" },
+  lastTimeoutId: null,
+  location: null,
 };
 
 const shipperSlice = createSlice({
@@ -25,6 +27,9 @@ const shipperSlice = createSlice({
     },
     setToken: (state, action) => {
       state.token = action.payload;
+    },
+    setLocation: (state, action) => {
+      state.location = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -55,6 +60,11 @@ const shipperSlice = createSlice({
         state.status = "idle";
       })
       .addCase(login.rejected, (state, action) => {
+        state.status = "idle";
+      })
+
+      .addCase(setOnline.fulfilled, (state, action) => {
+        state.lastTimeoutId = action.payload;
         state.status = "idle";
       });
   },
@@ -183,7 +193,41 @@ export const compeleteJob = createAsyncThunk(
   }
 );
 
-export const { setToken, resetShipperSlice } = shipperSlice.actions;
+export const setOnline = createAsyncThunk(
+  "online,setOnline",
+  async (data, { getState, rejectWithValue, dispatch }) => {
+    const { ws, userId } = data;
+    try {
+      if (ws.connected) {
+        return setInterval(async () => {
+          const newLocation = await getCurrentLocation();
+          const { shipperSlice } = getState();
+          const { location } = shipperSlice;
+
+          const body = {
+            userId: userId,
+            ...newLocation,
+          };
+          if (location) {
+            body["prevLatitude"] = location.latitude;
+            body["prevLongitude"] = location.longitude;
+          }
+          ws.publish({
+            destination: `/app/shipper/location`,
+            body: body,
+          });
+          dispatch(setLocation(newLocation));
+        }, 5000);
+      }
+    } catch (err) {
+      console.log(err);
+      return rejectWithValue(err?.response);
+    }
+  }
+);
+
+export const { setToken, resetShipperSlice, setLocation } =
+  shipperSlice.actions;
 export const getToken = (state) => state.shipperSlice.token;
 export const getShipperProfile = (state) => state.shipperSlice.user;
 export default shipperSlice.reducer;

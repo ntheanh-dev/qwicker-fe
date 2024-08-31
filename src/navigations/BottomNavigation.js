@@ -17,48 +17,9 @@ import MyOrderTab from "../screens/driver/myOrderTab";
 import FindOrderTab from "../screens/driver/findOrderTab";
 import ReviewOrder from "../screens/driver/hideTab/ReviewOrder";
 import SearchOrder from "../screens/driver/hideTab/SearchOrder";
-import { useSelector } from "react-redux";
-import { getSocket } from "../redux/socketSlice";
-import * as Location from "expo-location";
 
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
-  const [oldLocation, setOldLocation] = useState({
-    latitude: 0,
-    longitude: 0,
-  });
-  const ws = useSelector(getSocket);
-  let intervalId;
-  useEffect(() => {
-    if (!intervalId) {
-      intervalId = setInterval(async () => {
-        if (ws.connected) {
-          const currentLocation = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.High,
-            maximumAge: 10000,
-          });
-          const { latitude, longitude } = oldLocation;
-          ws.publish({
-            destination: "/app/locations",
-            body: {
-              messageType: "CURRENT_LOCATION",
-              userId: "1",
-              latitude: latitude,
-              longitude: longitude,
-              prevLatitude: currentLocation.coords.latitude,
-              prevLongitude: currentLocation.coords.longitude,
-              timestamp: currentLocation.timestamp,
-            },
-          });
-          setOldLocation((loc) => {
-            loc.latitude = currentLocation.coords.latitude;
-            loc.longitude = currentLocation.coords.longitude;
-          });
-        }
-      }, 4000);
-    }
-  }, []);
-
   return (
     <Tab.Navigator
       initialRouteName={ROUTES.FIND_ORDER_DRIVER_TAB}
