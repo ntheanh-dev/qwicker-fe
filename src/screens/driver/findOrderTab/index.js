@@ -81,7 +81,7 @@ const FindOrderTab = ({ navigation }) => {
   const { access_token } = useSelector(getToken);
   const { id } = useSelector(getShipperProfile);
   const ws = useSelector(getSocket);
-  const [posts, setPosts] = useState([fakePost]);
+  const [posts, setPosts] = useState([]);
   const [filter, updateFilter] = useReducer(
     (prev, next) => ({
       ...prev,
@@ -149,6 +149,7 @@ const FindOrderTab = ({ navigation }) => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
+      setPosts([]);
       setRefreshing(false);
     }, 1000);
   }, []);

@@ -13,6 +13,7 @@ import { getToken, joinJob, viewJob } from "../../../redux/shipperSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { formatCurrency } from "../../../features/ultils";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
+import Spinner from "react-native-loading-spinner-overlay";
 
 const PickOrder = ({ route, navigation }) => {
   const { data } = route.params;
@@ -24,35 +25,44 @@ const PickOrder = ({ route, navigation }) => {
     dropLocation,
     ...order
   } = data;
+  console.log(data);
+
   const [showImage, setShowImage] = useState(false);
-  // const handleJoinJob = () => {
-  //   dispatch(joinJob({ token: token.access_token, jobId: jobId }))
-  //     .then(unwrapResult)
-  //     .then((res) => {
-  //       Toast.show({
-  //         type: ALERT_TYPE.SUCCESS,
-  //         title: "Tham gia thành công",
-  //         textBody: "Hãy chờ cho đến khi chủ đơn hàng chấp nhận bạn",
-  //       });
-  //     })
-  //     .catch((resp) => {
-  //       if (resp.status === 400) {
-  //         Toast.show({
-  //           type: ALERT_TYPE.WARNING,
-  //           title: "Tham gia thất bại",
-  //           textBody: "Ban đã tham gia đơn hàng này trước đó",
-  //         });
-  //       } else {
-  //         Toast.show({
-  //           type: ALERT_TYPE.WARNING,
-  //           title: "Tham gia thất bại",
-  //           textBody: "Có thể đơn hàng này đã được nhận bởi người khác",
-  //         });
-  //       }
-  //     });
-  // };
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const token = useSelector(getToken);
+  const handleJoinJob = () => {
+    setLoading(true);
+    dispatch(joinJob({ token: token.access_token, postId: data.id }))
+      .then(unwrapResult)
+      .then((res) => {
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: "Tham gia thành công",
+          textBody: "Hãy chờ cho đến khi chủ đơn hàng chấp nhận bạn",
+        });
+        setLoading(false);
+      })
+      .catch((resp) => {
+        setLoading(false);
+        if (resp.status === 409) {
+          Toast.show({
+            type: ALERT_TYPE.WARNING,
+            title: "Tham gia thất bại",
+            textBody: "Ban đã tham gia đơn hàng này trước đó",
+          });
+        } else {
+          Toast.show({
+            type: ALERT_TYPE.WARNING,
+            title: "Tham gia thất bại",
+            textBody: "Có thể đơn hàng này đã được nhận bởi người khác",
+          });
+        }
+      });
+  };
   return (
     <View className="flex-1">
+      <Spinner visible={loading} size="large" animation="fade" />
       <View className="px-4 bg-[#3422F1] pb-8">
         <Text className="text-lg font-medium text-white ">Nhận đơn ngay</Text>
         <Text className="text-base text-white my-1">Cách ~ 3 kilomet</Text>
@@ -129,22 +139,27 @@ const PickOrder = ({ route, navigation }) => {
             </View>
           </TouchableOpacity>
           {/* ----------vehicleType---------- */}
-          <View className="flex-col bg-white rounded-lg border border-gray-300 p-4 mb-2">
-            <View className="flex-col">
-              <View className="flex-row justify-between">
-                <Text className="text-lg font-medium">{vehicleType?.name}</Text>
-              </View>
-
-              {order.descripttion && (
-                <View className="flex-row items-center space-x-2 pt-3">
-                  <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
-                  <Text className="text-base text-gray-600">
-                    {order?.descripttion}
+          {vehicleType && (
+            <View className="flex-col bg-white rounded-lg border border-gray-300 p-4 mb-2">
+              <View className="flex-col">
+                <View className="flex-row justify-between">
+                  <Text className="text-lg font-medium">
+                    {vehicleType?.name}
                   </Text>
                 </View>
-              )}
+
+                {order.descripttion && (
+                  <View className="flex-row items-center space-x-2 pt-3">
+                    <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
+                    <Text className="text-base text-gray-600">
+                      {order?.descripttion}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
-          </View>
+          )}
+
           {/* ----------Price---------- */}
           <View className="flex-row bg-white rounded-lg border border-gray-300 p-4 mb-2 space-x-4 items-center">
             <Ionicons name="cash-outline" size={24} color="#3422F1" />
@@ -178,7 +193,7 @@ const PickOrder = ({ route, navigation }) => {
             {shipper_count} Tài xế đang tham gia
           </Text> */}
           <TouchableOpacity
-            // onPress={handleJoinJob}
+            onPress={handleJoinJob}
             className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
           >
             <Text className="text-lg font-medium text-white">

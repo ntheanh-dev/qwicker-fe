@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API, {
+  POST_ENDPOINTS,
   ShipperJobEndpoints,
   accountEndpoints,
   authAPI,
@@ -134,10 +135,10 @@ export const viewJob = createAsyncThunk(
 export const joinJob = createAsyncThunk(
   "job, joinJob",
   async (data, { rejectWithValue }) => {
-    const { token, jobId } = data;
+    const { token, postId } = data;
     try {
       const res = await authAPI(token).post(
-        ShipperJobEndpoints["join-job"](jobId)
+        POST_ENDPOINTS["get-post-by-id"](postId)
       );
       return res.status;
     } catch (err) {
