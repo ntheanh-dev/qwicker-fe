@@ -40,6 +40,7 @@ export const jobEndpoints = {
 export const POST_ENDPOINTS = {
   "create-post": "/api/posts",
   posts: (params) => `/api/posts?${params}`,
+  "get-post-by-id": (id) => `/api/posts/${id}`,
 };
 
 export const ShipperJobEndpoints = {

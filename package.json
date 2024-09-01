@@ -37,7 +37,7 @@
     "react-native": "0.74.5",
     "react-native-alert-notification": "^0.4.0",
     "react-native-check-box": "^2.1.7",
-    "react-native-element-dropdown": "^2.10.1",
+    "react-native-element-dropdown": "^2.12.1",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-loading-spinner-overlay": "^3.0.1",
     "react-native-maps": "1.14.0",

@@ -114,20 +114,6 @@ export const login = createAsyncThunk(
     }
   }
 );
-export const findJob = createAsyncThunk(
-  "job, findJob",
-  async (access_token, { rejectWithValue }) => {
-    try {
-      const res = await authAPI(access_token).get(
-        ShipperJobEndpoints["find-job"]
-      );
-      return res.data;
-    } catch (err) {
-      console.log(err);
-      return rejectWithValue(err?.response?.data);
-    }
-  }
-);
 
 export const viewJob = createAsyncThunk(
   "job, viewJob",
@@ -196,7 +182,7 @@ export const compeleteJob = createAsyncThunk(
 export const setOnline = createAsyncThunk(
   "online,setOnline",
   async (data, { getState, rejectWithValue, dispatch }) => {
-    const { ws, userId } = data;
+    const { ws, shipperId } = data;
     try {
       if (ws.connected) {
         return setInterval(async () => {
@@ -205,15 +191,18 @@ export const setOnline = createAsyncThunk(
           const { location } = shipperSlice;
 
           const body = {
-            userId: userId,
-            ...newLocation,
+            messageType: "UPDATE_SHIPPER_LOCATION",
+            content: JSON.stringify({
+              ...newLocation,
+              shipperId: shipperId,
+            }),
           };
           if (location) {
-            body["prevLatitude"] = location.latitude;
-            body["prevLongitude"] = location.longitude;
+            body.content["prevLatitude"] = location.latitude;
+            body.content["prevLongitude"] = location.longitude;
           }
           ws.publish({
-            destination: `/app/shipper/location`,
+            destination: `/app/shipper/${shipperId}`,
             body: body,
           });
           dispatch(setLocation(newLocation));

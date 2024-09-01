@@ -16,17 +16,16 @@ import {
 } from "../../../features/ultils";
 
 const Order = ({ data }) => {
-  const { shipment, payment, product, ...order } = data;
+  const { payment, product, dropLocation, pickupLocation, ...p } = data;
   const navigation = useNavigation();
   var moment = require("moment-timezone");
   moment.tz.setDefault("Asia/Ho_Chi_Minh");
-  const orderTime = moment(shipment?.pickupDatetime);
-
+  const orderTime = moment(p.pickupDatetime || p.postTime);
   const getType = () => {
-    if (shipment.type === "Now") {
+    if (p.type === "Now") {
       return "now";
     } else {
-      const restTime = getDiffBetweenTwoTime(shipment.pickupDatetime);
+      const restTime = getDiffBetweenTwoTime(p.pickupDatetime || p.postTime);
       if (restTime.day >= 1) {
         return "later";
       } else {
@@ -46,7 +45,7 @@ const Order = ({ data }) => {
       ? "Giao ngay"
       : type === "today"
       ? "Hôm nay"
-      : formatMomentDateToVietnamese(shipment?.pickupDatetime);
+      : formatMomentDateToVietnamese(p.pickupDatetime || p.postTime);
   const headerTime =
     orderTime.minute() < 10
       ? `${orderTime.hour()}:0${orderTime.minute()}`
@@ -54,7 +53,7 @@ const Order = ({ data }) => {
   return (
     <TouchableOpacity
       onPress={() =>
-        navigation.navigate(ROUTES.PICK_ORDER_DRIVER_TAB, { jobId: data.id })
+        navigation.navigate(ROUTES.PICK_ORDER_DRIVER_TAB, { data: data })
       }
       className="flex-col rounded-md overflow-hidden my-2 bg-white pb-3"
     >
@@ -81,20 +80,20 @@ const Order = ({ data }) => {
         <View className="basis-5/6 ml-[-12] ">
           <View>
             <Text className="font-medium text-lg">
-              {shipment.pickupLocation.addressLine}
+              {pickupLocation.addressLine}
             </Text>
           </View>
           <View className="py-2 flex-row justify-between items-center ">
             <Text className="font-medium text-lg">
-              {shipment.dropLocation.addressLine}
+              {dropLocation.addressLine}
             </Text>
           </View>
         </View>
       </View>
-      {order.descripttion && (
+      {p.descripttion && (
         <View className="flex-row items-center space-x-4 px-4 mt-2">
           <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
-          <Text className="text-base text-gray-600">{order.descripttion}</Text>
+          <Text className="text-base text-gray-600">{p.descripttion}</Text>
         </View>
       )}
       <View className="flex-row justify-between items-center p-4 ">
@@ -103,7 +102,7 @@ const Order = ({ data }) => {
           <Text>{payment.method.name}</Text>
         </View>
         <Text className="text-xl font-semibold">
-          đ{formatCurrency(shipment.cost)}
+          đ{formatCurrency(payment.price)}
         </Text>
       </View>
     </TouchableOpacity>

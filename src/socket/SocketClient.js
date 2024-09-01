@@ -4,7 +4,6 @@ class SocketClient {
   constructor(url, jwt) {
     this.url = url;
     this.jwt = jwt;
-    this.state = {};
     this.client = new Client();
     const socket = new SockJS(url + `?token=${jwt}`);
 
@@ -83,12 +82,6 @@ class SocketClient {
   get jwt() {
     return this.jwt;
   }
-
-  get state() {
-    return this.state;
-  }
-
-  set state(value) {}
 
   set jwt(value) {}
 }

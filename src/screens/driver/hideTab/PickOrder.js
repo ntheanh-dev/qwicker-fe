@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
   MaterialIcons,
@@ -15,48 +15,42 @@ import { formatCurrency } from "../../../features/ultils";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 
 const PickOrder = ({ route, navigation }) => {
-  const { jobId } = route.params;
-  const [job, setJob] = useState({});
-  const { product, payment, shipment, vehicle, shipper_count, ...order } = job;
-  const token = useSelector(getToken);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(viewJob({ token: token.access_token, jobId: jobId }))
-      .then(unwrapResult)
-      .then((res) => {
-        setJob(res);
-      })
-      .catch((e) => {
-        console.log(e);
-        navigation.goBack();
-      });
-  }, [jobId]);
-  const handleJoinJob = () => {
-    dispatch(joinJob({ token: token.access_token, jobId: jobId }))
-      .then(unwrapResult)
-      .then((res) => {
-        Toast.show({
-          type: ALERT_TYPE.SUCCESS,
-          title: "Tham gia thành công",
-          textBody: "Hãy chờ cho đến khi chủ đơn hàng chấp nhận bạn",
-        });
-      })
-      .catch((resp) => {
-        if (resp.status === 400) {
-          Toast.show({
-            type: ALERT_TYPE.WARNING,
-            title: "Tham gia thất bại",
-            textBody: "Ban đã tham gia đơn hàng này trước đó",
-          });
-        } else {
-          Toast.show({
-            type: ALERT_TYPE.WARNING,
-            title: "Tham gia thất bại",
-            textBody: "Có thể đơn hàng này đã được nhận bởi người khác",
-          });
-        }
-      });
-  };
+  const { data } = route.params;
+  const {
+    product,
+    payment,
+    vehicleType,
+    pickupLocation,
+    dropLocation,
+    ...order
+  } = data;
+  const [showImage, setShowImage] = useState(false);
+  // const handleJoinJob = () => {
+  //   dispatch(joinJob({ token: token.access_token, jobId: jobId }))
+  //     .then(unwrapResult)
+  //     .then((res) => {
+  //       Toast.show({
+  //         type: ALERT_TYPE.SUCCESS,
+  //         title: "Tham gia thành công",
+  //         textBody: "Hãy chờ cho đến khi chủ đơn hàng chấp nhận bạn",
+  //       });
+  //     })
+  //     .catch((resp) => {
+  //       if (resp.status === 400) {
+  //         Toast.show({
+  //           type: ALERT_TYPE.WARNING,
+  //           title: "Tham gia thất bại",
+  //           textBody: "Ban đã tham gia đơn hàng này trước đó",
+  //         });
+  //       } else {
+  //         Toast.show({
+  //           type: ALERT_TYPE.WARNING,
+  //           title: "Tham gia thất bại",
+  //           textBody: "Có thể đơn hàng này đã được nhận bởi người khác",
+  //         });
+  //       }
+  //     });
+  // };
   return (
     <View className="flex-1">
       <View className="px-4 bg-[#3422F1] pb-8">
@@ -78,10 +72,10 @@ const PickOrder = ({ route, navigation }) => {
                 </View>
                 <View className="flex-col basis-5/6 ">
                   <Text className="text-lg font-semibold">
-                    {shipment?.pickupLocation.addressLine}
+                    {pickupLocation.addressLine}
                   </Text>
                   <Text className="text-gray-600">
-                    {shipment?.pickupLocation.formattedAddress}
+                    {pickupLocation.formattedAddress}
                   </Text>
                 </View>
               </View>
@@ -92,25 +86,53 @@ const PickOrder = ({ route, navigation }) => {
                 </View>
                 <View className="flex-col basis-5/6 ">
                   <Text className="text-lg font-semibold">
-                    {shipment?.dropLocation.addressLine}
+                    {dropLocation.addressLine}
                   </Text>
                   <Text className="text-gray-600">
-                    {shipment?.dropLocation.formattedAddress}
+                    {dropLocation.formattedAddress}
                   </Text>
                 </View>
               </View>
             </View>
           </View>
-          {/* ----------Vehicle---------- */}
+
+          {/* ----------Hình ảnh------------- */}
+          <TouchableOpacity
+            onPress={() => setShowImage(!showImage)}
+            className="flex-col bg-white rounded-lg border border-gray-300 p-4 mb-2"
+          >
+            <View className="flex-col">
+              <View className="flex-row justify-between">
+                <Text className="text-lg font-medium">Hình ảnh</Text>
+                {showImage ? (
+                  <MaterialIcons
+                    name="keyboard-arrow-up"
+                    size={24}
+                    color="black"
+                  />
+                ) : (
+                  <MaterialIcons
+                    name="keyboard-arrow-down"
+                    size={24}
+                    color="black"
+                  />
+                )}
+              </View>
+              {showImage && (
+                <View className="flex justify-center items-center">
+                  <Image
+                    source={{ uri: product?.image }}
+                    className="w-[150] h-[150]"
+                  />
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+          {/* ----------vehicleType---------- */}
           <View className="flex-col bg-white rounded-lg border border-gray-300 p-4 mb-2">
             <View className="flex-col">
               <View className="flex-row justify-between">
-                <Text className="text-lg font-medium">{vehicle?.name}</Text>
-                <MaterialIcons
-                  name="keyboard-arrow-down"
-                  size={24}
-                  color="black"
-                />
+                <Text className="text-lg font-medium">{vehicleType?.name}</Text>
               </View>
 
               {order.descripttion && (
@@ -128,7 +150,7 @@ const PickOrder = ({ route, navigation }) => {
             <Ionicons name="cash-outline" size={24} color="#3422F1" />
             <View className="flex-col">
               <Text className="text-xl font-semibold">
-                đ{formatCurrency(shipment?.cost)}
+                đ{formatCurrency(payment.price)}
               </Text>
               <Text className="text-base font-medium text-gray-400 ">
                 {payment?.method.name}
@@ -144,19 +166,19 @@ const PickOrder = ({ route, navigation }) => {
             />
             <View className="flex-col">
               <Text className="text-xl font-semibold">
-                {product?.category.name}
+                {product.category.name}
               </Text>
             </View>
           </View>
         </View>
         {/* ---------Confirm Button Sheet-------- */}
-        <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
+        <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6 z-40">
           <Text className="text-xl font-semibold">Đừng bỏ lỡ!</Text>
-          <Text className="text-base font-medium text-gray-400 ">
+          {/* <Text className="text-base font-medium text-gray-400 ">
             {shipper_count} Tài xế đang tham gia
-          </Text>
+          </Text> */}
           <TouchableOpacity
-            onPress={handleJoinJob}
+            // onPress={handleJoinJob}
             className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
           >
             <Text className="text-lg font-medium text-white">

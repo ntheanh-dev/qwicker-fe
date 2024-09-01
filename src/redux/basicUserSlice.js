@@ -214,9 +214,9 @@ export const retrieve = createAsyncThunk(
     const { access_token, orderId } = data;
     try {
       const res = await authAPI(access_token).get(
-        basicUserEndpoints["job-retrieve"](orderId)
+        POST_ENDPOINTS["get-post-by-id"](orderId)
       );
-      return res.data;
+      return res.data.result;
     } catch (err) {
       return rejectWithValue(err?.response.data);
     }
