@@ -17,6 +17,7 @@ import MyOrderTab from "../screens/driver/myOrderTab";
 import FindOrderTab from "../screens/driver/findOrderTab";
 import ReviewOrder from "../screens/driver/hideTab/ReviewOrder";
 import SearchOrder from "../screens/driver/hideTab/SearchOrder";
+import ViewDistance from "../screens/driver/hideTab/ViewDistance";
 
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
@@ -50,14 +51,14 @@ const BottomNavigation = () => {
                 color={focused ? "#3422F1" : "black"}
               />
             );
-          } else if (route.name === ROUTES.TASK_DRIVER_TAB) {
-            return (
-              <FontAwesome
-                name="tasks"
-                size={30}
-                color={focused ? "#3422F1" : "black"}
-              />
-            );
+            // } else if (route.name === ROUTES.TASK_DRIVER_TAB) {
+            //   return (
+            //     <FontAwesome
+            //       name="tasks"
+            //       size={30}
+            //       color={focused ? "#3422F1" : "black"}
+            //     />
+            //   );
           } else if (route.name === ROUTES.NOTIFICATION_DRIVER_TAB) {
             return (
               <Feather
@@ -86,7 +87,7 @@ const BottomNavigation = () => {
       <Tab.Screen
         name={ROUTES.FIND_ORDER_DRIVER_TAB}
         component={FindOrderTab}
-        options={({ navigation }) => ({
+        options={() => ({
           title: "Nhận hàng",
           headerShown: true,
           headerTitle: () => (
@@ -169,6 +170,15 @@ const BottomNavigation = () => {
         name={ROUTES.SEARCH_ORDER_DRIVER_TAB}
         component={SearchOrder}
         options={{ headerShown: false, tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name={ROUTES.DRIVER_VIEW_DISTANCE}
+        component={ViewDistance}
+        options={{
+          headerShown: false,
+          tabBarButton: () => null,
+          tabBarStyle: { display: "none" },
+        }}
       />
     </Tab.Navigator>
   );

@@ -19,6 +19,7 @@ import { unwrapResult } from "@reduxjs/toolkit";
 import { formatCurrency } from "../../../features/ultils";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import Spinner from "react-native-loading-spinner-overlay";
+import { LOCATION, ROUTES } from "../../../constants";
 
 const PickOrder = ({ route, navigation }) => {
   const { data } = route.params;
@@ -39,7 +40,6 @@ const PickOrder = ({ route, navigation }) => {
   useEffect(() => {
     setLoading(true);
     const form = {
-      token: token.access_token,
       lat1: pickupLocation.latitude,
       long1: pickupLocation.longitude,
       lat2: dropLocation.latitude,
@@ -48,7 +48,7 @@ const PickOrder = ({ route, navigation }) => {
     dispatch(getDuration(form))
       .then(unwrapResult)
       .then((res) => {
-        setDistance(res.resourceSets[0].resources[0]);
+        setDistance(res);
         setLoading(false);
       })
       .catch((err) => {
@@ -87,8 +87,25 @@ const PickOrder = ({ route, navigation }) => {
             textBody: "Có thể đơn hàng này đã được nhận bởi người khác",
           });
         }
+        navigation.goBack();
       });
   };
+
+  const viewDistance = (type) => {
+    if (type === LOCATION.pickupLocation) {
+      navigation.navigate(ROUTES.DRIVER_VIEW_DISTANCE, {
+        pickupLocation: pickupLocation,
+        locationType: LOCATION.pickupLocation,
+      });
+    } else {
+      navigation.navigate(ROUTES.DRIVER_VIEW_DISTANCE, {
+        pickupLocation: pickupLocation,
+        dropLocation: dropLocation,
+        locationType: LOCATION.dropLocation,
+      });
+    }
+  };
+
   return (
     <View className="flex-1">
       <Spinner visible={loading} size="large" animation="fade" />
@@ -110,7 +127,10 @@ const PickOrder = ({ route, navigation }) => {
             </View>
             <View className="flex-col space-y-4">
               {/* -----------Delivery Address------------- */}
-              <View className="flex-row ">
+              <TouchableOpacity
+                onPress={() => viewDistance(LOCATION.pickupLocation)}
+                className="flex-row "
+              >
                 <View className="basis-1/6 flex justify-center items-center">
                   <Entypo name="circle" size={18} color="#3422F1" />
                 </View>
@@ -122,9 +142,12 @@ const PickOrder = ({ route, navigation }) => {
                     {pickupLocation.formattedAddress}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
               {/* -----------Pick up------------- */}
-              <View className="flex-row ">
+              <TouchableOpacity
+                onPress={() => viewDistance(LOCATION.dropLocation)}
+                className="flex-row "
+              >
                 <View className="basis-1/6 flex justify-center items-center">
                   <Foundation name="marker" size={28} color="#3422F1" />
                 </View>
@@ -136,7 +159,7 @@ const PickOrder = ({ route, navigation }) => {
                     {dropLocation.formattedAddress}
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             </View>
           </View>
 

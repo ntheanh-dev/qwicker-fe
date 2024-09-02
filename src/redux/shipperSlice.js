@@ -5,6 +5,7 @@ import API, {
   accountEndpoints,
   authAPI,
   shipperEndpoints,
+  virtualearthDriving,
 } from "../configs/API";
 import { getCurrentLocation, objectToFormData } from "../features/ultils";
 
@@ -135,11 +136,10 @@ export const viewJob = createAsyncThunk(
 export const getDuration = createAsyncThunk(
   "duration, getDuration",
   async (data, { rejectWithValue }) => {
-    const { token, lat1, long1, lat2, long2 } = data;
-    const param = `p1=${lat1},${long1}&p2=${lat2},${long2}`;
+    const { lat1, long1, lat2, long2 } = data;
     try {
-      const res = await authAPI(token).get(shipperEndpoints["duration"](param));
-      return res.data.result;
+      const res = await virtualearthDriving(lat1, long1, lat2, long2).get();
+      return res.data.resourceSets[0].resources[0];
     } catch (err) {
       console.log(err);
       return rejectWithValue(err?.response);
