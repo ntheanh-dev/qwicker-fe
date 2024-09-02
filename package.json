@@ -19,6 +19,7 @@
     "@react-navigation/native-stack": "^6.9.17",
     "@react-navigation/stack": "^6.3.20",
     "@reduxjs/toolkit": "^2.0.1",
+    "@rnmapbox/maps": "^10.1.30",
     "@stomp/stompjs": "^7.0.0",
     "axios": "^1.6.5",
     "dayjs": "^1.11.10",
@@ -44,6 +45,7 @@
     "react-native-modern-datepicker": "^1.0.0-beta.91",
     "react-native-onboarding-swiper": "^1.2.0",
     "react-native-pager-view": "6.3.0",
+    "react-native-phone-call": "^1.2.0",
     "react-native-raw-bottom-sheet": "^2.2.0",
     "react-native-reanimated": "~3.10.1",
     "react-native-reanimated-carousel": "^3.5.1",
@@ -54,6 +56,7 @@
     "react-native-webview": "13.8.6",
     "react-redux": "^9.0.4",
     "redux-persist": "^6.0.0",
+    "rn-slide-button-updated": "^1.0.4",
     "socket.io-client": "^4.7.5",
     "sockjs-client": "^1.6.1",
     "text-encoding": "^0.7.0"

@@ -44,6 +44,8 @@ export default {
   PICK_ORDER_DRIVER_TAB: "Order detail driver tab",
   REVIEW_ORDER_DRIVER_TAB: "Review order driver tab",
   SEARCH_ORDER_DRIVER_TAB: "Search order driver tab",
+  VIEW_ORDER_BEFORE_SHIP: "View order before ship",
+  ROUTING_TAB: "routing tab",
 
   DRIVER_PROFILE_NAVIGATION: "Driver profile navigation",
   DRIVER_PROFILE_STACK: "Driver profile stack",

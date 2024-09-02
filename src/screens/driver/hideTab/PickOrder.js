@@ -9,18 +9,12 @@ import {
   Octicons,
 } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getDuration,
-  getToken,
-  joinJob,
-  viewJob,
-} from "../../../redux/shipperSlice";
+import { getDuration, getToken, joinJob } from "../../../redux/shipperSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { formatCurrency } from "../../../features/ultils";
+import { formatCurrency, getCurrentLocation } from "../../../features/ultils";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import Spinner from "react-native-loading-spinner-overlay";
 import { LOCATION, ROUTES } from "../../../constants";
-
 const PickOrder = ({ route, navigation }) => {
   const { data } = route.params;
   const {
@@ -61,47 +55,56 @@ const PickOrder = ({ route, navigation }) => {
   }, [data]);
 
   const handleJoinJob = () => {
-    setLoading(true);
-    dispatch(joinJob({ token: token.access_token, postId: data.id }))
-      .then(unwrapResult)
-      .then((res) => {
-        Toast.show({
-          type: ALERT_TYPE.SUCCESS,
-          title: "Tham gia thành công",
-          textBody: "Hãy chờ cho đến khi chủ đơn hàng chấp nhận bạn",
-        });
-        setLoading(false);
-      })
-      .catch((resp) => {
-        setLoading(false);
-        if (resp.status === 409) {
-          Toast.show({
-            type: ALERT_TYPE.WARNING,
-            title: "Tham gia thất bại",
-            textBody: "Ban đã tham gia đơn hàng này trước đó",
-          });
-        } else {
-          Toast.show({
-            type: ALERT_TYPE.WARNING,
-            title: "Tham gia thất bại",
-            textBody: "Có thể đơn hàng này đã được nhận bởi người khác",
-          });
-        }
-        navigation.goBack();
-      });
+    navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, { data: data });
+
+    // setLoading(true);
+    // dispatch(joinJob({ token: token.access_token, postId: data.id }))
+    //   .then(unwrapResult)
+    //   .then((res) => {
+    //     Toast.show({
+    //       type: ALERT_TYPE.SUCCESS,
+    //       title: "Tham gia thành công",
+    //       textBody: "Hãy chờ cho đến khi chủ đơn hàng chấp nhận bạn",
+    //     });
+    //     setLoading(false);
+    //     navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, { data: data });
+    //   })
+    //   .catch((resp) => {
+    //     setLoading(false);
+    //     if (resp.status === 409) {
+    //       Toast.show({
+    //         type: ALERT_TYPE.WARNING,
+    //         title: "Tham gia thất bại",
+    //         textBody: "Ban đã tham gia đơn hàng này trước đó",
+    //       });
+    //     } else {
+    //       Toast.show({
+    //         type: ALERT_TYPE.WARNING,
+    //         title: "Tham gia thất bại",
+    //         textBody: "Có thể đơn hàng này đã được nhận bởi người khác",
+    //       });
+    //     }
+    //     navigation.goBack();
+    //   });
   };
 
-  const viewDistance = (type) => {
+  const viewDistance = async (type) => {
     if (type === LOCATION.pickupLocation) {
+      setLoading(true);
+      const startPoint = await getCurrentLocation();
+      setLoading(false);
       navigation.navigate(ROUTES.DRIVER_VIEW_DISTANCE, {
-        pickupLocation: pickupLocation,
-        locationType: LOCATION.pickupLocation,
+        locationType: type,
+        startPoint: startPoint,
+        endPoint: pickupLocation,
+        data: data,
       });
     } else {
       navigation.navigate(ROUTES.DRIVER_VIEW_DISTANCE, {
-        pickupLocation: pickupLocation,
-        dropLocation: dropLocation,
-        locationType: LOCATION.dropLocation,
+        startPoint: pickupLocation,
+        endPoint: dropLocation,
+        locationType: type,
+        data: data,
       });
     }
   };

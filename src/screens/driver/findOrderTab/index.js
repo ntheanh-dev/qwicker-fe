@@ -36,7 +36,7 @@ const fakePost = {
     id: "7706bf5c-a8a1-4a0f-aab7-c01df79dc9ee",
     latitude: 26.85770416,
     longitude: 80.94849396,
-    phoneNumber: null,
+    phoneNumber: "0123456789",
     postalCode: "65191",
   },
   id: "441d2777-d462-4d79-a054-28090266c21b",
@@ -53,9 +53,9 @@ const fakePost = {
     contact: "Chi A",
     formattedAddress: "Nkqubela Road, Bhongweni, Kokstad, 4693, South Africa",
     id: "926a7891-954c-41e8-bfe3-dbfdcd940f90",
-    latitude: 10.90623443203636,
-    longitude: 106.64754031288199,
-    phoneNumber: null,
+    latitude: 10.852196110485785,
+    longitude: 106.66718719016735,
+    phoneNumber: "0123456789",
     postalCode: "72216",
   },
   postTime: "2024-08-25T21:20:52.278788",
@@ -81,7 +81,7 @@ const FindOrderTab = ({ navigation }) => {
   const { access_token } = useSelector(getToken);
   const { id } = useSelector(getShipperProfile);
   const ws = useSelector(getSocket);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState([fakePost]);
   const [filter, updateFilter] = useReducer(
     (prev, next) => ({
       ...prev,

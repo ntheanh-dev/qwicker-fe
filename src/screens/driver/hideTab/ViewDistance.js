@@ -20,74 +20,43 @@ const INIT_REGION = {
   longitudeDelta: LONGITUDE_DELTA,
 };
 const ViewDistance = ({ navigation, route }) => {
-  let { pickupLocation, dropLocation, locationType } = route.params;
+  let { startPoint, endPoint, locationType, data } = route.params;
   const dispatch = useDispatch();
   const [region, setRegion] = useState();
   const { vehicle } = useSelector(getShipperProfile);
   const [loading, setLoading] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState();
-  const [destination, setDestination] = useState();
   const [routeCoordinates, setRouteCoordinates] = useState([]);
+  const [duration, setDuration] = useState();
   const fetchData = async () => {
     try {
       setLoading(true);
-      let param = {};
-      if (locationType === LOCATION.pickupLocation) {
-        const { latitude, longitude } = await getCurrentLocation();
-        setCurrentLocation({ latitude: latitude, longitude: longitude });
-        setDestination({
-          latitude: pickupLocation.latitude,
-          longitude: pickupLocation.longitude,
-        });
-        setRegion({
-          latitude: (latitude + pickupLocation.latitude) / 2,
-          longitude: (longitude + pickupLocation.longitude) / 2,
-          latitudeDelta: Math.abs(latitude - pickupLocation.latitude) * 1.5,
-          longitudeDelta: Math.abs(longitude - pickupLocation.longitude) * 1.5,
-        });
-        param = {
-          lat1: latitude,
-          long1: longitude,
-          lat2: pickupLocation.latitude,
-          long2: pickupLocation.longitude,
-        };
-      } else {
-        setCurrentLocation({
-          latitude: pickupLocation.latitude,
-          longitude: pickupLocation.longitude,
-        });
-        setDestination({
-          latitude: dropLocation.latitude,
-          longitude: dropLocation.longitude,
-        });
-        setRegion({
-          latitude: (pickupLocation.latitude + dropLocation.latitude) / 2,
-          longitude: (pickupLocation.longitude + dropLocation.longitude) / 2,
-          latitudeDelta:
-            Math.abs(pickupLocation.latitude - dropLocation.latitude) * 1.5,
-          longitudeDelta:
-            Math.abs(pickupLocation.longitude - dropLocation.longitude) * 1.5,
-        });
-        param = {
-          lat1: pickupLocation.latitude,
-          long1: pickupLocation.longitude,
-          lat2: dropLocation.latitude,
-          long2: dropLocation.longitude,
-        };
-      }
-
-      dispatch(getDuration(param))
+      setRegion({
+        latitude: (startPoint.latitude + endPoint.latitude) / 2,
+        longitude: (startPoint.longitude + endPoint.longitude) / 2,
+        latitudeDelta: Math.abs(startPoint.latitude - endPoint.latitude) * 1.5,
+        longitudeDelta:
+          Math.abs(startPoint.longitude - endPoint.longitude) * 1.5,
+      });
+      dispatch(
+        getDuration({
+          lat1: startPoint.latitude,
+          long1: startPoint.longitude,
+          lat2: endPoint.latitude,
+          long2: endPoint.longitude,
+        })
+      )
         .then(unwrapResult)
         .then((res) => {
+          setDuration(res);
           const route = res.routeLegs[0].itineraryItems;
           const routePath = route.map((route) => ({
             latitude: route.maneuverPoint.coordinates[0],
             longitude: route.maneuverPoint.coordinates[1],
           }));
           setRouteCoordinates([
-            { latitude: param.lat1, longitude: param.long1 },
+            { latitude: startPoint.latitude, longitude: startPoint.longitude },
             ...routePath,
-            { latitude: param.lat2, longitude: param.long2 },
+            { latitude: endPoint.latitude, longitude: endPoint.longitude },
           ]);
           setLoading(false);
         });
@@ -98,10 +67,10 @@ const ViewDistance = ({ navigation, route }) => {
   };
   useEffect(() => {
     fetchData();
-  }, [locationType]);
+  }, [locationType, data]);
 
   const handleBack = () => {
-    navigation.goBack();
+    navigation.navigate(ROUTES.PICK_ORDER_DRIVER_TAB, { data: data });
   };
 
   return (
@@ -113,8 +82,8 @@ const ViewDistance = ({ navigation, route }) => {
         initialRegion={INIT_REGION}
         // provider={PROVIDER_GOOGLE}
       >
-        {currentLocation && (
-          <Marker.Animated coordinate={currentLocation}>
+        {duration && (
+          <Marker.Animated coordinate={startPoint}>
             <Image
               source={{ uri: vehicle?.icon }}
               style={{
@@ -125,7 +94,7 @@ const ViewDistance = ({ navigation, route }) => {
             />
           </Marker.Animated>
         )}
-        {destination && <Marker coordinate={destination} />}
+        {duration && <Marker coordinate={endPoint} />}
 
         {routeCoordinates.length > 0 && (
           <Polyline
@@ -147,25 +116,10 @@ const ViewDistance = ({ navigation, route }) => {
           <Entypo name="circle" size={12} color="#3422F1" />
         </View>
         <TouchableOpacity className="basis-10/12 flex-col flex-shrink-0 pl-2">
-          {locationType === LOCATION.pickupLocation ? (
-            <>
-              <Text className="text-base font-bold">
-                {pickupLocation.addressLine}
-              </Text>
-              <Text className="text text-gray-500">
-                {pickupLocation.formattedAddress}
-              </Text>
-            </>
-          ) : (
-            <>
-              <Text className="text-base font-bold">
-                {dropLocation.addressLine}
-              </Text>
-              <Text className="text text-gray-500">
-                {dropLocation.formattedAddress}
-              </Text>
-            </>
-          )}
+          <Text className="text-base font-bold">{endPoint.addressLine}</Text>
+          <Text className="text text-gray-500">
+            {endPoint.formattedAddress}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

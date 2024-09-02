@@ -18,6 +18,8 @@ import FindOrderTab from "../screens/driver/findOrderTab";
 import ReviewOrder from "../screens/driver/hideTab/ReviewOrder";
 import SearchOrder from "../screens/driver/hideTab/SearchOrder";
 import ViewDistance from "../screens/driver/hideTab/ViewDistance";
+import ViewOrderBeforeShip from "../screens/driver/hideTab/ViewOrderBeforeShip";
+import Routing from "../screens/driver/hideTab/Routing";
 
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
@@ -157,7 +159,7 @@ const BottomNavigation = () => {
             </TouchableOpacity>
           ),
           headerRight: () => (
-            <Text className="text-lg mr-4 font-medium text-[#3422F1]">
+            <Text className="text-lg mr-4 font-normal text-[#3422F1]">
               TRỢ GIÚP
             </Text>
           ),
@@ -166,6 +168,61 @@ const BottomNavigation = () => {
           headerTitleAlign: "center",
         })}
       />
+
+      <Tab.Screen
+        name={ROUTES.VIEW_ORDER_BEFORE_SHIP}
+        component={ViewOrderBeforeShip}
+        options={({ navigation, route }) => ({
+          tabBarButton: () => null,
+          tabBarStyle: { display: "none" },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => navigation.navigate(ROUTES.ORDER_DRIVER_TAB)}
+              className="ml-4"
+            >
+              <Ionicons name="arrow-back-sharp" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <Text className="text-lg mr-4 font-normal text-[#3422F1]">
+              TRỢ GIÚP
+            </Text>
+          ),
+          headerShown: true,
+          headerTitle: "",
+          headerTitleAlign: "center",
+        })}
+      />
+
+      <Tab.Screen
+        name={ROUTES.ROUTING_TAB}
+        component={Routing}
+        options={({ navigation, route }) => ({
+          tabBarButton: () => null,
+          tabBarStyle: { display: "none" },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, {
+                  data: route.params.data,
+                })
+              }
+              className="ml-4"
+            >
+              <Ionicons name="arrow-back-sharp" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <Text className="text-lg mr-4 font-normal text-[#3422F1]">
+              TRỢ GIÚP
+            </Text>
+          ),
+          headerShown: true,
+          headerTitle: route.params?.title,
+          headerTitleAlign: "center",
+        })}
+      />
+
       <Tab.Screen
         name={ROUTES.SEARCH_ORDER_DRIVER_TAB}
         component={SearchOrder}

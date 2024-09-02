@@ -166,3 +166,17 @@ export const getCurrentLocation = async () => {
     timestamp: currentLocation.timestamp,
   };
 };
+
+export function uuidToNumber(uuid) {
+  const hex = uuid.replace(/-/g, ""); // Loại bỏ dấu gạch ngang
+  let number = "";
+
+  // Chuyển đổi từng cặp ký tự hex thành số
+  for (let i = 0; i < hex.length; i += 2) {
+    const value = parseInt(hex.substring(i, i + 2), 16); // Chuyển đổi từng cặp hex thành số
+    number += value.toString(); // Thêm số vào chuỗi
+  }
+
+  // Giới hạn độ dài chuỗi số nếu cần thiết
+  return number.substring(0, 10); // Ví dụ: lấy 20 ký tự đầu tiên
+}

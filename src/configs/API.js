@@ -21,7 +21,7 @@ export const accountEndpoints = {
 export const basicUserEndpoints = {
   "basic-user-register": "/api/users/",
   "my-info": "/api/users/my-info",
-  "my-jobs": (pagrams) => `/api/jobs/?${pagrams}`,
+  "my-jobs": (params) => `/api/jobs/?${params}`,
   "job-retrieve": (jobId) => `/api/jobs/${jobId}/`,
   "assign-job": (jobId) => `/api/jobs/${jobId}/assign/`,
   send_feedback: (jobId) => `/api/jobs/${jobId}/feedback/`,
@@ -31,6 +31,7 @@ export const basicUserEndpoints = {
 export const shipperEndpoints = {
   "shipper-register": "/api/shippers/",
   "my-info": "/api/shippers/my-info",
+  duration: (params) => `/api/location/duration?${params}`,
 };
 export const jobEndpoints = {
   jobs: "/api/jobs/",
@@ -79,6 +80,11 @@ export const virtualearthLocation = (query) =>
 export const virtualearthAutoSuggest = (query) =>
   axios.create({
     baseURL: `https://dev.virtualearth.net/REST/v1/Autosuggest?query=${query}&key=AiG0p7k1VuqiubVqZ22aZXS6HEih9Yg95wRzucCj_gRvT0HeaMMuanyX13L4qGfd`,
+  });
+
+export const virtualearthDriving = (lat1, long1, lat2, long2) =>
+  axios.create({
+    baseURL: `https://dev.virtualearth.net/REST/v1/Routes/Driving?o=json&wp.0=${lat1},${long1}&wp.1=${lat2},${long2}&key=AiG0p7k1VuqiubVqZ22aZXS6HEih9Yg95wRzucCj_gRvT0HeaMMuanyX13L4qGfd`,
   });
 
 export default axios.create({
