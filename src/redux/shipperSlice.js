@@ -132,6 +132,21 @@ export const viewJob = createAsyncThunk(
   }
 );
 
+export const getDuration = createAsyncThunk(
+  "duration, getDuration",
+  async (data, { rejectWithValue }) => {
+    const { token, lat1, long1, lat2, long2 } = data;
+    const param = `p1=${lat1},${long1}&p2=${lat2},${long2}`;
+    try {
+      const res = await authAPI(token).get(shipperEndpoints["duration"](param));
+      return res.data.result;
+    } catch (err) {
+      console.log(err);
+      return rejectWithValue(err?.response);
+    }
+  }
+);
+
 export const joinJob = createAsyncThunk(
   "job, joinJob",
   async (data, { rejectWithValue }) => {

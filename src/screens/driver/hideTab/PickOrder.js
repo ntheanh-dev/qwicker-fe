@@ -9,7 +9,12 @@ import {
   Octicons,
 } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getToken, joinJob, viewJob } from "../../../redux/shipperSlice";
+import {
+  getDuration,
+  getToken,
+  joinJob,
+  viewJob,
+} from "../../../redux/shipperSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { formatCurrency } from "../../../features/ultils";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
@@ -25,12 +30,36 @@ const PickOrder = ({ route, navigation }) => {
     dropLocation,
     ...order
   } = data;
-  console.log(data);
-
   const [showImage, setShowImage] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [distance, setDistance] = useState();
   const dispatch = useDispatch();
   const token = useSelector(getToken);
+
+  useEffect(() => {
+    setLoading(true);
+    const form = {
+      token: token.access_token,
+      lat1: pickupLocation.latitude,
+      long1: pickupLocation.longitude,
+      lat2: dropLocation.latitude,
+      long2: dropLocation.longitude,
+    };
+    dispatch(getDuration(form))
+      .then(unwrapResult)
+      .then((res) => {
+        setDistance(res.resourceSets[0].resources[0]);
+        setLoading(false);
+      })
+      .catch((err) => {
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: "Tính quãng đường không thành công",
+        });
+        setLoading(false);
+      });
+  }, [data]);
+
   const handleJoinJob = () => {
     setLoading(true);
     dispatch(joinJob({ token: token.access_token, postId: data.id }))
@@ -65,14 +94,19 @@ const PickOrder = ({ route, navigation }) => {
       <Spinner visible={loading} size="large" animation="fade" />
       <View className="px-4 bg-[#3422F1] pb-8">
         <Text className="text-lg font-medium text-white ">Nhận đơn ngay</Text>
-        <Text className="text-base text-white my-1">Cách ~ 3 kilomet</Text>
+        <Text className="text-base text-white my-1">
+          Cách ~ {distance && Math.round(distance?.travelDistance)}{" "}
+          {distance?.distanceUnit}
+        </Text>
       </View>
       <View className="relative  flex-1">
         <View className="absolute left-0 right-0 px-4 top-[-20] z-10">
           {/* ----------Location---------- */}
           <View className="flex-col bg-white rounded-lg border border-gray-300 pb-4 mb-2">
             <View className="py-2">
-              <Text className="text-gray-600 pl-4 py-1">3.41 Kilomet</Text>
+              <Text className="text-gray-600 pl-4 py-1">
+                {distance?.travelDistance} {distance?.distanceUnit}
+              </Text>
             </View>
             <View className="flex-col space-y-4">
               {/* -----------Delivery Address------------- */}
