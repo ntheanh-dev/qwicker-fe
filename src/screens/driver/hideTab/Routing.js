@@ -1,15 +1,22 @@
 import { View, Text, Dimensions, TouchableOpacity, Image } from "react-native";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import MapView, { Circle, Marker, Polyline } from "react-native-maps";
+import React, { useEffect, useRef, useState } from "react";
+import MapView, { Marker, Polyline } from "react-native-maps";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "react-native-loading-spinner-overlay";
-import { getDuration, getShipperProfile } from "../../../redux/shipperSlice";
+import {
+  getDuration,
+  getShipperProfile,
+  getToken,
+  updateOrder,
+} from "../../../redux/shipperSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { Feather, Entypo, AntDesign, MaterialIcons } from "@expo/vector-icons";
 import call from "react-native-phone-call";
 import RBSheet from "react-native-raw-bottom-sheet";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
+import { LOCATION, POSTSTATUS, ROUTES } from "../../../constants";
+import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 
 const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;
@@ -22,57 +29,57 @@ const INIT_REGION = {
   longitudeDelta: LONGITUDE_DELTA,
 };
 const Routing = ({ navigation, route }) => {
-  let { startPoint, endPoint, locationType, data } = route.params;
+  let { startPoint, endPoint, locationType } = route.params;
+  const [data, setData] = useState(route.params.data);
   const dispatch = useDispatch();
+  const { access_token } = useSelector(getToken);
   const [region, setRegion] = useState();
   const { vehicle } = useSelector(getShipperProfile);
   const [loading, setLoading] = useState(false);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [duration, setDuration] = useState();
   const [processArrived, setProcessArrived] = useState(0); //0: init, 1: show confirm box
-  const [image, setImage] = useState(null);
-
   const fetchData = async () => {
-    try {
-      setLoading(true);
-      setRegion({
-        latitude: (startPoint.latitude + endPoint.latitude) / 2,
-        longitude: (startPoint.longitude + endPoint.longitude) / 2,
-        latitudeDelta: Math.abs(startPoint.latitude - endPoint.latitude) * 1.5,
-        longitudeDelta:
-          Math.abs(startPoint.longitude - endPoint.longitude) * 1.5,
-      });
-      dispatch(
-        getDuration({
-          lat1: startPoint.latitude,
-          long1: startPoint.longitude,
-          lat2: endPoint.latitude,
-          long2: endPoint.longitude,
-        })
-      )
-        .then(unwrapResult)
-        .then((res) => {
-          setDuration(res);
-          const route = res.routeLegs[0].itineraryItems;
-          const routePath = route.map((route) => ({
-            latitude: route.maneuverPoint.coordinates[0],
-            longitude: route.maneuverPoint.coordinates[1],
-          }));
-          setRouteCoordinates([
-            { latitude: startPoint.latitude, longitude: startPoint.longitude },
-            ...routePath,
-            { latitude: endPoint.latitude, longitude: endPoint.longitude },
-          ]);
-          setLoading(false);
+    setLoading(true);
+    dispatch(
+      getDuration({
+        lat1: startPoint.latitude,
+        long1: startPoint.longitude,
+        lat2: endPoint.latitude,
+        long2: endPoint.longitude,
+      })
+    )
+      .then(unwrapResult)
+      .then((res) => {
+        setDuration(res);
+        const route = res.routeLegs[0].itineraryItems;
+        const routePath = route.map((route) => ({
+          latitude: route.maneuverPoint.coordinates[0],
+          longitude: route.maneuverPoint.coordinates[1],
+        }));
+        setRouteCoordinates([
+          { latitude: startPoint.latitude, longitude: startPoint.longitude },
+          ...routePath,
+          { latitude: endPoint.latitude, longitude: endPoint.longitude },
+        ]);
+        setRegion({
+          latitude: (startPoint.latitude + endPoint.latitude) / 2,
+          longitude: (startPoint.longitude + endPoint.longitude) / 2,
+          latitudeDelta:
+            Math.abs(startPoint.latitude - endPoint.latitude) * 1.5,
+          longitudeDelta:
+            Math.abs(startPoint.longitude - endPoint.longitude) * 1.5,
         });
-    } catch (e) {
-      setLoading(false);
-      console.log(e);
-    }
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        setLoading(false);
+      });
   };
   useEffect(() => {
     fetchData();
-  }, [locationType, data]);
+  }, [locationType, data, endPoint]);
   const takePhotoRBS = useRef();
 
   const pickImage = async () => {
@@ -87,16 +94,50 @@ const Routing = ({ navigation, route }) => {
       });
       if (!result.canceled) {
         const uri = result.assets[0]?.uri;
-        const mintype = result.assets[0]?.mimeType;
-
         if (uri) {
           try {
+            setLoading(true);
             const base64 = await FileSystem.readAsStringAsync(uri, {
               encoding: FileSystem.EncodingType.Base64,
             });
-            setImage(base64);
             takePhotoRBS.current.close();
             setProcessArrived(0);
+
+            dispatch(
+              updateOrder({
+                access_token: access_token,
+                orderId: data.id,
+                body: {
+                  status: POSTSTATUS.SHIPPED,
+                  photo: base64,
+                },
+              })
+            )
+              .then(unwrapResult)
+              .then((res) => {
+                setData(res);
+                if (locationType === LOCATION.pickupLocation) {
+                  Toast.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    title: "Lấy Hàng Thành Công!",
+                    textBody: "Giờ Hãy Giao Đến Điểm Hẹn",
+                  });
+                  navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, {
+                    data: res,
+                  });
+                } else {
+                  Toast.show({
+                    type: ALERT_TYPE.SUCCESS,
+                    title: "Giao Hàng Thành Công Thành Công!",
+                  });
+                  navigation.navigate(ROUTES.ORDER_DRIVER_TAB);
+                }
+                setLoading(false);
+              })
+              .catch((e) => {
+                console.log(e);
+                setLoading(false);
+              });
           } catch (readError) {
             console.error("Error reading image as base64:", readError);
           }

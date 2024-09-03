@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import API, { baseEndpoints } from "../configs/API";
-import { LogBox } from "react-native";
 
 const appSlice = createSlice({
   name: "app",
   initialState: {
     isUseAppBefore: false,
-    role: 1, // 1:user, 2:shipper,
+    role: 2, // 1:user, 2:shipper,
     typeChoosingLocation: 1, // 1: pick up, 2:deliver address,
+    locationPermission: false,
     vehicles: [],
     productcategories: [],
     paymentMethods: [],
@@ -21,6 +21,9 @@ const appSlice = createSlice({
     },
     setIsUseAppBefore: (state, action) => {
       state.isUseAppBefore = true;
+    },
+    setLocationPermission: (state, action) => {
+      state.locationPermission = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -102,8 +105,13 @@ export const getCategories = (state) => state.app.productcategories;
 export const getVehicles = (state) => state.app.vehicles;
 export const getRole = (state) => state.app.role;
 export const getIsUseAppBefore = (state) => state.app.isUseAppBefore;
+export const getLocationPermission = (state) => state.app.locationPermission;
 export const getTypeChoosingLocation = (state) =>
   state.app.typeChoosingLocation;
-export const { setRole, setTypeChoosingLocation, setIsUseAppBefore } =
-  appSlice.actions;
+export const {
+  setRole,
+  setTypeChoosingLocation,
+  setIsUseAppBefore,
+  setLocationPermission,
+} = appSlice.actions;
 export default appSlice.reducer;

@@ -42,6 +42,7 @@ export const POST_ENDPOINTS = {
   "create-post": "/api/posts",
   posts: (params) => `/api/posts?${params}`,
   "get-post-by-id": (id) => `/api/posts/${id}`,
+  "update-post-by-id": (id) => `/api/posts/${id}/update`,
 };
 
 export const ShipperJobEndpoints = {
@@ -49,7 +50,6 @@ export const ShipperJobEndpoints = {
   "job-retrieve": (jobId) => `/api/shipper-jobs/${jobId}/`,
   "join-job": (jobId) => `/api/shipper-jobs/${jobId}/join/`,
   "my-jobs": (pagrams) => `/api/shipper-jobs/my-jobs/?${pagrams}`,
-  complete: (jobId) => `/api/shipper-jobs/${jobId}/complete/`,
 };
 export const paymentEndpoints = {
   "vnpay-payment-url": "/api/vnpay/payment_url/",

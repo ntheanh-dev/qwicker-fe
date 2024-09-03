@@ -179,17 +179,33 @@ export const myJobs = createAsyncThunk(
   }
 );
 
-export const compeleteJob = createAsyncThunk(
+export const updateOrder = createAsyncThunk(
   "job, myJobs",
   async (data, { rejectWithValue }) => {
-    const { access_token, jobId } = data;
+    const { access_token, orderId, body } = data;
     try {
       const res = await authAPI(access_token).post(
-        ShipperJobEndpoints["complete"](jobId)
+        POST_ENDPOINTS["update-post-by-id"](orderId),
+        body
       );
-      return res.data;
+      return res.data.result;
     } catch (err) {
       console.log(err);
+      return rejectWithValue(err?.response?.data);
+    }
+  }
+);
+
+export const getOrder = createAsyncThunk(
+  "job, myJobs",
+  async (data, { rejectWithValue }) => {
+    const { access_token, orderId } = data;
+    try {
+      const res = await authAPI(access_token).get(
+        POST_ENDPOINTS["get-post-by-id"](orderId)
+      );
+      return res.data.result;
+    } catch (err) {
       return rejectWithValue(err?.response);
     }
   }
