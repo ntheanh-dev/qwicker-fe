@@ -103,20 +103,20 @@ const Routing = ({ navigation, route }) => {
             takePhotoRBS.current.close();
             setProcessArrived(0);
 
-            dispatch(
-              updateOrder({
-                access_token: access_token,
-                orderId: data.id,
-                body: {
-                  status: POSTSTATUS.SHIPPED,
-                  photo: base64,
-                },
-              })
-            )
-              .then(unwrapResult)
-              .then((res) => {
-                setData(res);
-                if (locationType === LOCATION.pickupLocation) {
+            if (LOCATION.pickupLocation) {
+              dispatch(
+                updateOrder({
+                  access_token: access_token,
+                  orderId: data.id,
+                  body: {
+                    status: POSTSTATUS.SHIPPED,
+                    photo: base64,
+                  },
+                })
+              )
+                .then(unwrapResult)
+                .then((res) => {
+                  setData(res);
                   Toast.show({
                     type: ALERT_TYPE.SUCCESS,
                     title: "Lấy Hàng Thành Công!",
@@ -125,19 +125,38 @@ const Routing = ({ navigation, route }) => {
                   navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, {
                     data: res,
                   });
-                } else {
+                  setLoading(false);
+                })
+                .catch((e) => {
+                  console.log(e);
+                  setLoading(false);
+                });
+            } else {
+              dispatch(
+                updateOrder({
+                  access_token: access_token,
+                  orderId: data.id,
+                  body: {
+                    status: POSTSTATUS.DELIVERED,
+                    photo: base64,
+                  },
+                })
+              )
+                .then(unwrapResult)
+                .then((res) => {
+                  setData(res);
                   Toast.show({
                     type: ALERT_TYPE.SUCCESS,
                     title: "Giao Hàng Thành Công Thành Công!",
                   });
                   navigation.navigate(ROUTES.ORDER_DRIVER_TAB);
-                }
-                setLoading(false);
-              })
-              .catch((e) => {
-                console.log(e);
-                setLoading(false);
-              });
+                  setLoading(false);
+                })
+                .catch((e) => {
+                  console.log(e);
+                  setLoading(false);
+                });
+            }
           } catch (readError) {
             console.error("Error reading image as base64:", readError);
           }
