@@ -15,6 +15,7 @@ import { getShipperProfile, getToken } from "../../../redux/shipperSlice";
 import { useFetchPaginatedData } from "../../../hooks/useFetchPaginatedData";
 import { getSocket } from "../../../redux/socketSlice";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
+import { JOBSTATUS, POSTSTATUS } from "../../../constants";
 
 const FILTER_DATA = [
   { id: 1, content: "Tất cả" },
@@ -68,7 +69,7 @@ const fakePost = {
     quantity: 1,
   },
   requestType: "Now",
-  status: "PENDING",
+  status: POSTSTATUS.CONFIRM_WITH_CUSTOMER,
   vehicleType: {
     capacity: "1.7 x 1.2 x 1.2 Mét Lên đến 500 kg",
     description: "Hoạt Động Tất Cả Khung Giờ | Chở Tối Đa 500Kg * 1.5CBM",
@@ -77,11 +78,11 @@ const fakePost = {
     name: "Xe Van 500 kg",
   },
 };
-const FindOrderTab = ({ navigation }) => {
+const FindOrderTab = ({ navigation, route }) => {
   const { access_token } = useSelector(getToken);
   const { id } = useSelector(getShipperProfile);
   const ws = useSelector(getSocket);
-  const [posts, setPosts] = useState([fakePost]);
+  const [posts, setPosts] = useState([]);
   const [filter, updateFilter] = useReducer(
     (prev, next) => ({
       ...prev,
@@ -103,7 +104,14 @@ const FindOrderTab = ({ navigation }) => {
   const handleApplyFilter = () => {
     updateFilter({ showFilter: false });
   };
+
   useEffect(() => {
+    //--------------Cho truong hop go back tu pickOrderTab khi post da duoc nhan boi shipper khac
+    if (route.params?.removePostID && posts.length > 0) {
+      const newPosts = posts.map((p) => p.id !== route.params?.removePostID);
+      setPosts(newPosts);
+    }
+    //-------------------------------------------------------------------------------------------
     let subscription = null;
     if (ws && ws.connected) {
       subscription = ws.subscribe(`/topic/shipper/${id}`, (message) => {

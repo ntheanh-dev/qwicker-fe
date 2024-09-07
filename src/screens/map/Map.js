@@ -47,7 +47,7 @@ const Map = ({ navigation }) => {
   const refRBSheet = useRef();
   const type = useSelector(getTypeChoosingLocation);
   const {
-    contactName,
+    contact,
     phoneNumber,
     addressLine,
     formattedAddress,
@@ -64,7 +64,7 @@ const Map = ({ navigation }) => {
     {
       showBottomSheet: true,
       phoneNumber: phoneNumber,
-      contactName: contactName,
+      contact: contact,
       apartmentNumber: apartmentNumber,
     }
   );
@@ -155,8 +155,8 @@ const Map = ({ navigation }) => {
   };
 
   const isFullfil = () => {
-    const { phoneNumber, contactName, apartmentNumber } = data;
-    return phoneNumber !== "" && contactName !== "" && apartmentNumber !== "";
+    const { phoneNumber, contact, apartmentNumber } = data;
+    return phoneNumber !== "" && contact !== "" && apartmentNumber !== "";
   };
   return (
     <View className="flex-1 relative">
@@ -242,8 +242,8 @@ const Map = ({ navigation }) => {
               placeholder="Tên liên lạc"
               placeholderTextColor={"#4B5563"}
               className="p-3 rounded-md border border-gray-300 mt-4"
-              value={data.contactName}
-              onChangeText={(t) => updateData({ contactName: t })}
+              value={data.contact}
+              onChangeText={(t) => updateData({ contact: t })}
             />
             <TouchableOpacity
               onPress={handleConfirm}

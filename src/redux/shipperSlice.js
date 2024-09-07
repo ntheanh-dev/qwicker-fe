@@ -147,6 +147,22 @@ export const getDuration = createAsyncThunk(
   }
 );
 
+export const getNumShipperJoined = createAsyncThunk(
+  "numShipperJoined, getNumShipperJoined",
+  async (data, { rejectWithValue }) => {
+    const { token, jobId } = data;
+    try {
+      const res = await authAPI(token).get(
+        POST_ENDPOINTS["get-num-shipper-joined"](jobId)
+      );
+      return res.data.result.num;
+    } catch (err) {
+      console.log(err);
+      return rejectWithValue(err?.response);
+    }
+  }
+);
+
 export const joinJob = createAsyncThunk(
   "job, joinJob",
   async (data, { rejectWithValue }) => {

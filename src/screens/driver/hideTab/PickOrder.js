@@ -9,12 +9,19 @@ import {
   Octicons,
 } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getDuration, getToken, joinJob } from "../../../redux/shipperSlice";
+import {
+  getDuration,
+  getNumShipperJoined,
+  getShipperProfile,
+  getToken,
+} from "../../../redux/shipperSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { formatCurrency, getCurrentLocation } from "../../../features/ultils";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import Spinner from "react-native-loading-spinner-overlay";
 import { LOCATION, ROUTES } from "../../../constants";
+import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
+import { getSocket } from "../../../redux/socketSlice";
 const PickOrder = ({ route, navigation }) => {
   const { data } = route.params;
   const {
@@ -28,9 +35,13 @@ const PickOrder = ({ route, navigation }) => {
   const [showImage, setShowImage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [distance, setDistance] = useState();
+  const [numShipperJoin, setNumShipperJoin] = useState(2);
+  const [isJoined, setIsJoined] = useState(false);
+  const { id } = useSelector(getShipperProfile);
+  const { access_token } = useSelector(getToken);
+  const [postStatus, setPostStatus] = useState(data.status);
   const dispatch = useDispatch();
-  const token = useSelector(getToken);
-
+  const ws = useSelector(getSocket);
   useEffect(() => {
     setLoading(true);
     const form = {
@@ -52,40 +63,82 @@ const PickOrder = ({ route, navigation }) => {
         });
         setLoading(false);
       });
+
+    dispatch(getNumShipperJoined({ token: access_token, jobId: data.id }))
+      .then(unwrapResult)
+      .then((res) => {
+        setNumShipperJoin(res);
+      })
+      .catch((err) => {
+        setNumShipperJoin(0);
+      });
+    let postSubscription = null;
+    if (ws && ws.connected) {
+      postSubscription = ws.subscribe(`/topic/post/${data.id}`, (message) => {
+        const messageBody = JSON.parse(message.body);
+        if (messageBody.messageType === "NUM_SHIPPER_JOINED") {
+          setNumShipperJoin(messageBody.content.num);
+        } else if (messageBody.messageType === "FOUND_SHIPPER") {
+          const shipper = messageBody.shipper;
+          const post = messageBody.post;
+          setPostStatus(post.status);
+          if (shipper.id === id) {
+            Toast.show({
+              type: ALERT_TYPE.SUCCESS,
+              title: "Nhận đơn hàng thành công!",
+            });
+            navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, { data: post });
+          } else {
+            if (isJoined) {
+              Toast.show({
+                type: ALERT_TYPE.WARNING,
+                title: "Tham gia thất bại",
+                textBody: "Đơn hàng này đã được nhận bởi người khác",
+              });
+              navigation.navigate(ROUTES.FIND_ORDER_DRIVER_TAB, {
+                removePostID: data.id,
+              });
+            }
+          }
+        }
+      });
+    }
+    return () => {
+      if (postSubscription) {
+        postSubscription.unsubscribe();
+      }
+    };
   }, [data]);
 
   const handleJoinJob = () => {
-    navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, { data: data });
-
-    // setLoading(true);
-    // dispatch(joinJob({ token: token.access_token, postId: data.id }))
-    //   .then(unwrapResult)
-    //   .then((res) => {
-    //     Toast.show({
-    //       type: ALERT_TYPE.SUCCESS,
-    //       title: "Tham gia thành công",
-    //       textBody: "Hãy chờ cho đến khi chủ đơn hàng chấp nhận bạn",
-    //     });
-    //     setLoading(false);
-    //     navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, { data: data });
-    //   })
-    //   .catch((resp) => {
-    //     setLoading(false);
-    //     if (resp.status === 409) {
-    //       Toast.show({
-    //         type: ALERT_TYPE.WARNING,
-    //         title: "Tham gia thất bại",
-    //         textBody: "Ban đã tham gia đơn hàng này trước đó",
-    //       });
-    //     } else {
-    //       Toast.show({
-    //         type: ALERT_TYPE.WARNING,
-    //         title: "Tham gia thất bại",
-    //         textBody: "Có thể đơn hàng này đã được nhận bởi người khác",
-    //       });
-    //     }
-    //     navigation.goBack();
-    //   });
+    if (postStatus === "PENDING") {
+      if (!isJoined) {
+        setIsJoined(true);
+        if (ws && ws.connected) {
+          ws.publish({
+            destination: `/app/post/${data.id}`,
+            body: {
+              messageType: "REQUEST_JOIN_POST",
+            },
+          });
+        } else {
+          Toast.show({
+            type: ALERT_TYPE.WARNING,
+            title: "Tham gia thất bại",
+            textBody: "Lỗi hệ thống do websocket",
+          });
+        }
+      }
+    } else {
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: "Tham gia thất bại",
+        textBody: "Đơn hàng này đã được nhận bởi người khác",
+      });
+      navigation.navigate(ROUTES.FIND_ORDER_DRIVER_TAB, {
+        removePostID: data.id,
+      });
+    }
   };
 
   const viewDistance = async (type) => {
@@ -248,10 +301,28 @@ const PickOrder = ({ route, navigation }) => {
         </View>
         {/* ---------Confirm Button Sheet-------- */}
         <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6 z-40">
-          <Text className="text-xl font-semibold">Đừng bỏ lỡ!</Text>
-          {/* <Text className="text-base font-medium text-gray-400 ">
-            {shipper_count} Tài xế đang tham gia
-          </Text> */}
+          <View className="flex-row space-x-2">
+            <CountdownCircleTimer
+              isPlaying={isJoined}
+              duration={7}
+              size={50}
+              colors="#3422F1"
+            >
+              {({ remainingTime }) => (
+                <Text className="text-[#3422F1] font-medium">
+                  {remainingTime}
+                </Text>
+              )}
+            </CountdownCircleTimer>
+            <View className="flex items-start">
+              <Text className="text-xl font-semibold">
+                {isJoined ? "Đừng rời đi" : "Hãy trở thành người đầu tiên"}
+              </Text>
+              <Text className="text-base font-medium text-gray-400 ">
+                {numShipperJoin} Tài xế đang tham gia
+              </Text>
+            </View>
+          </View>
           <TouchableOpacity
             onPress={handleJoinJob}
             className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"

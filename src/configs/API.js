@@ -43,6 +43,7 @@ export const POST_ENDPOINTS = {
   posts: (params) => `/api/posts?${params}`,
   "get-post-by-id": (id) => `/api/posts/${id}`,
   "update-post-by-id": (id) => `/api/posts/${id}/update`,
+  "get-num-shipper-joined": (id) => `/api/posts/${id}/num-shipper-joined`,
 };
 
 export const ShipperJobEndpoints = {

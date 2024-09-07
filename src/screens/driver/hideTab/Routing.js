@@ -1,5 +1,5 @@
 import { View, Text, Dimensions, TouchableOpacity, Image } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "react-native-loading-spinner-overlay";
@@ -82,6 +82,63 @@ const Routing = ({ navigation, route }) => {
   }, [locationType, data, endPoint]);
   const takePhotoRBS = useRef();
 
+  const updatePost = (base64) => {
+    if (LOCATION.pickupLocation === locationType) {
+      dispatch(
+        updateOrder({
+          access_token: access_token,
+          orderId: data.id,
+          body: {
+            status: POSTSTATUS.SHIPPED,
+            photo: base64,
+          },
+        })
+      )
+        .then(unwrapResult)
+        .then((res) => {
+          setData(res);
+          Toast.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: "Lấy Hàng Thành Công!",
+            textBody: "Giờ Hãy Giao Đến Điểm Hẹn",
+          });
+          navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, {
+            data: res,
+          });
+          setLoading(false);
+        })
+        .catch((e) => {
+          console.log(e);
+          setLoading(false);
+        });
+    } else {
+      dispatch(
+        updateOrder({
+          access_token: access_token,
+          orderId: data.id,
+          body: {
+            status: POSTSTATUS.DELIVERED,
+            photo: base64,
+          },
+        })
+      )
+        .then(unwrapResult)
+        .then((res) => {
+          setData(res);
+          Toast.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: "Giao Hàng Thành Công Thành Công!",
+          });
+          navigation.navigate(ROUTES.ORDER_DRIVER_TAB);
+          setLoading(false);
+        })
+        .catch((e) => {
+          console.log(e);
+          setLoading(false);
+        });
+    }
+  };
+
   const pickImage = async () => {
     let { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -96,67 +153,12 @@ const Routing = ({ navigation, route }) => {
         const uri = result.assets[0]?.uri;
         if (uri) {
           try {
-            setLoading(true);
             const base64 = await FileSystem.readAsStringAsync(uri, {
               encoding: FileSystem.EncodingType.Base64,
             });
             takePhotoRBS.current.close();
+            updatePost(base64);
             setProcessArrived(0);
-
-            if (LOCATION.pickupLocation) {
-              dispatch(
-                updateOrder({
-                  access_token: access_token,
-                  orderId: data.id,
-                  body: {
-                    status: POSTSTATUS.SHIPPED,
-                    photo: base64,
-                  },
-                })
-              )
-                .then(unwrapResult)
-                .then((res) => {
-                  setData(res);
-                  Toast.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    title: "Lấy Hàng Thành Công!",
-                    textBody: "Giờ Hãy Giao Đến Điểm Hẹn",
-                  });
-                  navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, {
-                    data: res,
-                  });
-                  setLoading(false);
-                })
-                .catch((e) => {
-                  console.log(e);
-                  setLoading(false);
-                });
-            } else {
-              dispatch(
-                updateOrder({
-                  access_token: access_token,
-                  orderId: data.id,
-                  body: {
-                    status: POSTSTATUS.DELIVERED,
-                    photo: base64,
-                  },
-                })
-              )
-                .then(unwrapResult)
-                .then((res) => {
-                  setData(res);
-                  Toast.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    title: "Giao Hàng Thành Công Thành Công!",
-                  });
-                  navigation.navigate(ROUTES.ORDER_DRIVER_TAB);
-                  setLoading(false);
-                })
-                .catch((e) => {
-                  console.log(e);
-                  setLoading(false);
-                });
-            }
           } catch (readError) {
             console.error("Error reading image as base64:", readError);
           }
@@ -179,7 +181,12 @@ const Routing = ({ navigation, route }) => {
 
   return (
     <View className="flex-1 relative">
-      <Spinner visible={loading} size="large" animation="fade" />
+      <Spinner
+        visible={loading}
+        size="large"
+        animation="fade"
+        className="z-50"
+      />
       <MapView
         className="w-full h-full"
         region={region}

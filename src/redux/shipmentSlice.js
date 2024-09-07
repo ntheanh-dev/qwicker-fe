@@ -7,7 +7,7 @@ import { SHIPMENTYPE } from "../constants";
 import { getCurrentDateTime } from "../features/ultils";
 
 export const INITIAL_ADDRESS = {
-  contactName: "",
+  contact: "",
   phoneNumber: "",
   apartmentNumber: "",
 

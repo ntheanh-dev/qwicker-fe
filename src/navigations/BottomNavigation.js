@@ -101,7 +101,7 @@ const BottomNavigation = () => {
         })}
       />
       <Tab.Screen
-        options={{ title: "Đơn hàng" }}
+        options={{ title: "Đơn hàng", unmountOnBlur: true }}
         name={ROUTES.ORDER_DRIVER_TAB}
         component={MyOrderTab}
       />
@@ -174,6 +174,7 @@ const BottomNavigation = () => {
         component={ViewOrderBeforeShip}
         options={({ navigation, route }) => ({
           tabBarButton: () => null,
+          unmountOnBlur: true,
           tabBarStyle: { display: "none" },
           headerLeft: () => (
             <TouchableOpacity
@@ -217,6 +218,7 @@ const BottomNavigation = () => {
               TRỢ GIÚP
             </Text>
           ),
+          unmountOnBlur: true,
           headerShown: true,
           headerTitle: route.params?.title,
           headerTitleAlign: "center",
