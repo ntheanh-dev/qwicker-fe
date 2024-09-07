@@ -24,6 +24,7 @@ import {
 import {
   formatCurrency,
   formatMomentDateToVietnamese2,
+  uuidToNumber,
 } from "../../features/ultils";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -33,9 +34,12 @@ import {
   sendFeedback,
   vnPayCreatePaymentUrl,
 } from "../../redux/basicUserSlice";
+import Spinner from "react-native-loading-spinner-overlay";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
-import { JOBSTATUS, ROUTES } from "../../constants";
+import { JOBSTATUS, POSTSTATUS, ROUTES } from "../../constants";
+import Timeline from "react-native-timeline-flatlist";
+import StarRating, { StarRatingDisplay } from "react-native-star-rating-widget";
 const comments = [
   { id: 1, content: "Thái độ tốt" },
   { id: 2, content: "Tình trạng phương tiện tốt" },
@@ -47,63 +51,42 @@ const ReviewOrder = ({ navigation, route }) => {
   const { orderId } = route.params;
   const { access_token } = useSelector(getBasicUserToken);
 
+  const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState();
   var moment = require("moment-timezone");
   moment.tz.setDefault("Asia/Ho_Chi_Minh");
-  const date = moment(feedback?.created_at).format("yy-MM-d");
-
-  const [orderData, setOrderData] = useState({});
-  const { shipment, vehicle, product, payment, winner, status, ...order } =
-    orderData;
+  const [post, setPost] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [showImage, setShowImage] = useState(false);
+  const [showTimeLine, setShowTimeLine] = useState(false);
   useEffect(() => {
-    dispatch(retrieve({ access_token: access_token, orderId: orderId }))
+    navigation.setOptions({
+      headerTitle: () => (
+        <Text className="font-medium text-lg">Hoàn Thành</Text>
+      ),
+    });
+
+    setLoading(true);
+    const data = { access_token: access_token, orderId: orderId };
+    dispatch(retrieve(data))
       .then(unwrapResult)
       .then((res) => {
-        setOrderData(res);
-
-        dispatch(myFeedback({ access_token: access_token, orderId: orderId }))
+        setPost(res);
+        dispatch(myFeedback(data))
           .then(unwrapResult)
           .then((res) => {
-            setFeedback(res);
+            setLoading(false);
+            if (res) setFeedback(res);
           });
       })
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        console.log(e);
+        setLoading(false);
+      });
   }, [orderId]);
 
   const refRBSheet = useRef();
-  const [star, setStar] = useState(0);
   const [text, setText] = useState("");
-  const renderStars = (star, type) => {
-    const arr = [];
-    for (let i = 1; i <= 5; i++) {
-      if (type === "STATIC") {
-        if (i <= star) {
-          arr.push(
-            <MaterialIcons name="star" key={i} size={16} color="yellow" />
-          );
-        } else {
-          arr.push(
-            <MaterialIcons name="star-border" key={i} size={16} color="black" />
-          );
-        }
-      } else {
-        if (i <= star) {
-          arr.push(
-            <TouchableOpacity key={i} onPress={() => setStar(i)}>
-              <MaterialIcons name="star" size={34} color="yellow" />
-            </TouchableOpacity>
-          );
-        } else {
-          arr.push(
-            <TouchableOpacity key={i} onPress={() => setStar(i)}>
-              <MaterialIcons name="star-border" size={34} color="black" />
-            </TouchableOpacity>
-          );
-        }
-      }
-    }
-    return arr;
-  };
 
   const handleChooseRecommedFeadback = (comment) => {
     if (text === "") {
@@ -115,18 +98,16 @@ const ReviewOrder = ({ navigation, route }) => {
 
   const handleFeedback = () => {
     if (text.length > 0) {
-      const formData = new FormData();
-      formData.append("shipper_id", winner?.id);
-      formData.append("rating", star);
-      formData.append("comment", text);
-
-      dispatch(
-        sendFeedback({
-          access_token: access_token,
-          jobId: order.id,
-          formData: formData,
-        })
-      )
+      setLoading(true);
+      const data = {
+        access_token: access_token,
+        postId: post?.id,
+        body: {
+          rating: rating,
+          feedback: text,
+        },
+      };
+      dispatch(sendFeedback(data))
         .then(unwrapResult)
         .then((res) => {
           Toast.show({
@@ -135,35 +116,42 @@ const ReviewOrder = ({ navigation, route }) => {
           });
           setFeedback(res);
           refRBSheet.current.close();
+          setLoading(false);
         })
         .catch((e) => console.log(e));
     }
   };
-
   const handlePayment = () => {
-    const formData = new FormData();
-    formData.append("amount", shipment?.cost);
-    formData.append("order_info", order?.id);
-    dispatch(
-      vnPayCreatePaymentUrl({ access_token: access_token, formData: formData })
-    )
-      .then(unwrapResult)
-      .then((res) => {
-        navigation.navigate(ROUTES.VNPAY_WEBVIEW_DRAWER, {
-          paymentURL: res.payment_url,
-          orderId: orderId,
-          paymentId: payment.id,
-        });
-      })
-      .catch((e) => console.log(e));
+    // const formData = new FormData();
+    // formData.append("amount", post?.cost);
+    // formData.append("order_info", order?.id);
+    // dispatch(
+    //   vnPayCreatePaymentUrl({ access_token: access_token, formData: formData })
+    // )
+    //   .then(unwrapResult)
+    //   .then((res) => {
+    //     navigation.navigate(ROUTES.VNPAY_WEBVIEW_DRAWER, {
+    //       paymentURL: res.payment_url,
+    //       orderId: orderId,
+    //       paymentId: payment.id,
+    //     });
+    //   })
+    //   .catch((e) => console.log(e));
   };
 
   return (
     <View className="p-2 flex-1 flex-col relative">
-      <ScrollView>
+      <Spinner
+        visible={loading}
+        size="large"
+        animation="fade"
+        className="z-50"
+      />
+      <ScrollView contentContinaerStyle={{ flexGrow: 1 }}>
         {/* ---------Driver infor---------- */}
-        {Number(status) !== JOBSTATUS.WAITING_PAY && (
-          <View className="bg-white p-4 flex-col mb-4">
+        {/* {post?.data !== JOBSTATUS.WAITING_PAY &&
+          (
+          <View className="bg-white p-4 flex-col mb-2">
             <View className="flex-row space-x-4">
               <View className="basis-1/6 px-3 ">
                 <Image
@@ -202,27 +190,29 @@ const ReviewOrder = ({ navigation, route }) => {
                 <Text className="text-base font-semibold">Gọi ngay</Text>
               </View>
             </View>
-          </View>
-        )}
+          </View> 
+          )} */}
         {/* ---------  Price-------------- */}
-        <View className="flex-row bg-white p-4 space-x-4 items-center mb-4">
+        <View className="flex-row bg-white p-4 space-x-4 items-center mb-2">
           <Ionicons name="cash-outline" size={24} color="#3422F1" />
           <View className="flex-col">
             <Text className="text-xl font-semibold">
-              {formatCurrency(shipment?.cost)}
+              {formatCurrency(post?.payment?.price)}
             </Text>
             <Text className="text-base font-medium text-gray-400 ">
-              {payment?.method.name}
+              {post?.payment?.method?.name}
             </Text>
           </View>
         </View>
         {/* -----------Location, date time, uuid----------- */}
-        <View className="flex-col bg-white p-4 mb-4">
+        <View className="flex-col bg-white p-4 mb-2">
           <View className="flex-row items-center justify-between pb-3">
             <Text className="text-base text-gray-500">
-              {formatMomentDateToVietnamese2(shipment?.pickupDatetime)}
+              {formatMomentDateToVietnamese2(post?.pickupDatetime)}
             </Text>
-            <Text className="text-gray-600 text-base">{`#${order?.uuid}`}</Text>
+            <Text className="text-gray-600 text-base">
+              {post?.id && `#${uuidToNumber(post?.id)}`}
+            </Text>
           </View>
 
           <View className="flex-row space-x-2">
@@ -231,17 +221,14 @@ const ReviewOrder = ({ navigation, route }) => {
               {/* <View className="border-l-2 border-dotted border-[#3422F1] flex-1 absolute top-6 bottom-0 left-1/2" style={{ width: 1 }}></View> */}
             </View>
 
-            <View className="basis-5/6 flex-col">
+            <View className="flex-col pr-2">
               <Text className="text-xl font-semibold">
-                {shipment?.pickupLocation?.addressLine}
+                {post?.pickupLocation?.addressLine}
               </Text>
               <Text className="text-lg text-gray-600">
-                {shipment?.pickupLocation?.formattedAddress}
+                {post?.pickupLocation?.formattedAddress}
               </Text>
-              <Text className="text-lg text-gray-600">{`${shipment?.pickupLocation?.contact}: ${shipment?.pickupLocation?.phoneNumber}`}</Text>
-            </View>
-            <View className="basis-1/6 flex justify-center items-start">
-              <FontAwesome name="location-arrow" size={30} color="#3422F1" />
+              <Text className="text-lg text-gray-600">{`${post?.pickupLocation?.contact}: ${post?.pickupLocation?.phoneNumber}`}</Text>
             </View>
           </View>
           <View className="flex-row space-x-2">
@@ -249,28 +236,27 @@ const ReviewOrder = ({ navigation, route }) => {
               <Foundation name="marker" size={22} color="#3422F1" />
             </View>
 
-            <View className="basis-5/6 flex-col mt-2">
+            <View className="flex-col pr-2 mt-2">
               <Text className="text-xl font-semibold">
-                {shipment?.dropLocation?.addressLine}
+                {post?.dropLocation?.addressLine}
               </Text>
               <Text className="text-lg text-gray-600">
-                {shipment?.dropLocation?.formattedAddress}
+                {post?.dropLocation?.formattedAddress}
               </Text>
-              <Text className="text-lg text-gray-600">{`${shipment?.dropLocation?.contact}: ${shipment?.dropLocation?.phoneNumber}`}</Text>
-            </View>
-            <View className="basis-1/6 flex justify-center items-start">
-              <FontAwesome name="location-arrow" size={30} color="#3422F1" />
+              <Text className="text-lg text-gray-600">{`${post?.dropLocation?.contact}: ${post?.dropLocation?.phoneNumber}`}</Text>
             </View>
           </View>
         </View>
         {/* -------------Vehicle----------- */}
-        <View className="flex-col bg-white p-4 mb-4 ">
-          <Text className="font-semibold text-xl">{vehicle?.name}</Text>
-          {order.description && (
+        <View className="flex-col bg-white p-4 mb-2 ">
+          <Text className="font-semibold text-xl">
+            {post?.vehicleType?.name}
+          </Text>
+          {post?.description && (
             <View className="flex-row items-center space-x-4 px-4 mt-2">
               <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
               <Text className="text-base text-gray-600">
-                {order?.description}
+                {post?.description}
               </Text>
             </View>
           )}
@@ -284,52 +270,99 @@ const ReviewOrder = ({ navigation, route }) => {
           />
           <View className="flex-col">
             <Text className="text-xl font-semibold">
-              {product?.category?.name}
+              {post?.product?.category?.name}
             </Text>
           </View>
         </View>
-        {/* -----------Feedback Space----------- */}
-        {Number(status) !== JOBSTATUS.WAITING_PAY &&
-          (feedback ? (
-            <>
-              <View className="flex-col bg-white p-4 border-b border-gray-300">
-                <Text className="font-semibold text-xl">Đánh giá của bạn</Text>
-                <View className="flex-row py-2">
-                  {renderStars(feedback?.rating, "STATIC")}
-                </View>
-                <Text className="text-base font-normal py-1">
-                  {feedback?.comment}
-                </Text>
-                <View className="flex-row justify-between mt-2">
-                  <Text className="text-xs font-normal text-gray-500">
-                    {date}
-                  </Text>
-                  <View className="flex-row space-x-5 justify-center items-center">
-                    <Entypo
-                      name="dots-three-horizontal"
-                      size={20}
-                      color="gray"
-                    />
-                  </View>
-                </View>
+        {/* ----------Hình ảnh------------- */}
+        <TouchableOpacity
+          onPress={() => setShowImage(!showImage)}
+          className="flex-col bg-white p-4 mb-2 space-x-2"
+        >
+          <View className="flex-col">
+            <View className="flex-row justify-between">
+              <Text className="text-lg font-medium">Hình ảnh</Text>
+              {showImage ? (
+                <MaterialIcons
+                  name="keyboard-arrow-up"
+                  size={24}
+                  color="black"
+                />
+              ) : (
+                <MaterialIcons
+                  name="keyboard-arrow-down"
+                  size={24}
+                  color="black"
+                />
+              )}
+            </View>
+            {showImage && (
+              <View className="flex justify-center items-center">
+                <Image
+                  source={{ uri: post?.product?.image }}
+                  className="w-[150] h-[150]"
+                />
               </View>
-              <View className="h-40"></View>
-            </>
-          ) : (
-            <>
-              <TouchableOpacity onPress={() => refRBSheet.current.open()}>
-                <Text className="text-md font-medium text-[#3422F1] text-center py-2 underline">
-                  Đánh giá
-                </Text>
-              </TouchableOpacity>
-              <View className="h-40"></View>
-            </>
-          ))}
+            )}
+          </View>
+        </TouchableOpacity>
+        {/* -----------Feedback Space----------- */}
+        {feedback && (
+          <View className="flex-col bg-white p-4 border-b border-gray-300">
+            <Text className="font-semibold text-xl">Đánh giá của bạn</Text>
+            <View className="flex-row py-2">
+              <StarRatingDisplay rating={feedback?.rating} />
+            </View>
+            <Text className="text-base font-normal py-1">
+              {feedback?.feedback}
+            </Text>
+            <View className="flex-row justify-between mt-2">
+              <Text className="text-xs font-normal text-gray-500">
+                {moment(feedback?.createdAt).format("yy-MM-d")}
+              </Text>
+              <View className="flex-row space-x-5 justify-center items-center">
+                <Entypo name="dots-three-horizontal" size={20} color="gray" />
+              </View>
+            </View>
+          </View>
+        )}
+        {/* ----------Time line------------- */}
+        <TouchableOpacity
+          onPress={() => setShowTimeLine(!showTimeLine)}
+          className="flex-col bg-white p-4 mb-2 space-x-2"
+        >
+          <View className="flex-col">
+            <View className="flex-row justify-between">
+              <Text className="text-lg font-medium">Time Line</Text>
+            </View>
+            <Timeline
+              lineColor="rgb(45,156,219)"
+              circleColor="rgb(45,156,219)"
+              timeContainerStyle={{ minWidth: 52, marginTop: 5 }}
+              timeStyle={{
+                textAlign: "center",
+                backgroundColor: "#ff9797",
+                color: "white",
+                padding: 5,
+                borderRadius: 13,
+              }}
+              circleStyle={{ marginTop: 10 }}
+              data={postHistoryToTimeData(post?.history)}
+              options={{
+                style: { paddingTop: 5 },
+              }}
+              renderFullLine={true}
+              renderCircle={false}
+            />
+          </View>
+        </TouchableOpacity>
+
+        <View className="h-40"></View>
       </ScrollView>
 
       <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
         {/* --------------Place order again----------- */}
-        {status == JOBSTATUS.DONE && (
+        {post?.status == JOBSTATUS.DONE && (
           <TouchableOpacity
             className={`rounded-lg w-full flex justify-center items-center h-14 bg-[#3422F1]`}
           >
@@ -339,7 +372,7 @@ const ReviewOrder = ({ navigation, route }) => {
           </TouchableOpacity>
         )}
         {/* --------------Payment------------------- */}
-        {status == JOBSTATUS.WAITING_PAY && (
+        {post?.status == JOBSTATUS.WAITING_PAY && (
           <TouchableOpacity
             onPress={handlePayment}
             className={`rounded-lg w-full flex justify-center items-center h-14 bg-[#3422F1]`}
@@ -350,6 +383,17 @@ const ReviewOrder = ({ navigation, route }) => {
           </TouchableOpacity>
         )}
       </View>
+
+      {!feedback && post?.status !== POSTSTATUS.WAITING_PAY && (
+        <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
+          <TouchableOpacity
+            onPress={() => refRBSheet.current.open()}
+            className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
+          >
+            <Text className="text-lg font-medium text-white">Đánh Giá</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* --------------Feadback bottom sheet---------- */}
       <RBSheet
@@ -386,7 +430,7 @@ const ReviewOrder = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
           <View className="flex-row justify-center space-x-2 py-4">
-            {renderStars(star, "DINAMIC").map((ele) => ele)}
+            <StarRating rating={rating} onChange={setRating} />
           </View>
           <View className="flex-row flex-wrap justify-center">
             {comments.map((ele) => (
@@ -420,6 +464,41 @@ const ReviewOrder = ({ navigation, route }) => {
       </RBSheet>
     </View>
   );
+};
+
+const postHistoryToTimeData = (history) => {
+  if (history && history.length > 0) {
+    var moment = require("moment-timezone");
+    moment.tz.setDefault("Asia/Ho_Chi_Minh");
+    return history
+      .sort(
+        (a, b) => new Date(a.statusChangeDate) - new Date(b.statusChangeDate)
+      )
+      .map((e) => {
+        return {
+          time: moment(e.statusChangeDate).format("HH:mm"),
+          title: translatePostStatus(e.status),
+        };
+      });
+  }
+  return [];
+};
+
+const translatePostStatus = (status) => {
+  switch (status) {
+    case POSTSTATUS.PENDING:
+      return "Tạo Đơn Hàng";
+    case POSTSTATUS.FOUND_SHIPPER:
+      return "Tìm Thấy Shipper";
+    case POSTSTATUS.CONFIRM_WITH_CUSTOMER:
+      return "Shipper Đã Xác Nhận Đơn Hàng";
+    case POSTSTATUS.SHIPPED:
+      return "Shipper Đã Nhận Hàng";
+    case POSTSTATUS.DELIVERED:
+      return "Giao Hàng Thành Công";
+    default:
+      return status;
+  }
 };
 
 export default ReviewOrder;

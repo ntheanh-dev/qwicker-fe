@@ -12,17 +12,34 @@ import { JOBSTATUS, ROUTES } from "../../constants";
 const OrderItem = ({ data }) => {
   const navigation = useNavigation();
   const handleNavigate = () => {
-    if (order.status == JOBSTATUS.DELIVERED) {
-      navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: order.id });
-    } else if (order.status == JOBSTATUS.WAITING_PAY) {
-      navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: order.id });
-    } else {
-      navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
-        orderId: order.id,
-        status: order.status,
-        data: data,
-      });
+    switch (data.status) {
+      case JOBSTATUS.PENDING:
+        navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
+          orderId: data.id,
+          data: data,
+        });
+        break;
+      case JOBSTATUS.WAITING_PAY:
+        navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: data.id });
+        break;
+      case JOBSTATUS.DELIVERED:
+        navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: data.id });
+        break;
+      default:
+        navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
+          orderId: data.id,
+        });
     }
+    // if (data.status == JOBSTATUS.DELIVERED) {
+    // } else if (order.status == JOBSTATUS.WAITING_PAY) {
+    //   navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: order.id });
+    // } else {
+    //   navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
+    //     orderId: order.id,
+    //     status: order.status,
+    //     data: data,
+    //   });
+    // }
   };
   return (
     <TouchableOpacity

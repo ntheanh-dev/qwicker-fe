@@ -238,23 +238,15 @@ export const getJoinedShipper = createAsyncThunk(
   }
 );
 
-export const assignJob = createAsyncThunk(
-  "job,assignJob",
+export const myFeedback = createAsyncThunk(
+  "feedBack,myFeedback",
   async (data, { rejectWithValue }) => {
-    const { access_token, orderId, shipperId } = data;
-    const formData = new FormData();
-    formData.append("shipper", shipperId);
+    const { access_token, orderId } = data;
     try {
-      const res = await authAPI(access_token).post(
-        basicUserEndpoints["assign-job"](orderId),
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+      const res = await authAPI(access_token).get(
+        POST_ENDPOINTS["get-feedback"](orderId)
       );
-      return res.data;
+      return res.data.result;
     } catch (err) {
       return rejectWithValue(err?.response.data);
     }
@@ -264,20 +256,16 @@ export const assignJob = createAsyncThunk(
 export const sendFeedback = createAsyncThunk(
   "job,sendFeedback",
   async (data, { rejectWithValue }) => {
-    const { access_token, jobId, formData } = data;
+    const { access_token, body, postId } = data;
     try {
       const res = await authAPI(access_token).post(
-        basicUserEndpoints["send_feedback"](jobId),
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        POST_ENDPOINTS["sent-feedback"](postId),
+        body
       );
-      return res.data;
+      return res?.data?.result;
     } catch (err) {
-      return rejectWithValue(err?.response.data);
+      console.log(err);
+      return rejectWithValue(err?.response?.data);
     }
   }
 );
@@ -291,25 +279,6 @@ export const viewFeedback = createAsyncThunk(
         basicUserEndpoints["view_feedbacks"](shipperId)
       );
       return res.data;
-    } catch (err) {
-      return rejectWithValue(err?.response.data);
-    }
-  }
-);
-
-export const myFeedback = createAsyncThunk(
-  "feedback,myFeedback",
-  async (data, { rejectWithValue }) => {
-    const { access_token, orderId } = data;
-    try {
-      const res = await authAPI(access_token).get(
-        basicUserEndpoints["my_feedback"](orderId)
-      );
-      if (res.status === 204) {
-        return null;
-      } else {
-        return res.data;
-      }
     } catch (err) {
       return rejectWithValue(err?.response.data);
     }
