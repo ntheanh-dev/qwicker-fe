@@ -19,14 +19,16 @@ import { getTypeChoosingLocation } from "../../redux/appSlice";
 import { LOCATION, ROUTES } from "../../constants";
 import { virtualearth, virtualearthAutoSuggest } from "../../configs/API";
 import useDebounce from "../../hooks/useDebouce";
+import Spinner from "react-native-loading-spinner-overlay";
 const AddressInputer = ({ navigation }) => {
   const dispatch = useDispatch();
   const type = useSelector(getTypeChoosingLocation);
   const pickUp = useSelector(getPickUP);
   const deliveryAddress = useSelector(getDeliveryAddress);
   const [addressSuggest, setAddressSuggest] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [txt, setTxt] = useState("");
-  const debounceValue = useDebounce(txt, 500);
+  const debounceValue = useDebounce(txt, 600);
   const handleClearText = () => {
     setTxt("");
     setAddressSuggest([]);
@@ -53,10 +55,12 @@ const AddressInputer = ({ navigation }) => {
 
   const fetchData = async () => {
     try {
+      setLoading(true);
       const response = await virtualearthAutoSuggest(debounceValue).get();
       setAddressSuggest(response.data.resourceSets[0]?.resources[0]?.value);
+      setLoading(false);
     } catch (e) {
-      console.log(e);
+      setLoading(false);
     }
   };
 
@@ -72,8 +76,15 @@ const AddressInputer = ({ navigation }) => {
       headerShown: false,
     });
   }, []);
+
   return (
     <SafeAreaView className="relative bg-white flex-1">
+      <Spinner
+        visible={loading}
+        size="large"
+        animation="fade"
+        className="z-50"
+      />
       <View className="flex-row items-center py-2 px-4 absolute top-14 left-5 right-5 bg-white border border-gray-200 rounded-xl">
         <TouchableOpacity
           className="basis-1/12 justify-center"
@@ -85,8 +96,7 @@ const AddressInputer = ({ navigation }) => {
           <Entypo name="circle" size={12} color="#3422F1" />
         </View>
         <TextInput
-          className="text-lg mr-[-18] basis-10/12 pr-8 flex-shrink-0 pl-2"
-          defaultValue={txt}
+          className="text-lg mr-[-18] basis-10/12 pr-8 pl-2"
           value={txt}
           onChangeText={setTxt}
           placeholder={
@@ -104,24 +114,42 @@ const AddressInputer = ({ navigation }) => {
         <FlatList
           className="px-4 absolute top-28 left-5 right-5"
           data={addressSuggest}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => handleChooseLocation(item.address)}
-              className="w-full flex-row mb-8"
-            >
-              <View className="basis-1/8 flex justify-center items-center">
-                <Foundation name="marker" size={24} color="black" />
-              </View>
-              <View className="basis-7/8 pl-4 flex-col flex-shrink-0">
-                <Text className="text-lg font-semibold">
-                  {item.address.addressLine}
-                </Text>
-                <Text className="text-gray-600">
-                  {item.address.formattedAddress}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          )}
+          renderItem={({ item }) => {
+            const address = item.address;
+            let title = "";
+            let content = "";
+            switch (item.__type) {
+              case "Address":
+                title = address.addressLine;
+                content = address.formattedAddress;
+                break;
+              case "Place":
+                title =
+                  address.addressLine ||
+                  address.adminDistrict2 ||
+                  address.adminDistrict;
+                content = address.formattedAddress;
+                break;
+              case "LocalBusiness":
+                title = item.name;
+                content = address.formattedAddress;
+            }
+            if (title === content) return;
+            return (
+              <TouchableOpacity
+                onPress={() => handleChooseLocation(item.address)}
+                className="w-full flex-row mb-8"
+              >
+                <View className="basis-1/8 flex justify-center items-center">
+                  <Foundation name="marker" size={24} color="black" />
+                </View>
+                <View className="basis-7/8 pl-4 flex-col flex-shrink-0">
+                  <Text className="text-lg font-semibold">{title}</Text>
+                  <Text className="text-gray-600">{content}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          }}
           keyExtractor={(item) => item.address.formattedAddress}
           showsVerticalScrollIndicator={false}
         />

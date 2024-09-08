@@ -238,6 +238,21 @@ export const getJoinedShipper = createAsyncThunk(
   }
 );
 
+export const getWinShipper = createAsyncThunk(
+  "shipper,getWinShipper",
+  async (data, { rejectWithValue }) => {
+    const { access_token, orderId } = data;
+    try {
+      const res = await authAPI(access_token).get(
+        POST_ENDPOINTS["get-winner"](orderId)
+      );
+      return res.data.result;
+    } catch (err) {
+      return rejectWithValue(err?.response.data);
+    }
+  }
+);
+
 export const myFeedback = createAsyncThunk(
   "feedBack,myFeedback",
   async (data, { rejectWithValue }) => {
