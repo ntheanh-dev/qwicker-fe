@@ -22,6 +22,7 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import {
+  averageRatingPoint,
   formatCurrency,
   formatMomentDateToVietnamese2,
   uuidToNumber,
@@ -29,6 +30,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
   getBasicUserToken,
+  getWinShipper,
   myFeedback,
   retrieve,
   sendFeedback,
@@ -59,6 +61,7 @@ const ReviewOrder = ({ navigation, route }) => {
   const [loading, setLoading] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [showTimeLine, setShowTimeLine] = useState(false);
+  const [shipper, setShipper] = useState();
   useEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
@@ -75,9 +78,18 @@ const ReviewOrder = ({ navigation, route }) => {
         dispatch(myFeedback(data))
           .then(unwrapResult)
           .then((res) => {
-            setLoading(false);
             if (res) setFeedback(res);
+            setLoading(false);
           });
+
+        if (res?.status === POSTSTATUS.DELIVERED) {
+          dispatch(getWinShipper(data))
+            .then(unwrapResult)
+            .then((res) => {
+              setShipper(res);
+              console.log("winner: " + res);
+            });
+        }
       })
       .catch((e) => {
         console.log(e);
@@ -149,29 +161,28 @@ const ReviewOrder = ({ navigation, route }) => {
       />
       <ScrollView contentContinaerStyle={{ flexGrow: 1 }}>
         {/* ---------Driver infor---------- */}
-        {/* {post?.data !== JOBSTATUS.WAITING_PAY &&
-          (
+        {post?.status === JOBSTATUS.DELIVERED && (
           <View className="bg-white p-4 flex-col mb-2">
             <View className="flex-row space-x-4">
               <View className="basis-1/6 px-3 ">
                 <Image
-                  source={{ uri: winner?.avatar }}
+                  source={{ uri: shipper?.user?.avatar }}
                   className="h-12 w-12 rounded-full"
                 />
               </View>
               <View className="basis-5/6 flex-col space-y-1">
-                <Text>{`${winner?.first_name} ${winner?.last_name}`}</Text>
+                <Text>{`${shipper?.user?.firstName} ${shipper?.user?.lastName}`}</Text>
                 <View
                   className="bg-gray-100 rounded-md px-1"
                   style={{ alignSelf: "flex-start" }}
                 >
-                  <Text className="text-xs text-gray-600 font-semibold">{`${winner?.more.vehicle_number} ${winner?.more.vehicle.name}`}</Text>
+                  <Text className="text-xs text-gray-600 font-semibold">{`${shipper?.vehicleNumber} ${shipper?.vehicle?.name}`}</Text>
                 </View>
 
                 <View className="flex-row items-center space-x-1">
                   <AntDesign name="star" size={20} color="yellow" />
                   <Text className="text-sm text-gray-600 font-semibold">
-                    {parseFloat(winner?.rating)}
+                    {shipper?.ratings && averageRatingPoint(shipper?.ratings)}
                   </Text>
                 </View>
               </View>
@@ -190,8 +201,8 @@ const ReviewOrder = ({ navigation, route }) => {
                 <Text className="text-base font-semibold">Gọi ngay</Text>
               </View>
             </View>
-          </View> 
-          )} */}
+          </View>
+        )}
         {/* ---------  Price-------------- */}
         <View className="flex-row bg-white p-4 space-x-4 items-center mb-2">
           <Ionicons name="cash-outline" size={24} color="#3422F1" />
