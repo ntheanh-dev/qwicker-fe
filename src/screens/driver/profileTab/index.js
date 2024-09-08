@@ -18,12 +18,12 @@ import {
 import { ROUTES } from "../../../constants";
 import { useSelector } from "react-redux";
 import { getShipperProfile } from "../../../redux/shipperSlice";
+import { averageRatingPoint } from "../../../features/ultils";
 
 const { height } = Dimensions.get("window");
 const top = (height * 25) / 100 - 32;
 const ProfileTab = ({ navigation }) => {
-  const { user } = useSelector(getShipperProfile);
-  console.log(useSelector(getShipperProfile));
+  const { user, ratings } = useSelector(getShipperProfile);
 
   return (
     <SafeAreaView className="flex-1 flex-col relative items-center">
@@ -59,12 +59,12 @@ const ProfileTab = ({ navigation }) => {
       <View className="bg-white basis-2/12 flex-row justify-between w-full h-full mb-4">
         <View className="flex-col justify-center items-center basis-1/2">
           <Text className="text-xl font-semibold text-red-600">
-            {/* {parseFloat(rating)} */}
+            {averageRatingPoint(ratings)}
           </Text>
           <Text className="text-xl font-semibold text-gray-600">Đánh giá</Text>
         </View>
         <View className="flex-col justify-center items-center basis-1/2">
-          <Text className="text-xl font-semibold text-red-600">54</Text>
+          <Text className="text-xl font-semibold text-red-600">0</Text>
           <Text className="text-xl font-semibold text-gray-600">Yêu thích</Text>
         </View>
       </View>
@@ -87,7 +87,7 @@ const ProfileTab = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity className="flex-row justify-between items-center py-4">
           <View className="flex-row space-x-2 items-center ">
-            <Ionicons name="ios-settings-outline" size={24} color="#3422F1" />
+            <AntDesign name="setting" size={24} color="#3422F1" />
             <Text className="text-md font-semibold text-gray-500">
               Quản lý logo
             </Text>

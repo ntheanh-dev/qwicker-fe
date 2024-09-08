@@ -180,3 +180,30 @@ export function uuidToNumber(uuid) {
   // Giới hạn độ dài chuỗi số nếu cần thiết
   return number.substring(0, 10); // Ví dụ: lấy 20 ký tự đầu tiên
 }
+// "ratings": [
+//             {
+//                 "rating": 4.5,
+//                 "feedback": "Tình trạng phương tiện tốt",
+//                 "createdAt": "2024-09-08T00:47:38.163096",
+//                 "user": {
+//                     "username": "theanh1",
+//                     "firstName": "Chai",
+//                     "lastName": "Nguyen",
+//                     "email": "a@example.com",
+//                     "avatar": null
+//                 }
+//             }
+//         ]
+export function averageRatingPoint(ratings) {
+  if (!ratings || ratings.length === 0) return 0;
+  const result = ratings.reduce(
+    (prve, curr) => {
+      return {
+        totalPoint: prve.totalPoint + curr.rating,
+        num: prve.num + 1,
+      };
+    },
+    { totalPoint: 0, num: 0 }
+  );
+  return result.totalPoint / result.num;
+}

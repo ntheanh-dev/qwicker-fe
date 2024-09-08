@@ -163,11 +163,7 @@ const OrderDetail = ({ navigation }) => {
           className="flex-row py-6 border-b border-gray-200 items-center justify-between"
         >
           <View className="flex-row space-x-3 items-center">
-            <Ionicons
-              name="md-file-tray-stacked-outline"
-              size={24}
-              color="#3422F1"
-            />
+            <Feather name="shopping-cart" size={24} color="#3422F1" />
             <Text className="text-lg">Số lượng gói hàng</Text>
           </View>
           <TextInput

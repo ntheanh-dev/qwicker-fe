@@ -46,6 +46,7 @@ export const POST_ENDPOINTS = {
   "get-num-shipper-joined": (id) => `/api/posts/${id}/num-shipper-joined`,
   "sent-feedback": (id) => `/api/posts/${id}/rating`,
   "get-feedback": (id) => `/api/posts/${id}/rating`,
+  "get-winner": (id) => `/api/posts/${id}/winner`,
 };
 
 export const ShipperJobEndpoints = {
