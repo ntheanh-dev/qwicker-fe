@@ -115,7 +115,10 @@ const ProfileTab = ({ navigation }) => {
             />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity className="flex-row justify-between items-center py-4">
+        <TouchableOpacity
+          onPress={() => navigation.navigate(ROUTES.DRIVER_INCOME_STATISTIC)}
+          className="flex-row justify-between items-center py-4"
+        >
           <View className="flex-row space-x-2 items-center ">
             <AntDesign name="linechart" size={24} color="#3422F1" />
             <Text className="text-md font-semibold text-gray-500">
