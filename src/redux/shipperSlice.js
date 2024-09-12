@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API, {
+  ENDPOINTS,
   POST_ENDPOINTS,
   ShipperJobEndpoints,
   accountEndpoints,
@@ -156,6 +157,20 @@ export const getNumShipperJoined = createAsyncThunk(
         POST_ENDPOINTS["get-num-shipper-joined"](jobId)
       );
       return res.data.result.num;
+    } catch (err) {
+      console.log(err);
+      return rejectWithValue(err?.response);
+    }
+  }
+);
+
+export const getInComeStatistic = createAsyncThunk(
+  "statistic, getStatistic",
+  async (data, { rejectWithValue }) => {
+    const { token, body } = data;
+    try {
+      const res = await authAPI(token).post(ENDPOINTS["statistic"], body);
+      return res.data.result;
     } catch (err) {
       console.log(err);
       return rejectWithValue(err?.response);

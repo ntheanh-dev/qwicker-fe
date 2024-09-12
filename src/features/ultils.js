@@ -30,6 +30,20 @@ export const getCurrentDateTime = () => {
   const minute = currentDate.getMinutes();
   return `${year}-${month}-${day} ${hour}:${minute}`;
 };
+
+export const getVietnamesDay = (date) => {
+  const daysInVietnames = [
+    "Chủ Nhật",
+    "Thứ Hai",
+    "Thứ Ba",
+    "Thứ Tư",
+    "Thứ Năm",
+    "Thứ Sáu",
+    "Thứ Bảy",
+  ];
+  return daysInVietnames[new Date(date).getDay()];
+};
+
 export function formatDateTimeToVietnamese(dateString, timeString) {
   const monthsInVietnamese = [
     "thg 1",

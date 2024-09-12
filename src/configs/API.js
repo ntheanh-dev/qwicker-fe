@@ -38,6 +38,10 @@ export const jobEndpoints = {
   listShipper: (jobId) => `/api/jobs/${jobId}/list-shipper/`,
 };
 
+export const ENDPOINTS = {
+  statistic: "/api/statistic",
+};
+
 export const POST_ENDPOINTS = {
   "create-post": "/api/posts",
   posts: (params) => `/api/posts?${params}`,

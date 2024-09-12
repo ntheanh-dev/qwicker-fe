@@ -5,4 +5,14 @@ import ROLE from "./role";
 import SHIPMENTYPE from "./shipmentType";
 import JOBSTATUS from "./jobstatus";
 import POSTSTATUS from "./postStatus";
-export { ROUTES, COLORS, LOCATION, ROLE, SHIPMENTYPE, JOBSTATUS, POSTSTATUS };
+import STATISTIC_TYPE from "./statisticType";
+export {
+  ROUTES,
+  COLORS,
+  LOCATION,
+  ROLE,
+  SHIPMENTYPE,
+  JOBSTATUS,
+  POSTSTATUS,
+  STATISTIC_TYPE,
+};

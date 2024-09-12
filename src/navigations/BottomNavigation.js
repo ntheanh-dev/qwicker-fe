@@ -20,6 +20,7 @@ import SearchOrder from "../screens/driver/hideTab/SearchOrder";
 import ViewDistance from "../screens/driver/hideTab/ViewDistance";
 import ViewOrderBeforeShip from "../screens/driver/hideTab/ViewOrderBeforeShip";
 import Routing from "../screens/driver/hideTab/Routing";
+import IncomeStatistic from "../screens/driver/imcomeStatisticTab";
 
 const Tab = createBottomTabNavigator();
 const BottomNavigation = () => {
@@ -194,7 +195,29 @@ const BottomNavigation = () => {
           headerTitleAlign: "center",
         })}
       />
+      <Tab.Screen
+        name={ROUTES.DRIVER_INCOME_STATISTIC}
+        component={IncomeStatistic}
+        options={({ navigation, route }) => ({
+          tabBarButton: () => null,
+          unmountOnBlur: true,
+          tabBarStyle: { display: "none" },
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate(ROUTES.DRIVER_PROFILE_NAVIGATION)
+              }
+              className="ml-4"
+            >
+              <Ionicons name="arrow-back-sharp" size={24} color="black" />
+            </TouchableOpacity>
+          ),
 
+          headerShown: true,
+          headerTitle: "Thống Kê Thu Nhập",
+          headerTitleAlign: "center",
+        })}
+      />
       <Tab.Screen
         name={ROUTES.ROUTING_TAB}
         component={Routing}
