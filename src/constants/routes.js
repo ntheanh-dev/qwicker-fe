@@ -52,4 +52,5 @@ export default {
   DRIVER_SETTING_STACK: "Driver setting stack",
   DRIVER_CHANGE_PROFILE_STACK: "Driver change profile stack",
   DRIVER_VIEW_DISTANCE: "Dirver view distance",
+  DRIVER_INCOME_STATISTIC: "Driver income statistic",
 };

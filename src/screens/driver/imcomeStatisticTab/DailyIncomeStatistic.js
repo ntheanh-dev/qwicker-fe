@@ -10,10 +10,8 @@ import { STATISTIC_TYPE } from "../../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { formatCurrency, getVietnamesDay } from "../../../features/ultils";
 import Spinner from "react-native-loading-spinner-overlay";
-import { useFocusEffect } from "@react-navigation/native";
-const { height, width } = Dimensions.get("window");
-const init = [19, 18, 25, 20, 16];
-const getWeekRange = () => {
+const { width } = Dimensions.get("window");
+const getDayRange = () => {
   const date = new Date();
   const endOfWeek = new Date(date.setDate(date.getDate()));
   const startOfWeek = new Date(date.setDate(endOfWeek.getDate() - 5));
@@ -54,7 +52,7 @@ const moment = require("moment-timezone");
 moment.tz.setDefault("Asia/Ho_Chi_Minh");
 moment.locale("vi");
 
-const WeeklyIncomeStatistic = ({ parentIndex }) => {
+const DailyIncomeStatistic = ({ parentIndex }) => {
   const { access_token } = useSelector(getToken);
   const [loading, setLoading] = useState([]);
   const [statistic, setStatistic] = useState([]);
@@ -63,12 +61,12 @@ const WeeklyIncomeStatistic = ({ parentIndex }) => {
     datasets: [{ data: [], colors: [] }],
   });
   const [routes, setRoutes] = useState([]);
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(4);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const { endDate, startDate } = getWeekRange();
+    const { endDate, startDate } = getDayRange();
     setLoading(true);
     dispatch(
       getInComeStatistic({
@@ -110,6 +108,7 @@ const WeeklyIncomeStatistic = ({ parentIndex }) => {
           }
         );
         setDataSet(myDataSet);
+        setLoading(false);
         setRoutes(
           myDataSet?.lables?.map((lb, index) => {
             return {
@@ -119,7 +118,6 @@ const WeeklyIncomeStatistic = ({ parentIndex }) => {
             };
           })
         );
-        setLoading(false);
       })
       .catch((e) => {
         setLoading(false);
@@ -222,7 +220,7 @@ const renderScene = ({ route }) => {
   );
 };
 
-const Head = ({ index, setIndex, dataSet, routes }) => {
+const Head = ({ index, setIndex, routes }) => {
   return (
     <TabView
       navigationState={{ index, routes }}
@@ -249,11 +247,9 @@ const Head = ({ index, setIndex, dataSet, routes }) => {
               {route.title}
             </Text>
           )}
-
-          // tabStyle={{ padding: 0, backgroundColor: "red" }}
         />
       )}
     />
   );
 };
-export default WeeklyIncomeStatistic;
+export default DailyIncomeStatistic;

@@ -2,7 +2,8 @@ import * as React from "react";
 import { View, useWindowDimensions, Text, Dimensions } from "react-native";
 import { TabView, TabBar } from "react-native-tab-view";
 import { useState } from "react";
-import WeeklyIncomeStatistic from "./WeeklyIncomeStatistic";
+import DailyIncomeStatistic from "./DailyIncomeStatistic";
+import HourlyIncomeStatistic from "./HourlyIncomeStatistic";
 const { height } = Dimensions.get("window");
 
 function IncomeStatistic() {
@@ -16,14 +17,9 @@ function IncomeStatistic() {
   const renderScene = ({ route }) => {
     switch (route.key) {
       case 1:
-        return (
-          <View className="flex-1">
-            <View style={{ height: height / 2 }} className="bg-red-500"></View>
-            <View className="flex-1 bg-yellow-500"></View>
-          </View>
-        );
+        return <HourlyIncomeStatistic parentIndex={index} />;
       case 2:
-        return <WeeklyIncomeStatistic parentIndex={index} />;
+        return <DailyIncomeStatistic parentIndex={index} />;
       case 3:
         return (
           <View className="flex-1">
