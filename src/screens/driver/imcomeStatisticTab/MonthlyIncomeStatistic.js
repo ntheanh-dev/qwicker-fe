@@ -8,51 +8,53 @@ import { useDispatch, useSelector } from "react-redux";
 import { getInComeStatistic, getToken } from "../../../redux/shipperSlice";
 import { STATISTIC_TYPE } from "../../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { formatCurrency, getVietnamesDay } from "../../../features/ultils";
+import {
+  formatCurrency,
+  getVietnamesDay,
+  getVietnamesMonth,
+} from "../../../features/ultils";
 import Spinner from "react-native-loading-spinner-overlay";
 const { width } = Dimensions.get("window");
-const getDayRange = () => {
-  const date = new Date();
-  const endOfWeek = new Date(date.setDate(date.getDate()));
-  const startOfWeek = new Date(date.setDate(endOfWeek.getDate() - 4));
+const getMonthRange = () => {
+  const now = new Date();
+  const fiveMonthsAgo = new Date(now.getTime());
+  fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 4);
   return {
-    startDate: startOfWeek,
-    endDate: endOfWeek,
+    startDate: fiveMonthsAgo,
+    endDate: now,
   };
 };
-const fillMissingDates = (data, startDate, endDate) => {
-  const existingDates = new Set(
-    data.map((item) => item.dateTime.split("T")[0])
-  );
-
-  const formatDate = (date) => date.toISOString().split("T")[0];
-
-  for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
-    const formattedDate = formatDate(d) + "T00:00:00";
-
-    if (!existingDates.has(formatDate(d))) {
+const fillMissingMonths = (data, startDate, endDate) => {
+  // item.dateTiem example: 2024-05-01T00:00:00
+  const existingMonths = new Set(data.map((item) => item.dateTime.slice(0, 7)));
+  const formatMonth = (date) => date.toISOString().slice(0, 7);
+  for (
+    let d = new Date(startDate);
+    d <= endDate;
+    d.setMonth(d.getMonth() + 1)
+  ) {
+    const formattedMonth = formatMonth(d);
+    if (!existingMonths.has(formattedMonth)) {
       data.push({
-        dateTime: formattedDate,
+        dateTime: `${formattedMonth}-01T00:00:00`, // Sets the first day of the missing month
         totalPayments: 0,
         totalRevenue: 0.0,
         cashRevenue: 0.0,
         vnPayRevenue: 0.0,
-        type: "DAILY",
+        type: "MONTHLY",
       });
     }
   }
-  // Sort the data by date to maintain order
   const result = data.sort(
     (a, b) => new Date(a.dateTime) - new Date(b.dateTime)
   );
-
   return result.slice(-5);
 };
 const moment = require("moment-timezone");
 moment.tz.setDefault("Asia/Ho_Chi_Minh");
 moment.locale("vi");
 
-const DailyIncomeStatistic = ({ parentIndex, parentRoute }) => {
+const MonthlyIncomeStatistic = ({ parentRoute, parentIndex }) => {
   const { access_token } = useSelector(getToken);
   const [loading, setLoading] = useState([]);
   const [statistic, setStatistic] = useState([]);
@@ -66,7 +68,7 @@ const DailyIncomeStatistic = ({ parentIndex, parentRoute }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const { endDate, startDate } = getDayRange();
+    const { endDate, startDate } = getMonthRange();
     if (parentIndex === parentRoute) {
       // force re-render when tabindex change and only re-render when tab present
       setLoading(true);
@@ -76,17 +78,17 @@ const DailyIncomeStatistic = ({ parentIndex, parentRoute }) => {
           body: {
             startDate: startDate,
             endDate: endDate,
-            type: STATISTIC_TYPE.DAILY,
+            type: STATISTIC_TYPE.MONTHLY,
           },
         })
       )
         .then(unwrapResult)
         .then((res) => {
-          const data = fillMissingDates(res, startDate, endDate);
+          const data = fillMissingMonths(res, startDate, endDate);
           setStatistic(data);
           const myDataSet = data.reduce(
             (prev, curr) => {
-              const title = getVietnamesDay(moment(curr.dateTime));
+              const title = getVietnamesMonth(moment(curr.dateTime));
               const preData = prev.datasets[0].data;
               const preColors = prev.datasets[0].colors;
               return {
@@ -255,4 +257,4 @@ const Head = ({ index, setIndex, routes }) => {
     />
   );
 };
-export default DailyIncomeStatistic;
+export default MonthlyIncomeStatistic;

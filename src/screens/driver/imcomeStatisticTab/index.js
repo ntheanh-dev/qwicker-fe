@@ -4,28 +4,30 @@ import { TabView, TabBar } from "react-native-tab-view";
 import { useState } from "react";
 import DailyIncomeStatistic from "./DailyIncomeStatistic";
 import HourlyIncomeStatistic from "./HourlyIncomeStatistic";
+import MonthlyIncomeStatistic from "./MonthlyIncomeStatistic";
 const { height } = Dimensions.get("window");
 
 function IncomeStatistic() {
   const layout = useWindowDimensions();
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(1);
   const [routes] = useState([
-    { key: 1, title: "Theo Ngày" },
-    { key: 2, title: "Theo Tuần" },
-    { key: 3, title: "Theo Tháng" },
+    { key: 0, title: "Theo Ngày" },
+    { key: 1, title: "Theo Tuần" },
+    { key: 2, title: "Theo Tháng" },
   ]);
   const renderScene = ({ route }) => {
     switch (route.key) {
-      case 1:
-        return <HourlyIncomeStatistic parentIndex={index} />;
-      case 2:
-        return <DailyIncomeStatistic parentIndex={index} />;
-      case 3:
+      case 0:
         return (
-          <View className="flex-1">
-            <View style={{ height: height / 2 }} className="bg-red-500"></View>
-            <View className="flex-1 bg-yellow-500"></View>
-          </View>
+          <HourlyIncomeStatistic parentRoute={route.key} parentIndex={index} />
+        );
+      case 1:
+        return (
+          <DailyIncomeStatistic parentRoute={route.key} parentIndex={index} />
+        );
+      case 2:
+        return (
+          <MonthlyIncomeStatistic parentRoute={route.key} parentIndex={index} />
         );
     }
   };

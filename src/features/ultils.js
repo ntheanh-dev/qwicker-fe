@@ -44,6 +44,24 @@ export const getVietnamesDay = (date) => {
   return daysInVietnames[new Date(date).getDay()];
 };
 
+export const getVietnamesMonth = (date) => {
+  const daysInVietnames = [
+    "Thg 1",
+    "Thg 2",
+    "Thg 3",
+    "Thg 4",
+    "Thg 5",
+    "Thg 6",
+    "Thg 7",
+    "Thg 8",
+    "Thg 9",
+    "Thg 10",
+    "Thg 11",
+    "Thg 12",
+  ];
+  return daysInVietnames[new Date(date).getMonth()];
+};
+
 export function formatDateTimeToVietnamese(dateString, timeString) {
   const monthsInVietnamese = [
     "thg 1",

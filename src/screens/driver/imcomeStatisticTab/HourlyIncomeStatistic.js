@@ -18,7 +18,7 @@ moment.locale("vi");
 const getHourRange = () => {
   const now = new Date();
   const fiveHoursAgo = new Date(now.getTime());
-  fiveHoursAgo.setHours(fiveHoursAgo.getHours() - 5);
+  fiveHoursAgo.setHours(fiveHoursAgo.getHours() - 4);
   return {
     startDate: fiveHoursAgo,
     endDate: now,
@@ -49,7 +49,7 @@ const fillMissingHours = (data, startDate, endDate) => {
   return result.slice(-5);
 };
 
-const HourlyIncomeStatistic = ({ parentIndex }) => {
+const HourlyIncomeStatistic = ({ parentIndex, parentRoute }) => {
   const { access_token } = useSelector(getToken);
   const [loading, setLoading] = useState([]);
   const [statistic, setStatistic] = useState([]);
@@ -64,63 +64,64 @@ const HourlyIncomeStatistic = ({ parentIndex }) => {
 
   useEffect(() => {
     const { endDate, startDate } = getHourRange();
-    setLoading(true);
-    dispatch(
-      getInComeStatistic({
-        token: access_token,
-        body: {
-          startDate: moment(startDate).format("YYYY-MM-DDTHH:mm:ss"),
-          endDate: moment(endDate).format("YYYY-MM-DDTHH:mm:ss"),
-          type: STATISTIC_TYPE.HOURLY,
-        },
-      })
-    )
-      .then(unwrapResult)
-      .then((res) => {
-        const data = fillMissingHours(res, startDate, endDate);
-        console.log(startDate, endDate);
-
-        setStatistic(data);
-        const myDataSet = data.reduce(
-          (prev, curr) => {
-            const title = `${new Date(curr.dateTime).getHours()}h`;
-            const preData = prev.datasets[0].data;
-            const preColors = prev.datasets[0].colors;
-            return {
-              lables: [...prev.lables, title],
+    if (parentIndex === parentRoute) {
+      // force re-render when tabindex change and only re-render when tab present
+      setLoading(true);
+      dispatch(
+        getInComeStatistic({
+          token: access_token,
+          body: {
+            startDate: moment(startDate).format("YYYY-MM-DDTHH:mm:ss"),
+            endDate: moment(endDate).format("YYYY-MM-DDTHH:mm:ss"),
+            type: STATISTIC_TYPE.HOURLY,
+          },
+        })
+      )
+        .then(unwrapResult)
+        .then((res) => {
+          const data = fillMissingHours(res, startDate, endDate);
+          setStatistic(data);
+          const myDataSet = data.reduce(
+            (prev, curr) => {
+              const title = `${new Date(curr.dateTime).getHours()}h`;
+              const preData = prev.datasets[0].data;
+              const preColors = prev.datasets[0].colors;
+              return {
+                lables: [...prev.lables, title],
+                datasets: [
+                  {
+                    data: [...preData, curr.totalRevenue],
+                    colors: [...preColors, () => "white"],
+                  },
+                ],
+              };
+            },
+            {
+              lables: [],
               datasets: [
                 {
-                  data: [...preData, curr.totalRevenue],
-                  colors: [...preColors, () => "white"],
+                  data: [],
+                  colors: [],
                 },
               ],
-            };
-          },
-          {
-            lables: [],
-            datasets: [
-              {
-                data: [],
-                colors: [],
-              },
-            ],
-          }
-        );
-        setDataSet(myDataSet);
-        setLoading(false);
-        setRoutes(
-          myDataSet?.lables?.map((lb, index) => {
-            return {
-              key: index,
-              title: lb,
-              dataset: myDataSet,
-            };
-          })
-        );
-      })
-      .catch((e) => {
-        setLoading(false);
-      });
+            }
+          );
+          setDataSet(myDataSet);
+          setLoading(false);
+          setRoutes(
+            myDataSet?.lables?.map((lb, index) => {
+              return {
+                key: index,
+                title: lb,
+                dataset: myDataSet,
+              };
+            })
+          );
+        })
+        .catch((e) => {
+          setLoading(false);
+        });
+    }
   }, [parentIndex]);
   return (
     <View className="flex-1">
