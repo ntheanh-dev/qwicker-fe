@@ -129,7 +129,9 @@ const Routing = ({ navigation, route }) => {
             type: ALERT_TYPE.SUCCESS,
             title: "Giao Hàng Thành Công Thành Công!",
           });
-          navigation.navigate(ROUTES.ORDER_DRIVER_TAB);
+          navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, {
+            data: res,
+          });
           setLoading(false);
         })
         .catch((e) => {

@@ -39,7 +39,7 @@ const PickOrder = ({ route, navigation }) => {
   const [isJoined, setIsJoined] = useState(false);
   const { id } = useSelector(getShipperProfile);
   const { access_token } = useSelector(getToken);
-  const [postStatus, setPostStatus] = useState(data.status);
+  const [isPostTaken, setIsPostTaken] = useState(false);
   const dispatch = useDispatch();
   const ws = useSelector(getSocket);
   useEffect(() => {
@@ -81,20 +81,21 @@ const PickOrder = ({ route, navigation }) => {
         } else if (messageBody.messageType === "FOUND_SHIPPER") {
           const shipper = messageBody.shipper;
           const post = messageBody.post;
-          setPostStatus(post.status);
+          setIsPostTaken(true);
           if (shipper.id === id) {
             Toast.show({
               type: ALERT_TYPE.SUCCESS,
               title: "Nhận đơn hàng thành công!",
             });
             navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, { data: post });
-          } else {
+          } else if (messageBody.messageType === "POST_WAS_TAKEN") {
             if (isJoined) {
               Toast.show({
                 type: ALERT_TYPE.WARNING,
                 title: "Tham gia thất bại",
                 textBody: "Đơn hàng này đã được nhận bởi người khác",
               });
+              postSubscription.unsubscribe();
               navigation.navigate(ROUTES.FIND_ORDER_DRIVER_TAB, {
                 removePostID: data.id,
               });
@@ -111,23 +112,21 @@ const PickOrder = ({ route, navigation }) => {
   }, [data]);
 
   const handleJoinJob = () => {
-    if (postStatus === "PENDING") {
-      if (!isJoined) {
-        setIsJoined(true);
-        if (ws && ws.connected) {
-          ws.publish({
-            destination: `/app/post/${data.id}`,
-            body: {
-              messageType: "REQUEST_JOIN_POST",
-            },
-          });
-        } else {
-          Toast.show({
-            type: ALERT_TYPE.WARNING,
-            title: "Tham gia thất bại",
-            textBody: "Lỗi hệ thống do websocket",
-          });
-        }
+    if (!isJoined && !isPostTaken) {
+      setIsJoined(true);
+      if (ws && ws.connected) {
+        ws.publish({
+          destination: `/app/post/${data.id}`,
+          body: {
+            messageType: "REQUEST_JOIN_POST",
+          },
+        });
+      } else {
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: "Tham gia thất bại",
+          textBody: "Lỗi hệ thống do websocket",
+        });
       }
     } else {
       Toast.show({

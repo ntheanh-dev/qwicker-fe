@@ -40,6 +40,9 @@ export const jobEndpoints = {
 
 export const ENDPOINTS = {
   statistic: "/api/statistic",
+  "current-shipper-location": (shipperId) =>
+    `/api/shippers/${shipperId}/current-location`,
+  "collect-cash": (postId) => `/api/posts/${postId}/pay`,
 };
 
 export const POST_ENDPOINTS = {

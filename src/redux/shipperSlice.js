@@ -227,6 +227,21 @@ export const updateOrder = createAsyncThunk(
   }
 );
 
+export const collectCash = createAsyncThunk(
+  "cash, collectCash",
+  async (data, { rejectWithValue }) => {
+    const { access_token, orderId } = data;
+    try {
+      const res = await authAPI(access_token).get(
+        ENDPOINTS["collect-cash"](orderId)
+      );
+      return res.data.result;
+    } catch (err) {
+      return rejectWithValue(err?.response);
+    }
+  }
+);
+
 export const getOrder = createAsyncThunk(
   "job, myJobs",
   async (data, { rejectWithValue }) => {

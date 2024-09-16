@@ -4,6 +4,7 @@ import API, {
   authAPI,
   baseEndpoints,
   basicUserEndpoints,
+  ENDPOINTS,
   jobEndpoints,
   paymentEndpoints,
   POST_ENDPOINTS,
@@ -245,6 +246,21 @@ export const getWinShipper = createAsyncThunk(
     try {
       const res = await authAPI(access_token).get(
         POST_ENDPOINTS["get-winner"](orderId)
+      );
+      return res.data.result;
+    } catch (err) {
+      return rejectWithValue(err?.response.data);
+    }
+  }
+);
+
+export const getCurrentShipperLocation = createAsyncThunk(
+  "shipperLocation,getWinShipperLocation",
+  async (data, { rejectWithValue }) => {
+    const { access_token, shipperId } = data;
+    try {
+      const res = await authAPI(access_token).get(
+        ENDPOINTS["current-shipper-location"](shipperId)
       );
       return res.data.result;
     } catch (err) {

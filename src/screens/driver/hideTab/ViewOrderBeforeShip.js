@@ -20,7 +20,12 @@ import {
 } from "../../../features/ultils";
 import { LOCATION, POSTSTATUS, ROUTES } from "../../../constants";
 import { useDispatch, useSelector } from "react-redux";
-import { updateOrder, getToken, getOrder } from "../../../redux/shipperSlice";
+import {
+  updateOrder,
+  getToken,
+  getOrder,
+  collectCash,
+} from "../../../redux/shipperSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import call from "react-native-phone-call";
 import Spinner from "react-native-loading-spinner-overlay";
@@ -64,7 +69,24 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
         setLoading(false);
       });
   };
-
+  const handlePayment = () => {
+    setLoading(false);
+    dispatch(
+      collectCash({
+        access_token: access_token,
+        orderId: data.id,
+      })
+    )
+      .then(unwrapResult)
+      .then(() => {
+        navigation.navigate(ROUTES.ORDER_DRIVER_TAB);
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.log(e);
+        setLoading(false);
+      });
+  };
   const goToPickUpLocation = async () => {
     if (data?.status === POSTSTATUS.CONFIRM_WITH_CUSTOMER) {
       setLoading(true);
@@ -315,6 +337,19 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
       )}
+      {data?.status === POSTSTATUS.DELIVERED &&
+        data?.payment.method?.id === "1" && (
+          <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
+            <TouchableOpacity
+              onPress={handlePayment}
+              className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
+            >
+              <Text className="text-lg font-medium text-white">
+                Thu Tiền Mặt
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
     </View>
   );
 };

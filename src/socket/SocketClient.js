@@ -1,3 +1,4 @@
+import React from 'react';
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 class SocketClient {
@@ -6,7 +7,7 @@ class SocketClient {
     this.jwt = jwt;
     this.client = new Client();
     const socket = new SockJS(url + `?token=${jwt}`);
-
+    this.subscriptions = new Map();
     this.client.configure({
       webSocketFactory: () => socket,
       debug: (str) => {
@@ -39,7 +40,11 @@ class SocketClient {
   };
 
   subscribe = (topic, callback, ...forMessageTypes) => {
-    return this.client.subscribe(topic, (message) => {
+    if (this.subscriptions.has(topic)) {
+      console.log(`Already subscribed to ${topic}`);
+      return;
+    }
+    const subscription = this.client.subscribe(topic, (message) => {
       // if (
       //   !forMessageTypes ||
       //   forMessageTypes.includes(JSON.parse(message.body).messageType)
@@ -48,6 +53,23 @@ class SocketClient {
       // }
       callback(message);
     });
+    this.subscriptions.set(topic, subscription);
+    return subscription;
+  };
+
+  unsubscribe = (topic) => {
+    if (this.subscriptions.has(topic)) {
+      const subscription = this.subscriptions.get(topic);
+      subscription.unsubscribe();
+      this.subscriptions.delete(topic);
+      console.log(`Unsubscribed from ${topic}`);
+    }
+  };
+
+  resubscribe = () => {
+    for (const [topic, callback] of this.subscriptions.entries()) {
+      this.subscribe(topic, callback);
+    }
   };
 
   awaitConnect = async (awaitConnectConfig) => {
