@@ -23,6 +23,7 @@ const shipperSlice = createSlice({
   initialState: INIT_STATE,
   reducers: {
     resetShipperSlice: (state, action) => {
+      clearInterval(state?.lastTimeoutId);
       Object.assign(state, INIT_STATE);
     },
     setUserInfo: (state, action) => {
@@ -232,7 +233,7 @@ export const collectCash = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     const { access_token, orderId } = data;
     try {
-      const res = await authAPI(access_token).get(
+      const res = await authAPI(access_token).post(
         ENDPOINTS["collect-cash"](orderId)
       );
       return res.data.result;

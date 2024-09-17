@@ -180,45 +180,40 @@ const AddMoreOrderDetail = ({ navigation }) => {
   };
 
   const handlePlaceOrder = () => {
+    setLoading(true);
     placeOrderBTS.current.close();
-    // setTimeout(() => {
-    //   setLoading(true);
-    // }, 500);
 
     const data = {
       access_token: access_token,
       formData: order,
     };
-    dispatch(postJob(data)).catch((e) => {
-      console.log(e);
-    });
 
-    // dispatch(postJob(data))
-    //   .then(unwrapResult)
-    //   .then((res) => {
-    //     setLoading(false);
-    //     placeOrderBTS.current.close();
-    //     dispatch(resetOrderSlice());
-    //     dispatch(resetPaymentSlice());
-    //     dispatch(resetProductSlice());
-    //     dispatch(resetShipmentSlice());
-    //     if (selectedPaymentMethod === 1.1 || selectedPaymentMethod === 1.2)
-    //       navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
-    //         orderId: res.id,
-    //         status: res.status,
-    //       });
-    //     else
-    //       navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: res.id });
-    //   })
-    //   .catch((e) => {
-    //     Toast.show({
-    //       type: ALERT_TYPE.WARNING,
-    //       title: "Đăng bài thất bại",
-    //       textBody: "Vui lòng thử lại",
-    //     });
-    //     console.log(e);
-    //     setLoading(false);
-    //   });
+    dispatch(postJob(data))
+      .then(unwrapResult)
+      .then((res) => {
+        setLoading(false);
+        // placeOrderBTS.current.close();
+        // dispatch(resetOrderSlice());
+        // dispatch(resetPaymentSlice());
+        // dispatch(resetProductSlice());
+        // dispatch(resetShipmentSlice());
+        // if (selectedPaymentMethod === 1.1 || selectedPaymentMethod === 1.2)
+        //   navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
+        //     orderId: res.id,
+        //     status: res.status,
+        //   });
+        // else
+        navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: res.id });
+      })
+      .catch((e) => {
+        Toast.show({
+          type: ALERT_TYPE.WARNING,
+          title: "Đăng bài thất bại",
+          textBody: "Vui lòng thử lại",
+        });
+        console.log(e);
+        setLoading(false);
+      });
   };
 
   return (
@@ -545,7 +540,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
                   {getPaymentMethodUI(selectedPaymentMethod).text}
                 </Text>
               </View>
-              <Text>đ{formatCurrency(shipmentData.cost)}</Text>
+              <Text>{formatCurrency(shipmentData.cost)}</Text>
             </View>
             {/* -------------Place BTN-------------- */}
             <TouchableOpacity
@@ -573,7 +568,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
               </Text>
               <View className="flex-row space-x-2 items-center">
                 <Text className="text-2xl font-bold">
-                  đ{formatCurrency(shipmentData.cost)}
+                  {formatCurrency(shipmentData.cost)}
                 </Text>
                 <AntDesign name="exclamationcircleo" size={20} color="black" />
               </View>

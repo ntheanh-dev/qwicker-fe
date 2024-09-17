@@ -4,50 +4,54 @@ import {
   Dimensions,
   Animated,
   ScrollView,
-  FlatList,
-  Image,
   TouchableOpacity,
-  RefreshControl,
-  Alert,
+  Image,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, Polyline } from "react-native-maps";
+import call from "react-native-phone-call";
 import {
   MaterialIcons,
   Ionicons,
   Entypo,
   Foundation,
   AntDesign,
+  MaterialCommunityIcons,
+  Feather,
 } from "@expo/vector-icons";
 import { Easing } from "react-native-reanimated";
-import { formatCurrency } from "../../features/ultils";
+import {
+  averageRatingPoint,
+  formatCurrency,
+  uuidToNumber,
+} from "../../features/ultils";
 import { JOBSTATUS, ROUTES } from "../../constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  assignJob,
   getBasicUserToken,
-  getJoinedShipper,
-  myJob,
+  getCurrentShipperLocation,
+  getWinShipper,
   retrieve,
 } from "../../redux/basicUserSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
+import { getSocket } from "../../redux/socketSlice";
+import { getDuration } from "../../redux/shipperSlice";
+const { width, height } = Dimensions.get("window");
 
-const INIT_REGION = {
-  latitude: 10.678650548923207,
-  longitude: 106.68931532247792,
-  latitudeDelta: 0.09,
-  longitudeDelta: 0.03,
-};
-const { height } = Dimensions.get("window");
 const OrderStatus = ({ navigation, route }) => {
-  const distpatch = useDispatch();
+  const dispatch = useDispatch();
   const { access_token } = useSelector(getBasicUserToken);
-  let { orderId, status } = route.params;
-  const [order, setOrder] = useState({});
-  const { payment, product, shipment, vehicle, ...orderData } = order;
-  status = orderData?.status || status;
-  const [shipper, setShipper] = useState([]);
+  const ws = useSelector(getSocket);
+  let { orderId } = route.params;
+  const [post, setPost] = useState();
+  const [shipper, setShipper] = useState();
+  const [routeCoordinates, setRouteCoordinates] = useState([]);
+  const [duration, setDuration] = useState();
+  const [region, setRegion] = useState();
+  const [startPoint, setStartPoint] = useState();
+  const [endPoint, setEndpoint] = useState();
+  const isMounted = useRef(false); // Use a ref to track mount status
   // ---------------Marker Animation--------------
   const animatedColor = useRef(new Animated.Value(0)).current;
   const color = animatedColor.interpolate({
@@ -65,43 +69,31 @@ const OrderStatus = ({ navigation, route }) => {
     outputRange: [0, 1], // <-- value that larger than your content's height
   });
 
-  const handleBack = () => {
-    navigation.getParent().setOptions({
-      headerShown: true,
-    });
-    navigation.navigate(ROUTES.HOME_STACK);
-  };
   useEffect(() => {
-    if (orderId) {
-      const form = {
-        access_token: access_token,
-        orderId: orderId,
-      };
-      distpatch(retrieve(form))
-        .then(unwrapResult)
-        .then((res) => {
-          setOrder(res);
-          if (Number(status) == JOBSTATUS.FINDING_SHIPPER) {
-            distpatch(getJoinedShipper(form))
-              .then(unwrapResult)
-              .then((res) => {
-                setShipper(res);
-                const countShipper = res.length;
-                if (countShipper > 0) {
-                  Toast.show({
-                    type: ALERT_TYPE.SUCCESS,
-                    title: `Chúng tôi tìm thấy ${countShipper} shipper`,
-                    textBody:
-                      "Giờ đây bạn có thể xem và quyết định ai là người vận chuyển đơn hàng của bạn",
-                  });
-                }
-              })
-              .catch((e) => console.log(e));
-          }
-        })
-        .catch((e) => console.log(e));
+    let title = "Thông Tin Đơn Hàng Của Bạn";
+    if (post?.status === JOBSTATUS.PENDING) {
+      title = "Đang Tìm Shipper";
+    } else if (
+      post?.status === JOBSTATUS.FOUND_SHIPPER ||
+      post?.status === JOBSTATUS.CONFIRM_WITH_CUSTOMER
+    ) {
+      title = "Đợi Shipper";
+    } else {
+      title = "Shipper Đang Giao Hàng";
     }
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity onPress={handleBack}>
+          <AntDesign name="left" size={16} color="black" />
+        </TouchableOpacity>
+      ),
+      headerTitle: title,
+    });
+    navigation.getParent().setOptions({
+      headerShown: false,
+    });
 
+    isMounted.current = true;
     Animated.loop(
       Animated.timing(animatedColor, {
         toValue: 1,
@@ -118,217 +110,287 @@ const OrderStatus = ({ navigation, route }) => {
         easing: Easing.linear,
       })
     ).start();
-    navigation.getParent().setOptions({
-      headerShown: false,
-    });
+    return () => {
+      isMounted.current = false;
+    };
+  }, [post]);
 
-    navigation.setOptions({
-      headerLeft: () => (
-        <TouchableOpacity onPress={handleBack}>
-          <AntDesign name="left" size={16} color="black" />
-        </TouchableOpacity>
-      ),
+  const handleBack = () => {
+    navigation.getParent().setOptions({
+      headerShown: true,
     });
-  }, [orderId]);
-  // ---------------------Refesh shipper data--------------
-  const [refreshing, setRefreshing] = React.useState(false);
-  const onRefresh = React.useCallback(() => {
-    if (status == JOBSTATUS.FINDING_SHIPPER) {
-      setRefreshing(true);
-      distpatch(
-        getJoinedShipper({ access_token: access_token, orderId: orderId })
-      )
-        .then(unwrapResult)
-        .then((res) => {
-          setRefreshing(false);
-          setShipper(res);
-          const countShipper = res.length;
-          if (countShipper === 0) {
-            Toast.show({
-              type: ALERT_TYPE.WARNING,
-              title: `Đang tìm shipper ở ngần bạn`,
-              textBody:
-                "Sẽ mất một khoảng thời gian ngắn để shipper xác nhận đơn hàng của bạn",
-            });
-          } else {
+    navigation.navigate(ROUTES.HOME_STACK);
+  };
+  const getDurationBetweenTwoPoint = (startPoint, endPoint) => {
+    dispatch(
+      getDuration({
+        lat1: startPoint?.latitude,
+        long1: startPoint?.longitude,
+        lat2: endPoint?.latitude,
+        long2: endPoint?.longitude,
+      })
+    )
+      .then(unwrapResult)
+      .then((res) => {
+        setRegion({
+          latitude: (startPoint.latitude + endPoint.latitude) / 2,
+          longitude: (startPoint.longitude + endPoint.longitude) / 2,
+          latitudeDelta: Math.abs(startPoint.latitude - endPoint.latitude) * 2,
+          longitudeDelta:
+            Math.abs(startPoint.longitude - endPoint.longitude) * 2,
+        });
+        const route = res.routeLegs[0].itineraryItems;
+        const routePath = route.map((route) => ({
+          latitude: route.maneuverPoint.coordinates[0],
+          longitude: route.maneuverPoint.coordinates[1],
+        }));
+        setRouteCoordinates([
+          { latitude: startPoint?.latitude, longitude: startPoint?.longitude },
+          ...routePath,
+          { latitude: endPoint?.latitude, longitude: endPoint?.longitude },
+        ]);
+        setDuration(res);
+      });
+  };
+  const updateMapDependOnShipperLocation = (shipperPoint, currentPost) => {
+    setStartPoint(shipperPoint);
+    if (
+      JOBSTATUS.FOUND_SHIPPER === currentPost?.status ||
+      JOBSTATUS.CONFIRM_WITH_CUSTOMER === currentPost?.status
+    ) {
+      const ePoint = {
+        latitude: currentPost?.pickupLocation.latitude,
+        longitude: currentPost?.pickupLocation.longitude,
+      };
+      if (endPoint != ePoint) {
+        setEndpoint(ePoint);
+        getDurationBetweenTwoPoint(shipperPoint, {
+          latitude: currentPost?.pickupLocation.latitude,
+          longitude: currentPost?.pickupLocation.longitude,
+        });
+      }
+    } else if (JOBSTATUS.SHIPPED === currentPost?.status) {
+      const ePoint = {
+        latitude: currentPost?.dropLocation.latitude,
+        longitude: currentPost?.dropLocation.longitude,
+      };
+      if (endPoint != ePoint) {
+        // switch endpoint to pickuplocation
+        setEndpoint(ePoint);
+        getDurationBetweenTwoPoint(ePoint, ePoint);
+      }
+    }
+  };
+  //--------fetch post by id-------------
+  useEffect(() => {
+    let chanel = null;
+    dispatch(retrieve({ access_token: access_token, orderId: orderId }))
+      .then(unwrapResult)
+      .then((res) => {
+        setPost(res);
+        //---------------------websocket-----------------
+        chanel = `/topic/post/${orderId}`;
+        ws.subscribe(chanel, (message) => {
+          const messageBody = JSON.parse(message.body);
+          if (messageBody.messageType === "FOUND_SHIPPER") {
+            setPost(messageBody.post);
+            setShipper(messageBody.shipper);
             Toast.show({
               type: ALERT_TYPE.SUCCESS,
-              title: `Chúng tôi tìm thấy ${countShipper} shipper`,
-              textBody:
-                "Giờ đây bạn có thể xem và quyết định ai là người vận chuyển đơn hàng của bạn",
+              title: `Tìm thấy một shipper`,
             });
-          }
-        })
-        .catch((e) => {
-          console.log(e);
-          setRefreshing(false);
-        });
-    }
-  }, []);
-  //--------------------------------------------------------
-
-  const handleConfirmShipper = (shipperId) => {
-    Alert.alert(
-      "Lựa chọn shipper",
-      "Bạn đã chắc chắn chọn shipper này là người giao đơn hàng của bạn?",
-      [
-        {
-          text: "Tiếp tục tìm kiếm",
-          style: "cancel",
-        },
-        {
-          text: "Chọn",
-          onPress: () => {
-            const data = {
-              access_token: access_token,
-              orderId: order.id,
-              shipperId: shipperId,
+          } else if (messageBody.messageType === "SHIPPER_LOCATION") {
+            const shipperLocation = {
+              latitude: messageBody.latitude,
+              longitude: messageBody.longitude,
             };
-            distpatch(assignJob(data))
-              .then(unwrapResult)
-              .then((res) => {
-                setOrder(res);
-                navigation.navigate("Đơn hàng");
-              })
-              .catch((e) => {
-                Toast.show({
-                  type: ALERT_TYPE.WARNING,
-                  title: `Lựa chọn thất bại`,
-                  textBody: "Hãy thử lại sau một vài phút",
-                });
+            updateMapDependOnShipperLocation(shipperLocation, post);
+          } else if (messageBody.messageType === "UPDATE_POST_STATUS") {
+            setPost({ ...post, status: messageBody.content });
+            //-------------Done------------
+            if (JOBSTATUS.DELIVERED === messageBody.content) {
+              Toast.show({
+                type: ALERT_TYPE.SUCCESS,
+                title: `Đơn Hàng Của Bạn Đã Được Giao`,
               });
-          },
-        },
-      ]
-    );
-  };
+              navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, {
+                orderId: post.id,
+              });
+            }
+          }
+        });
+        //-----------------get winner---------------------
+        if (!shipper && res.status != JOBSTATUS.PENDING) {
+          dispatch(
+            getWinShipper({ access_token: access_token, orderId: res.id })
+          )
+            .then(unwrapResult)
+            .then((shipper) => {
+              setShipper(shipper);
+              //------------get current shipper location--------------
+              dispatch(
+                getCurrentShipperLocation({
+                  access_token: access_token,
+                  shipperId: shipper.id,
+                })
+              )
+                .then(unwrapResult)
+                .then((shipperLocation) => {
+                  const s = {
+                    latitude: shipperLocation.latitude,
+                    longitude: shipperLocation.longitude,
+                  };
+                  console.log(s);
+
+                  updateMapDependOnShipperLocation(s, res);
+                });
+            });
+        }
+      });
+    return () => {
+      if (chanel) {
+        ws.unsubscribe(chanel);
+      }
+    };
+  }, [orderId]);
 
   return (
     <View className="flex-1 relative">
-      <MapView initialRegion={INIT_REGION} className="h-full w-full">
-        <Marker
-          coordinate={{
-            latitude: INIT_REGION.latitude,
-            longitude: INIT_REGION.longitude,
+      {JOBSTATUS.PENDING === post?.status ? (
+        <MapView
+          region={{
+            latitude: post?.pickupLocation?.latitude,
+            longitude: post?.pickupLocation?.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01 * (width / height),
           }}
-          className="relative flex justify-center items-center w-80 h-80"
+          className="h-full w-full"
         >
-          <Animated.View
-            style={{
-              backgroundColor: color,
-              width: 220,
-              height: 220,
-              borderRadius: 1000,
-              transform: [{ scale: scale }],
+          <Marker
+            coordinate={{
+              latitude: post?.pickupLocation?.latitude,
+              longitude: post?.pickupLocation?.longitude,
             }}
-          ></Animated.View>
-          <View className="w-4 h-4 bg-red-500 rounded-full absolute bottom-1/2 right-1/2 translate-x-2 translate-y-2"></View>
-        </Marker>
-      </MapView>
+            className="relative flex justify-center items-center w-80 h-80"
+          >
+            <Animated.View
+              style={{
+                backgroundColor: color,
+                width: 220,
+                height: 220,
+                borderRadius: 1000,
+                transform: [{ scale: scale }],
+              }}
+            ></Animated.View>
+            <View className="w-4 h-4 bg-red-500 rounded-full absolute bottom-1/2 right-1/2 translate-x-2 translate-y-2"></View>
+          </Marker>
+        </MapView>
+      ) : (
+        duration && (
+          <MapView
+            className="w-full h-full"
+            region={region}
+            // provider={PROVIDER_GOOGLE}
+          >
+            <Marker.Animated coordinate={startPoint}>
+              <Image
+                source={{ uri: shipper?.vehicle?.icon }}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
+            </Marker.Animated>
+            <Marker coordinate={endPoint} />
+            <Polyline
+              strokeWidth={4}
+              strokeColor="#3422F1"
+              coordinates={routeCoordinates}
+            />
+          </MapView>
+        )
+      )}
 
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        className=" absolute left-0 top-0 right-0 bottom-0 px-4"
-      >
-        {/* ----------------Assumption-------------- */}
-        <View className="w-full" style={{ height: (height * 2) / 3 }}></View>
+      <ScrollView className="absolute left-0 top-2/4 right-0 bottom-0 px-4">
         {/* ------------Finding------------ */}
-        <View className="flex-col items-center bg-white rounded-lg pt-4 pb-12 mb-5">
-          <MaterialIcons name="keyboard-arrow-up" size={24} color="black" />
-          {status == JOBSTATUS.FINDING_SHIPPER &&
-            (shipper.length === 0 ? (
-              <>
-                <Text className="text-lg font-semibold py-1">
-                  Đang tìm tất cả shipper gần bạn
-                </Text>
-                <Text className="text-gray-500">
-                  Vui lòng đợi trong ít phút
-                </Text>
-              </>
-            ) : (
-              <>
-                <Text className="text-lg font-semibold pt-1 pb-4">
-                  Chúng tôi tìm thấy {shipper.length} shipper
-                </Text>
-
-                {/* --------List Shipper------------ */}
-                <FlatList
-                  data={shipper}
-                  horizontal={true}
-                  showsHorizontalScrollIndicator={false}
-                  renderItem={({ item }) => {
-                    const fullName = `${item?.last_name} ${item?.first_name}`;
-                    return (
-                      <View
-                        key={item.id}
-                        className="flex-col border border-gray-300 mx-3 rounded-lg"
-                      >
-                        <View className="flex-row px-3 py-4">
-                          <View className="basis-2/6 px-3">
-                            <Image
-                              source={{ uri: item?.avatar }}
-                              className="h-12 w-12 "
-                            />
-                          </View>
-                          <View className="basis-4/6 flex-col space-y-1">
-                            <Text>{fullName}</Text>
-                            <View className="flex-row items-center space-x-1">
-                              <AntDesign
-                                name="star"
-                                size={15}
-                                color="#FFB534"
-                              />
-                              <Text className="text-xs text-gray-600">
-                                {item?.rating}
-                              </Text>
-                            </View>
-                            <View className="bg-gray-100 rounded-md px-1">
-                              <Text className="text-xs text-gray-600 font-semibold">{`${item?.more?.vehicle_number} ${item?.more?.vehicle?.name}`}</Text>
-                            </View>
-                          </View>
-                        </View>
-                        <View className="flex-row border-t border-gray-300">
-                          <TouchableOpacity
-                            activeOpacity={1}
-                            onPress={() =>
-                              navigation.navigate(ROUTES.VIEW_FEEDBACK_STACK, {
-                                shipper: item,
-                              })
-                            }
-                            className="flex-row flex-1 items-center justify-center py-2 border-r border-gray-300"
-                          >
-                            <Text className="font-medium">Xem đánh giá</Text>
-                          </TouchableOpacity>
-
-                          <TouchableOpacity
-                            activeOpacity={1}
-                            className="flex-row flex-1 items-center justify-center"
-                            onPress={() => handleConfirmShipper(item.id)}
-                          >
-                            <Text className="font-medium">Chọn</Text>
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    );
-                  }}
-                />
-              </>
-            ))}
-          {status == JOBSTATUS.WAITING_SHIPPER && (
+        <View className="flex-col items-center bg-white rounded-lg pt-4 mb-5">
+          <MaterialIcons name="keyboard-arrow-up" size={24} color="#e5e7eb" />
+          {post?.status == JOBSTATUS.PENDING && (
             <>
               <Text className="text-lg font-semibold py-1">
-                Shipper đang trên đường đến chỗ bạn
+                Đang tìm tất cả shipper gần bạn
               </Text>
-              <Text className="text-gray-500">Vui lòng đợi trong ít phút</Text>
+              <Text className="text-gray-500 mb-4">
+                Vui lòng đợi trong ít phút
+              </Text>
             </>
+          )}
+          {shipper && (
+            <View className="flex-col bg-white rounded-lg">
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate(ROUTES.VIEW_FEEDBACK_STACK, {
+                    shipper: shipper,
+                  })
+                }
+                className="flex-row px-3 py-4"
+              >
+                <View className="basis-2/6 px-3">
+                  <Image
+                    source={{ uri: shipper?.user.avatar }}
+                    className="h-14 w-14 rounded-full"
+                  />
+                </View>
+                <View className="basis-4/6 flex-col space-y-1">
+                  <Text>{`${shipper?.user?.firstName} ${shipper?.user?.lastName}`}</Text>
+                  <View className="flex-row items-center space-x-1">
+                    <AntDesign name="star" size={15} color="#FFB534" />
+                    <Text className="text-xs text-gray-600">
+                      {shipper?.ratings && averageRatingPoint(shipper?.ratings)}
+                    </Text>
+                  </View>
+                  <View className="bg-gray-100 rounded-md px-1">
+                    <Text className="text-xs text-gray-600 font-semibold">{`${shipper?.vehicleNumber} ${shipper?.vehicle.name}`}</Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+              <View className="flex-row border-t border-gray-200">
+                <TouchableOpacity
+                  activeOpacity={1}
+                  className="flex-row flex-1 items-center justify-center py-3 border-r border-gray-100 space-x-2"
+                >
+                  <MaterialCommunityIcons
+                    name="android-messages"
+                    size={24}
+                    color="#3422F1"
+                  />
+                  <Text className="font-medium">Nhắn Tin</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={() =>
+                    call({
+                      number: 123456789, // String value with the number to call
+                      prompt: false, // Optional boolean property. Determines if the user should be prompted prior to the call
+                      skipCanOpen: true, // Skip the canOpenURL check
+                    })
+                  }
+                  className="flex-row flex-1 items-center justify-center space-x-2"
+                >
+                  <Feather name="phone" size={24} color="#3422F1" />
+                  <Text className="font-medium">Gọi Điện</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           )}
         </View>
         {/* ------------ Order sumary---------- */}
         <View className="flex-col bg-white rounded-lg mb-5">
           <View className="border-b border-gray-300 py-2">
-            <Text className="text-gray-600 pl-4 py-1">{vehicle?.name}</Text>
+            <Text className="text-gray-600 pl-4 py-1">
+              {post?.vehicleType?.name}
+            </Text>
           </View>
           {/* -----Time----- */}
           <View className="flex-col px-4 pt-6">
@@ -336,14 +398,14 @@ const OrderStatus = ({ navigation, route }) => {
               <View className="basis-1/6"></View>
               <View>
                 <Text className="basis-5/6 text-gray-600">
-                  {shipment?.pickupDatetime}
+                  {/* {pickupDatetime} */}
                 </Text>
               </View>
             </View>
           </View>
           {/* -----Places and Payment method----- */}
           <View className="flex-col px-4 pb-4 space-y-4">
-            {/* -----------Delivery Address------------- */}
+            {/* -----------Drop Location------------- */}
             <View className="flex-row ">
               <View className="basis-1/6 flex justify-center items-center">
                 <Entypo name="circle" size={18} color="#3422F1" />
@@ -351,20 +413,20 @@ const OrderStatus = ({ navigation, route }) => {
               <View className="flex-col basis-5/6 ">
                 <View className="flex-row items-center ">
                   <Text className="text-lg font-semibold">
-                    {shipment?.pickupLocation?.addressLine}
+                    {post?.pickupLocation?.addressLine}
                   </Text>
-                  {payment?.isPosterPay && (
+                  {post?.payment?.posterPay && (
                     <View className="ml-2 p-1 rounded-md bg-gray-300">
-                      <Text>{payment?.method?.name}</Text>
+                      <Text>{post?.payment?.method?.name}</Text>
                     </View>
                   )}
                 </View>
                 <Text className="text-gray-600">
-                  {shipment?.pickupLocation.formattedAddress}
+                  {post?.pickupLocation.formattedAddress}
                 </Text>
               </View>
             </View>
-            {/* -----------Pick up------------- */}
+            {/* -----------Pick up location------------- */}
             <View className="flex-row ">
               <View className="basis-1/6 flex justify-center items-center">
                 <Foundation name="marker" size={28} color="#3422F1" />
@@ -372,16 +434,16 @@ const OrderStatus = ({ navigation, route }) => {
               <View className="flex-col basis-5/6 ">
                 <View className="flex-row items-center ">
                   <Text className="text-lg font-semibold">
-                    {shipment?.dropLocation.addressLine}
+                    {post?.dropLocation.addressLine}
                   </Text>
-                  {!payment?.isPosterPay && (
+                  {!post?.payment?.posterPay && (
                     <View className="ml-2 p-1 rounded-md bg-gray-300">
-                      <Text>{payment?.method.name}</Text>
+                      <Text>{post?.payment?.method.name}</Text>
                     </View>
                   )}
                 </View>
                 <Text className="text-gray-600">
-                  {shipment?.dropLocation.formattedAddress}
+                  {post?.dropLocation.formattedAddress}
                 </Text>
               </View>
             </View>
@@ -404,7 +466,7 @@ const OrderStatus = ({ navigation, route }) => {
             <View className="flex-row justify-between items-center py-3">
               <View className="flex-col">
                 <Text className="text-base  font-semibold">
-                  {orderData.uuid}
+                  {post?.id && uuidToNumber(post?.id)}
                 </Text>
                 <Text className="text-gray-600">Mã đơn hàng</Text>
               </View>
@@ -415,16 +477,16 @@ const OrderStatus = ({ navigation, route }) => {
           </View>
           <View className="px-4 border-b border-gray-300">
             <View className="flex-col py-3">
-              <Text className="text-base  font-semibold">{`${shipment?.pickupLocation.contact} ${shipment?.pickupLocation.phoneNumber}`}</Text>
+              <Text className="text-base  font-semibold">{`${post?.pickupLocation?.contact} ${post?.pickupLocation?.phoneNumber}`}</Text>
               <Text className="text-gray-600">Thông tin liên hệ</Text>
             </View>
           </View>
           <View className="flex-col px-4 pt-3 pb-5">
             <Text className="text-base font-semibold">
-              {product?.category.name}
+              {post?.product?.category.name}
             </Text>
             <Text className="text-base  font-semibold">
-              {product?.quantity} gói hàng
+              {post?.product?.quantity} gói hàng
             </Text>
             <Text className="text-gray-600">Chi tiết đơn hàng</Text>
           </View>
@@ -432,11 +494,11 @@ const OrderStatus = ({ navigation, route }) => {
         {/* -----------------Fee---------------- */}
         <View className="flex-row justify-between items-center bg-white rounded-lg px-4 py-5 mb-14 ">
           <Text className="text-base font-semibold text-gray-600">
-            {payment?.method.name}
+            {post?.payment?.method.name}
           </Text>
           <View className="flex-row space-x-2 items-center">
             <Text className="text-lg font-bold">
-              {formatCurrency(shipment?.cost)}
+              {post?.payment?.price && formatCurrency(post?.payment?.price)}
             </Text>
             <AntDesign name="exclamationcircleo" size={20} color="black" />
           </View>
@@ -445,5 +507,4 @@ const OrderStatus = ({ navigation, route }) => {
     </View>
   );
 };
-
 export default OrderStatus;

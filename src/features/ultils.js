@@ -172,7 +172,7 @@ export const getTitleDependStatus = (status) => {
   switch (status) {
     case JOBSTATUS.PENDING:
       return "Đang tìm shipper";
-    case JOBSTATUS.WAITING_SHIPPER:
+    case JOBSTATUS.FOUND_SHIPPER:
       return "Đang đợi shipper";
     case JOBSTATUS.WAITING_PAY:
       return "Chờ thanh toán";
@@ -190,7 +190,6 @@ export const getTitleDependStatus = (status) => {
 export const getCurrentLocation = async () => {
   const currentLocation = await Location.getCurrentPositionAsync({
     accuracy: Location.Accuracy.High,
-    maximumAge: 10000,
   });
   return {
     latitude: currentLocation.coords.latitude,
