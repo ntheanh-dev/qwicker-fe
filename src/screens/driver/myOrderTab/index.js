@@ -13,17 +13,6 @@ import CompletedOrderTab from "./CompletedOrderTab";
 import CanceledOrderTab from "./CanceledOrderTab";
 import { ROUTES } from "../../../constants";
 
-const renderScene = ({ route, jumpTo }) => {
-  switch (route.key) {
-    case 1:
-      return <ProcessingOrderTab title={route.title} index={route.key} />;
-    case 2:
-      return <CompletedOrderTab title={route.title} index={route.key} />;
-    case 3:
-      return <CanceledOrderTab title={route.title} index={route.key} />;
-  }
-};
-
 export default function MyOrderTab({ navigation, route }) {
   const layout = useWindowDimensions();
   const [text, setText] = React.useState("");
@@ -32,11 +21,24 @@ export default function MyOrderTab({ navigation, route }) {
     route.params?.tabIndex ? route.params.tabIndex : 0
   );
   const [routes] = React.useState([
-    { key: 1, title: "Đang xử lý" },
-    { key: 2, title: "Đã hoàn thành" },
-    { key: 3, title: "Đã huỷ" },
+    { key: 0, title: "Đang xử lý" },
+    { key: 1, title: "Đã hoàn thành" },
+    { key: 2, title: "Đã huỷ" },
   ]);
-
+  const renderScene = ({ route, jumpTo }) => {
+    switch (route.key) {
+      case 0:
+        return (
+          <ProcessingOrderTab parentRoute={route.key} parentIndex={index} />
+        );
+      case 1:
+        return (
+          <CompletedOrderTab parentRoute={route.key} parentIndex={index} />
+        );
+      case 2:
+        return <CanceledOrderTab parentRoute={route.key} parentIndex={index} />;
+    }
+  };
   return (
     <SafeAreaView className="flex-1">
       <TouchableOpacity

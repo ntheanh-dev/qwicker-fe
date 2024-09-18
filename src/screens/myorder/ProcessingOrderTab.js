@@ -6,43 +6,35 @@ import { useDispatch, useSelector } from "react-redux";
 import { getBasicUserToken, myJob } from "../../redux/basicUserSlice";
 import { JOBSTATUS } from "../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { useFetchPaginatedData } from "../../hooks/useFetchPaginatedData";
-const ProcessingOrderTab = () => {
-  const distpatch = useDispatch();
+const ProcessingOrderTab = ({ parentIndex, parentRoute }) => {
+  const dispatch = useDispatch();
   const { access_token } = useSelector(getBasicUserToken);
   const [refreshing, setRefreshing] = useState(false);
-  const fetcher = useFetchPaginatedData(access_token);
   const [data, setData] = useState([]);
   useEffect(() => {
-    fetchData(false);
-  }, []);
+    if (parentIndex === parentRoute) {
+      fetchData();
+    }
+  }, [parentIndex]);
 
   const onRefresh = useCallback(() => {
-    fetchData(true);
+    fetchData();
   }, []);
 
-  const fetchData = useCallback(
-    (isRefresh) => {
-      const form = {
-        access_token: access_token,
-        params: `status=${JOBSTATUS.PENDING},${JOBSTATUS.WAITING_PAY},${JOBSTATUS.WAITING_SHIPPER},${JOBSTATUS.SHIPPED}`,
-      };
-      distpatch(myJob(form))
-        .then(unwrapResult)
-        .then((res) => {
-          setData(res);
-          if (isRefresh) {
-            setRefreshing(false);
-          }
-        })
-        .catch((e) => {
-          if (isRefresh) {
-            setRefreshing(false);
-          }
-        });
-    },
-    [access_token]
-  );
+  const fetchData = () => {
+    const form = {
+      access_token: access_token,
+      params: `status=${JOBSTATUS.PENDING},${JOBSTATUS.FOUND_SHIPPER},${JOBSTATUS.WAITING_PAY},${JOBSTATUS.SHIPPED},${JOBSTATUS.CONFIRM_WITH_CUSTOMER}`,
+    };
+    dispatch(myJob(form))
+      .then(unwrapResult)
+      .then((res) => {
+        setData(res);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  };
   return (
     <FlatList
       className="px-2"

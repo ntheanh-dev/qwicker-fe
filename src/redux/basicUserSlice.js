@@ -279,6 +279,9 @@ export const myFeedback = createAsyncThunk(
       );
       return res.data.result;
     } catch (err) {
+      console.log("feedBack,myFeedback");
+      console.log(err?.response.data);
+
       return rejectWithValue(err?.response.data);
     }
   }

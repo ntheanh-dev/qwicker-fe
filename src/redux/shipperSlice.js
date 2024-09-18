@@ -201,12 +201,12 @@ export const myJobs = createAsyncThunk(
     const { access_token, params } = data;
     try {
       const res = await authAPI(access_token).get(
-        ShipperJobEndpoints["my-jobs"](params)
+        ENDPOINTS["shipper-post"](params)
       );
-      return res.data;
+      return res?.data.result;
     } catch (err) {
-      console.log(err);
-      return rejectWithValue(err?.response);
+      console.log(err?.response?.data);
+      return rejectWithValue(err?.response?.data);
     }
   }
 );

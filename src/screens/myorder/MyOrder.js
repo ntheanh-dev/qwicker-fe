@@ -1,12 +1,8 @@
-import * as React from "react";
 import {
   View,
   useWindowDimensions,
   Text,
-  Image,
-  TextInput,
   TouchableOpacity,
-  FlatList,
 } from "react-native";
 import { TabView, TabBar } from "react-native-tab-view";
 import { Entypo, Feather } from "@expo/vector-icons";
@@ -14,30 +10,31 @@ import ProcessingOrderTab from "./ProcessingOrderTab";
 import DoneOrderTab from "./DoneOrderTab";
 import CanceledOrderTab from "./CanceledOrderTab";
 import { ROUTES } from "../../constants";
-
-const renderScene = ({ route, jumpTo }) => {
-  switch (route.key) {
-    case 1:
-      return <ProcessingOrderTab index={route.key} />;
-    case 2:
-      return <DoneOrderTab index={route.key} />;
-    case 3:
-      return <CanceledOrderTab index={route.key} />;
-  }
-};
+import { useState } from "react";
 
 export default function MyOrder({ navigation, route }) {
   const tabIndex = route?.params?.tabIndex || 0;
   const layout = useWindowDimensions();
-  const [text, setText] = React.useState("");
+  const [text, setText] = useState("");
 
-  const [index, setIndex] = React.useState(tabIndex);
-  const [routes] = React.useState([
-    { key: 1, title: "Đang tải" },
-    { key: 2, title: "Đã hoàn thành" },
-    { key: 3, title: "Đã huỷ" },
+  const [index, setIndex] = useState(tabIndex);
+  const [routes] = useState([
+    { key: 0, title: "Đang tải" },
+    { key: 1, title: "Đã hoàn thành" },
+    { key: 2, title: "Đã huỷ" },
   ]);
-
+  const renderScene = ({ route, jumpTo }) => {
+    switch (route.key) {
+      case 0:
+        return (
+          <ProcessingOrderTab parentRoute={route.key} parentIndex={index} />
+        );
+      case 1:
+        return <DoneOrderTab parentRoute={route.key} parentIndex={index} />;
+      case 2:
+        return <CanceledOrderTab parentRoute={route.key} parentIndex={index} />;
+    }
+  };
   return (
     <View className="flex-1">
       <TouchableOpacity

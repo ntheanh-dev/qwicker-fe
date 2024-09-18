@@ -174,6 +174,8 @@ export const getTitleDependStatus = (status) => {
       return "Đang tìm shipper";
     case JOBSTATUS.FOUND_SHIPPER:
       return "Đang đợi shipper";
+    case JOBSTATUS.CONFIRM_WITH_CUSTOMER:
+      return "Đã xác nhận với khách hàng";
     case JOBSTATUS.WAITING_PAY:
       return "Chờ thanh toán";
     case JOBSTATUS.SHIPPED:

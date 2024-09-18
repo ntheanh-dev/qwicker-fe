@@ -48,6 +48,8 @@ const comments = [
   { id: 3, content: "Rất đúng giờ" },
   { id: 4, content: "Phản hồi nhanh chóng" },
 ];
+var moment = require("moment-timezone");
+moment.tz.setDefault("Asia/Ho_Chi_Minh");
 const ReviewOrder = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const { orderId } = route.params;
@@ -55,8 +57,7 @@ const ReviewOrder = ({ navigation, route }) => {
 
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState();
-  var moment = require("moment-timezone");
-  moment.tz.setDefault("Asia/Ho_Chi_Minh");
+
   const [post, setPost] = useState({});
   const [loading, setLoading] = useState(false);
   const [showImage, setShowImage] = useState(false);

@@ -43,6 +43,7 @@ export const ENDPOINTS = {
   "current-shipper-location": (shipperId) =>
     `/api/shippers/${shipperId}/current-location`,
   "collect-cash": (postId) => `/api/posts/${postId}/pay`,
+  "shipper-post": (params) => `/api/shippers/my-post?${params}`,
 };
 
 export const POST_ENDPOINTS = {
