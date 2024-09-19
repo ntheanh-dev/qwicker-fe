@@ -77,7 +77,7 @@ const PickOrder = ({ route, navigation }) => {
       postSubscription = ws.subscribe(`/topic/post/${data.id}`, (message) => {
         const messageBody = JSON.parse(message.body);
         if (messageBody.messageType === "NUM_SHIPPER_JOINED") {
-          setNumShipperJoin(messageBody.content.num);
+          setNumShipperJoin(messageBody.content);
         } else if (messageBody.messageType === "FOUND_SHIPPER") {
           const shipper = messageBody.shipper;
           const post = messageBody.post;
