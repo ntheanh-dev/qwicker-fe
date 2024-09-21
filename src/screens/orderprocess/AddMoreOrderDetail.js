@@ -180,8 +180,8 @@ const AddMoreOrderDetail = ({ navigation }) => {
   };
 
   const handlePlaceOrder = () => {
-    setLoading(true);
     placeOrderBTS.current.close();
+    setLoading(true);
 
     const data = {
       access_token: access_token,

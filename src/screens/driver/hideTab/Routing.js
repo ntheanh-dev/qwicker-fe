@@ -1,5 +1,5 @@
 import { View, Text, Dimensions, TouchableOpacity, Image } from "react-native";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "react-native-loading-spinner-overlay";
@@ -83,11 +83,12 @@ const Routing = ({ navigation, route }) => {
   const takePhotoRBS = useRef();
 
   const updatePost = (base64) => {
+    setLoading(true);
     if (LOCATION.pickupLocation === locationType) {
       dispatch(
         updateOrder({
           access_token: access_token,
-          orderId: data.id,
+          orderId: data?.id,
           body: {
             status: POSTSTATUS.SHIPPED,
             photo: base64,
@@ -125,6 +126,7 @@ const Routing = ({ navigation, route }) => {
         .then(unwrapResult)
         .then((res) => {
           setData(res);
+          setLoading(false);
           Toast.show({
             type: ALERT_TYPE.SUCCESS,
             title: "Giao Hàng Thành Công Thành Công!",
@@ -132,7 +134,6 @@ const Routing = ({ navigation, route }) => {
           navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, {
             data: res,
           });
-          setLoading(false);
         })
         .catch((e) => {
           console.log(e);
@@ -187,12 +188,14 @@ const Routing = ({ navigation, route }) => {
         visible={loading}
         size="large"
         animation="fade"
-        className="z-50"
+        className="z-50 absolute left-0 top-0 right-0 bottom-0"
       />
       <MapView
         className="w-full h-full"
         region={region}
         initialRegion={INIT_REGION}
+        loadingEnabled={true}
+        loadingIndicatorColor="#3422F1"
         // provider={PROVIDER_GOOGLE}
       >
         {duration && (

@@ -76,9 +76,7 @@ const Home = ({ navigation }) => {
               Tổng cộng
             </Text>
             <View className="flex-row space-x-2 items-center">
-              <Text className="text-2xl font-bold">
-                đ{formatCurrency(cost)}
-              </Text>
+              <Text className="text-2xl font-bold">{formatCurrency(cost)}</Text>
               <AntDesign name="exclamationcircleo" size={20} color="black" />
             </View>
           </View>

@@ -31,6 +31,7 @@ import { AntDesign, Feather } from "@expo/vector-icons";
 import RBSheet from "react-native-raw-bottom-sheet";
 import { useIsFocused } from "@react-navigation/native";
 import { virtualearthLocation } from "../../configs/API";
+import Spinner from "react-native-loading-spinner-overlay";
 
 const { width, height } = Dimensions.get("window");
 const ASPECT_RATIO = width / height;

@@ -51,6 +51,7 @@ const OrderStatus = ({ navigation, route }) => {
   const [region, setRegion] = useState();
   const [startPoint, setStartPoint] = useState();
   const [endPoint, setEndpoint] = useState();
+  const [loading, setLoading] = useState();
   const isMounted = useRef(false); // Use a ref to track mount status
   // ---------------Marker Animation--------------
   const animatedColor = useRef(new Animated.Value(0)).current;
@@ -68,6 +69,7 @@ const OrderStatus = ({ navigation, route }) => {
     inputRange: [0, 1],
     outputRange: [0, 1], // <-- value that larger than your content's height
   });
+  console.log("postId ", post?.id);
 
   useEffect(() => {
     let title = "Thông Tin Đơn Hàng Của Bạn";
@@ -184,6 +186,7 @@ const OrderStatus = ({ navigation, route }) => {
   //--------fetch post by id-------------
   useEffect(() => {
     let chanel = null;
+    setLoading(true);
     dispatch(retrieve({ access_token: access_token, orderId: orderId }))
       .then(unwrapResult)
       .then((res) => {
@@ -214,8 +217,10 @@ const OrderStatus = ({ navigation, route }) => {
                 title: `Đơn Hàng Của Bạn Đã Được Giao`,
               });
               navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, {
-                orderId: post.id,
+                orderId: post?.id,
               });
+            } else {
+              setPost((prev) => ({ ...prev, status: messageBody.content }));
             }
           }
         });
@@ -240,11 +245,12 @@ const OrderStatus = ({ navigation, route }) => {
                     latitude: shipperLocation.latitude,
                     longitude: shipperLocation.longitude,
                   };
-                  console.log(s);
-
                   updateMapDependOnShipperLocation(s, res);
+                  setLoading(false);
                 });
             });
+        } else {
+          setLoading(false);
         }
       });
     return () => {
@@ -256,6 +262,12 @@ const OrderStatus = ({ navigation, route }) => {
 
   return (
     <View className="flex-1 relative">
+      <Spinner
+        visible={loading}
+        size="large"
+        animation="fade"
+        className="z-50 absolute left-0 top-0 right-0 bottom-0"
+      />
       {JOBSTATUS.PENDING === post?.status ? (
         <MapView
           region={{
@@ -422,7 +434,7 @@ const OrderStatus = ({ navigation, route }) => {
                   )}
                 </View>
                 <Text className="text-gray-600">
-                  {post?.pickupLocation.formattedAddress}
+                  {post?.pickupLocation?.formattedAddress}
                 </Text>
               </View>
             </View>
@@ -434,7 +446,7 @@ const OrderStatus = ({ navigation, route }) => {
               <View className="flex-col basis-5/6 ">
                 <View className="flex-row items-center ">
                   <Text className="text-lg font-semibold">
-                    {post?.dropLocation.addressLine}
+                    {post?.dropLocation?.addressLine}
                   </Text>
                   {!post?.payment?.posterPay && (
                     <View className="ml-2 p-1 rounded-md bg-gray-300">
@@ -443,7 +455,7 @@ const OrderStatus = ({ navigation, route }) => {
                   )}
                 </View>
                 <Text className="text-gray-600">
-                  {post?.dropLocation.formattedAddress}
+                  {post?.dropLocation?.formattedAddress}
                 </Text>
               </View>
             </View>
