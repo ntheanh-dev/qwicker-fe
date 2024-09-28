@@ -6,4 +6,8 @@ export default {
   SHIPPED: "SHIPPED", // shipper taken order and go to drop location
   DELIVERED: "DELIVERED", // shipped
   CANCELLED: "CANCELLED",
+
+  //for post history only
+  PAID_BY_VNPAY: "PAID_BY_VNPAY",
+  COLLECTED_CASH: "COLLECTED_CASH",
 };

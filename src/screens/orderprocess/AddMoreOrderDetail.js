@@ -32,6 +32,7 @@ import {
   getBasicUserToken,
   getCoupon,
   postJob,
+  vnPayCreatePaymentUrl,
 } from "../../redux/basicUserSlice";
 import Spinner from "react-native-loading-spinner-overlay";
 
@@ -187,32 +188,28 @@ const AddMoreOrderDetail = ({ navigation }) => {
       access_token: access_token,
       formData: order,
     };
-
     dispatch(postJob(data))
       .then(unwrapResult)
       .then((res) => {
         setLoading(false);
-        // placeOrderBTS.current.close();
-        // dispatch(resetOrderSlice());
-        // dispatch(resetPaymentSlice());
-        // dispatch(resetProductSlice());
-        // dispatch(resetShipmentSlice());
-        // if (selectedPaymentMethod === 1.1 || selectedPaymentMethod === 1.2)
-        //   navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
-        //     orderId: res.id,
-        //     status: res.status,
-        //   });
-        // else
-        navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: res.id });
+        dispatch(resetOrderSlice());
+        dispatch(resetPaymentSlice());
+        dispatch(resetProductSlice());
+        dispatch(resetShipmentSlice());
+        if (selectedPaymentMethod === 1.1 || selectedPaymentMethod === 1.2)
+          navigation.navigate(ROUTES.ORDER_STATUS_STACK, { orderId: res.id });
+        else {
+          navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: res.id });
+        }
       })
       .catch((e) => {
+        setLoading(false);
         Toast.show({
           type: ALERT_TYPE.WARNING,
           title: "Đăng bài thất bại",
           textBody: "Vui lòng thử lại",
         });
         console.log(e);
-        setLoading(false);
       });
   };
 
@@ -222,7 +219,7 @@ const AddMoreOrderDetail = ({ navigation }) => {
         visible={loading}
         size="large"
         animation="fade"
-        className="z-50"
+        className="z-50 absolute left-0 top-0 right-0 bottom-0"
       />
       <View className="bg-white flex-col px-4">
         {/* ----------------Order Detail------------- */}

@@ -1,12 +1,5 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  FlatList,
-  TextInput,
-  ScrollView,
-} from "react-native";
+import { View, Text, TouchableOpacity, Image, TextInput } from "react-native";
+import { ScrollView } from "react-native-virtualized-view";
 import React, { useEffect, useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
 
@@ -17,7 +10,6 @@ import {
   Foundation,
   Octicons,
   Entypo,
-  FontAwesome,
   AntDesign,
   MaterialIcons,
 } from "@expo/vector-icons";
@@ -76,13 +68,19 @@ const ReviewOrder = ({ navigation, route }) => {
       .then(unwrapResult)
       .then((res) => {
         setPost(res);
+        if (res.status === POSTSTATUS.WAITING_PAY) {
+          navigation.setOptions({
+            headerTitle: () => (
+              <Text className="font-medium text-lg">Chờ Thanh Toán</Text>
+            ),
+          });
+        }
         dispatch(myFeedback(data))
           .then(unwrapResult)
-          .then((res) => {
-            if (res) setFeedback(res);
+          .then((feedback) => {
+            if (feedback) setFeedback(feedback);
             setLoading(false);
           });
-
         if (res?.status === POSTSTATUS.DELIVERED) {
           dispatch(getWinShipper(data))
             .then(unwrapResult)
@@ -135,21 +133,29 @@ const ReviewOrder = ({ navigation, route }) => {
     }
   };
   const handlePayment = () => {
-    // const formData = new FormData();
-    // formData.append("amount", post?.cost);
-    // formData.append("order_info", order?.id);
-    // dispatch(
-    //   vnPayCreatePaymentUrl({ access_token: access_token, formData: formData })
-    // )
-    //   .then(unwrapResult)
-    //   .then((res) => {
-    //     navigation.navigate(ROUTES.VNPAY_WEBVIEW_DRAWER, {
-    //       paymentURL: res.payment_url,
-    //       orderId: orderId,
-    //       paymentId: payment.id,
-    //     });
-    //   })
-    //   .catch((e) => console.log(e));
+    setLoading(true);
+    dispatch(
+      vnPayCreatePaymentUrl({
+        access_token: access_token,
+        params: `?amount=${post?.payment?.price}&bankCode=NCB&orderInfo=${post.id}`,
+      })
+    )
+      .then(unwrapResult)
+      .then((r) => {
+        setLoading(false);
+        navigation.navigate(ROUTES.VNPAY_WEBVIEW_DRAWER, {
+          orderId: post.id,
+          paymentURL: r.paymentUrl,
+        });
+      })
+      .catch((e) => {
+        setLoading(false);
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: `Không thể thanh toán lúc này`,
+          textBody: e,
+        });
+      });
   };
 
   return (
@@ -158,7 +164,7 @@ const ReviewOrder = ({ navigation, route }) => {
         visible={loading}
         size="large"
         animation="fade"
-        className="z-50"
+        className="z-50 absolute left-0 top-0 right-0 bottom-0"
       />
       <ScrollView contentContinaerStyle={{ flexGrow: 1 }}>
         {/* ---------Driver infor---------- */}
@@ -220,7 +226,8 @@ const ReviewOrder = ({ navigation, route }) => {
         <View className="flex-col bg-white p-4 mb-2">
           <View className="flex-row items-center justify-between pb-3">
             <Text className="text-base text-gray-500">
-              {formatMomentDateToVietnamese2(post?.pickupDatetime)}
+              {post?.payment?.paidAt &&
+                formatMomentDateToVietnamese2(post?.payment?.paidAt)}
             </Text>
             <Text className="text-gray-600 text-base">
               {post?.id && `#${uuidToNumber(post?.id)}`}
@@ -500,6 +507,10 @@ const translatePostStatus = (status) => {
   switch (status) {
     case POSTSTATUS.PENDING:
       return "Tạo Đơn Hàng";
+    case POSTSTATUS.PAID_BY_VNPAY:
+      return "Đã thanh toán bằng VNPay";
+    case POSTSTATUS.COLLECTED_CASH:
+      return "Đã thanh toán bằng tiền mặt";
     case POSTSTATUS.FOUND_SHIPPER:
       return "Tìm Thấy Shipper";
     case POSTSTATUS.CONFIRM_WITH_CUSTOMER:

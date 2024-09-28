@@ -57,6 +57,7 @@
     "react-native-svg": "^15.6.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-timeline-flatlist": "^0.8.0",
+    "react-native-virtualized-view": "^1.0.0",
     "react-native-webview": "13.8.6",
     "react-redux": "^9.0.4",
     "redux-persist": "^6.0.0",

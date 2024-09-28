@@ -120,6 +120,7 @@ export const login = createAsyncThunk(
       };
     } catch (err) {
       console.log(err);
+
       return rejectWithValue(err?.response?.data);
     }
   }
@@ -322,43 +323,15 @@ export const viewFeedback = createAsyncThunk(
 export const vnPayCreatePaymentUrl = createAsyncThunk(
   "vnPay,vnPayCreatePayment",
   async (data, { rejectWithValue }) => {
-    const { access_token, formData } = data;
+    const { access_token, params } = data;
     try {
-      const res = await authAPI(access_token).post(
-        paymentEndpoints["vnpay-payment-url"],
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+      const res = await authAPI(access_token).get(
+        POST_ENDPOINTS["create-vnpay-url"](params)
       );
-      return res.data;
+      return res.data.result;
     } catch (err) {
-      return rejectWithValue(err?.response.data);
-    }
-  }
-);
-
-export const checkOutSuccess = createAsyncThunk(
-  "payment,Payment",
-  async (data, { rejectWithValue }) => {
-    const { access_token, orderId, paymentId } = data;
-    const formData = new FormData();
-    formData.append("order_id", orderId);
-    try {
-      const res = await authAPI(access_token).post(
-        paymentEndpoints["checkout-success"](paymentId),
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      return res.data;
-    } catch (err) {
-      return rejectWithValue(err?.response.data);
+      console.log(err?.response?.data);
+      return rejectWithValue(err?.response?.data);
     }
   }
 );

@@ -111,16 +111,11 @@ const HomeNavigation = () => {
       <Stack.Screen
         name={ROUTES.VNPAY_WEBVIEW_DRAWER}
         component={VnPay}
-        options={({ navigation }) => ({
+        options={() => ({
           headerTitle: () => (
             <Text className="text-lg font-semibold">Thanh toán online</Text>
           ),
-          headerBackVisible: false,
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <AntDesign name="close" size={24} color="black" />
-            </TouchableOpacity>
-          ),
+          headerTitleAlign: "center",
         })}
       />
     </Stack.Navigator>

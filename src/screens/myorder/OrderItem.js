@@ -1,11 +1,7 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import React from "react";
 import { Entypo, Foundation } from "@expo/vector-icons";
-import {
-  formatCurrency,
-  formatMomentDateToVietnamese,
-  getTitleDependStatus,
-} from "../../features/ultils";
+import { formatCurrency, getTitleDependStatus } from "../../features/ultils";
 import { useNavigation } from "@react-navigation/native";
 import { JOBSTATUS, ROUTES } from "../../constants";
 
@@ -30,16 +26,6 @@ const OrderItem = ({ data }) => {
           orderId: data.id,
         });
     }
-    // if (data.status == JOBSTATUS.DELIVERED) {
-    // } else if (order.status == JOBSTATUS.WAITING_PAY) {
-    //   navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: order.id });
-    // } else {
-    //   navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
-    //     orderId: order.id,
-    //     status: order.status,
-    //     data: data,
-    //   });
-    // }
   };
   return (
     <TouchableOpacity

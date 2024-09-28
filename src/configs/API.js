@@ -1,6 +1,6 @@
 import axios from "axios";
 export const BASE_URL = "http://192.168.100.16:8080";
-export const webSocketUrl = "http://192.168.100.16:8080/api/ws";
+export const webSocketUrl = `${BASE_URL}/api/ws`;
 export const baseEndpoints = {
   "product-categories": "/api/products/categories",
   vehicles: "/api/vehicles",
@@ -42,7 +42,7 @@ export const ENDPOINTS = {
   statistic: "/api/statistic",
   "current-shipper-location": (shipperId) =>
     `/api/shippers/${shipperId}/current-location`,
-  "collect-cash": (postId) => `/api/posts/${postId}/pay`,
+  "collect-cash": (postId) => `/api/posts/${postId}/collect-cash`,
   "shipper-post": (params) => `/api/shippers/my-post?${params}`,
 };
 
@@ -55,6 +55,7 @@ export const POST_ENDPOINTS = {
   "sent-feedback": (id) => `/api/posts/${id}/rating`,
   "get-feedback": (id) => `/api/posts/${id}/rating`,
   "get-winner": (id) => `/api/posts/${id}/winner`,
+  "create-vnpay-url": (params) => `/api/payment/vn-pay${params}`,
 };
 
 export const ShipperJobEndpoints = {
@@ -62,11 +63,6 @@ export const ShipperJobEndpoints = {
   "job-retrieve": (jobId) => `/api/shipper-jobs/${jobId}/`,
   "join-job": (jobId) => `/api/shipper-jobs/${jobId}/join/`,
   "my-jobs": (pagrams) => `/api/shipper-jobs/my-jobs/?${pagrams}`,
-};
-export const paymentEndpoints = {
-  "vnpay-payment-url": "/api/vnpay/payment_url/",
-  "vnpay-payment-ipn": "/api/vnpay/payment_ipn/",
-  "checkout-success": (paymentId) => `payments/${paymentId}/checkout/`,
 };
 
 export const authAPI = (access_token) =>

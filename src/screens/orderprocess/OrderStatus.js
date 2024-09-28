@@ -3,9 +3,9 @@ import {
   Text,
   Dimensions,
   Animated,
-  ScrollView,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
@@ -25,7 +25,7 @@ import {
   formatCurrency,
   uuidToNumber,
 } from "../../features/ultils";
-import { JOBSTATUS, ROUTES } from "../../constants";
+import { JOBSTATUS, POSTSTATUS, ROUTES } from "../../constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getBasicUserToken,
@@ -37,6 +37,7 @@ import { unwrapResult } from "@reduxjs/toolkit";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { getSocket } from "../../redux/socketSlice";
 import { getDuration } from "../../redux/shipperSlice";
+import Spinner from "react-native-loading-spinner-overlay";
 const { width, height } = Dimensions.get("window");
 
 const OrderStatus = ({ navigation, route }) => {
@@ -51,8 +52,7 @@ const OrderStatus = ({ navigation, route }) => {
   const [region, setRegion] = useState();
   const [startPoint, setStartPoint] = useState();
   const [endPoint, setEndpoint] = useState();
-  const [loading, setLoading] = useState();
-  const isMounted = useRef(false); // Use a ref to track mount status
+  const [loading, setLoading] = useState(false);
   // ---------------Marker Animation--------------
   const animatedColor = useRef(new Animated.Value(0)).current;
   const color = animatedColor.interpolate({
@@ -69,8 +69,6 @@ const OrderStatus = ({ navigation, route }) => {
     inputRange: [0, 1],
     outputRange: [0, 1], // <-- value that larger than your content's height
   });
-  console.log("postId ", post?.id);
-
   useEffect(() => {
     let title = "Thông Tin Đơn Hàng Của Bạn";
     if (post?.status === JOBSTATUS.PENDING) {
@@ -84,45 +82,10 @@ const OrderStatus = ({ navigation, route }) => {
       title = "Shipper Đang Giao Hàng";
     }
     navigation.setOptions({
-      headerLeft: () => (
-        <TouchableOpacity onPress={handleBack}>
-          <AntDesign name="left" size={16} color="black" />
-        </TouchableOpacity>
-      ),
       headerTitle: title,
     });
-    navigation.getParent().setOptions({
-      headerShown: false,
-    });
-
-    isMounted.current = true;
-    Animated.loop(
-      Animated.timing(animatedColor, {
-        toValue: 1,
-        duration: 2000,
-        useNativeDriver: true,
-        easing: Easing.linear,
-      })
-    ).start();
-    Animated.loop(
-      Animated.timing(animatedScale, {
-        toValue: 1.5,
-        duration: 2000,
-        useNativeDriver: true,
-        easing: Easing.linear,
-      })
-    ).start();
-    return () => {
-      isMounted.current = false;
-    };
   }, [post]);
 
-  const handleBack = () => {
-    navigation.getParent().setOptions({
-      headerShown: true,
-    });
-    navigation.navigate(ROUTES.HOME_STACK);
-  };
   const getDurationBetweenTwoPoint = (startPoint, endPoint) => {
     dispatch(
       getDuration({
@@ -186,11 +149,30 @@ const OrderStatus = ({ navigation, route }) => {
   //--------fetch post by id-------------
   useEffect(() => {
     let chanel = null;
-    setLoading(true);
     dispatch(retrieve({ access_token: access_token, orderId: orderId }))
       .then(unwrapResult)
       .then((res) => {
         setPost(res);
+        setLoading(false);
+        //----------------animation-------------------
+        if (res.status === POSTSTATUS.PENDING) {
+          Animated.loop(
+            Animated.timing(animatedColor, {
+              toValue: 1,
+              duration: 2000,
+              useNativeDriver: true,
+              easing: Easing.linear,
+            })
+          ).start();
+          Animated.loop(
+            Animated.timing(animatedScale, {
+              toValue: 1.5,
+              duration: 2000,
+              useNativeDriver: true,
+              easing: Easing.linear,
+            })
+          ).start();
+        }
         //---------------------websocket-----------------
         chanel = `/topic/post/${orderId}`;
         ws.subscribe(chanel, (message) => {
@@ -226,6 +208,7 @@ const OrderStatus = ({ navigation, route }) => {
         });
         //-----------------get winner---------------------
         if (!shipper && res.status != JOBSTATUS.PENDING) {
+          setLoading(true);
           dispatch(
             getWinShipper({ access_token: access_token, orderId: res.id })
           )
@@ -247,27 +230,52 @@ const OrderStatus = ({ navigation, route }) => {
                   };
                   updateMapDependOnShipperLocation(s, res);
                   setLoading(false);
+                })
+                .catch((e) => {
+                  setLoading(false);
                 });
+            })
+            .catch((e) => {
+              setLoading(false);
             });
-        } else {
-          setLoading(false);
         }
       });
+    //---------------header style----------------
+
     return () => {
       if (chanel) {
         ws.unsubscribe(chanel);
       }
     };
   }, [orderId]);
-
+  useEffect(() => {
+    navigation.getParent().setOptions({
+      headerShown: false,
+    });
+    navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity onPress={handleBack}>
+          <AntDesign name="left" size={16} color="black" />
+        </TouchableOpacity>
+      ),
+    });
+  });
+  const handleBack = () => {
+    navigation.getParent().setOptions({
+      headerShown: true,
+    });
+    navigation.navigate("Đơn hàng");
+  };
   return (
     <View className="flex-1 relative">
       <Spinner
         visible={loading}
+        spinnerKey={post?.id}
         size="large"
         animation="fade"
         className="z-50 absolute left-0 top-0 right-0 bottom-0"
       />
+
       {JOBSTATUS.PENDING === post?.status ? (
         <MapView
           region={{
