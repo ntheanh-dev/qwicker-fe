@@ -25,13 +25,15 @@ const getHourRange = () => {
   };
 };
 const fillMissingHours = (data, startDate, endDate) => {
-  const existingHours = new Set(data.map((item) => item.dateTime));
+  // item.dateTiem example: 2024-05-01T00:00:00
+  const existingHours = new Set(
+    data.map((item) => new Date(item.dateTime).getHours())
+  );
   const formatDate = (date) => date.toISOString().replace(".000Z", "");
   for (let d = startDate; d <= endDate; d.setHours(d.getHours() + 1)) {
-    const formattedDate = formatDate(d);
-    if (!existingHours.has(formattedDate)) {
+    if (!existingHours.has(d.getHours())) {
       data.push({
-        dateTime: formattedDate,
+        dateTime: formatDate(d),
         totalPayments: 0,
         totalRevenue: 0.0,
         cashRevenue: 0.0,

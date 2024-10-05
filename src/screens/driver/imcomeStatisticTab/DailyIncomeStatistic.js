@@ -21,6 +21,7 @@ const getDayRange = () => {
   };
 };
 const fillMissingDates = (data, startDate, endDate) => {
+  // item.dateTiem example: 2024-05-01T00:00:00
   const existingDates = new Set(
     data.map((item) => item.dateTime.split("T")[0])
   );
