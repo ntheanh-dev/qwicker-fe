@@ -7,7 +7,7 @@ import {
   Image,
   ScrollView,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import call from "react-native-phone-call";
 import {
@@ -47,11 +47,19 @@ const OrderStatus = ({ navigation, route }) => {
   let { orderId } = route.params;
   const [post, setPost] = useState();
   const [shipper, setShipper] = useState();
-  const [routeCoordinates, setRouteCoordinates] = useState([]);
-  const [duration, setDuration] = useState();
-  const [region, setRegion] = useState();
+  const [mapViewData, setMapViewData] = useReducer(
+    (prev, next) => ({
+      ...prev,
+      ...next,
+    }),
+    {
+      region: "",
+      routeCoordinates: [],
+    }
+  );
   const [startPoint, setStartPoint] = useState();
   const [endPoint, setEndpoint] = useState();
+  const [shipperPoint, setShipperPoint] = useState();
   const [loading, setLoading] = useState(false);
   // ---------------Marker Animation--------------
   const animatedColor = useRef(new Animated.Value(0)).current;
@@ -85,66 +93,37 @@ const OrderStatus = ({ navigation, route }) => {
       headerTitle: title,
     });
   }, [post]);
-
-  const getDurationBetweenTwoPoint = (startPoint, endPoint) => {
+  console.log(post);
+  const getRoutePaths = (p1, p2) => {
+    setLoading(true);
     dispatch(
       getDuration({
-        lat1: startPoint?.latitude,
-        long1: startPoint?.longitude,
-        lat2: endPoint?.latitude,
-        long2: endPoint?.longitude,
+        lat1: p1.latitude,
+        long1: p1.longitude,
+        lat2: p2.latitude,
+        long2: p2.longitude,
       })
     )
       .then(unwrapResult)
       .then((res) => {
-        setRegion({
-          latitude: (startPoint.latitude + endPoint.latitude) / 2,
-          longitude: (startPoint.longitude + endPoint.longitude) / 2,
-          latitudeDelta: Math.abs(startPoint.latitude - endPoint.latitude) * 2,
-          longitudeDelta:
-            Math.abs(startPoint.longitude - endPoint.longitude) * 2,
-        });
-        const route = res.routeLegs[0].itineraryItems;
-        const routePath = route.map((route) => ({
+        const routePath = res.routeLegs[0].itineraryItems.map((route) => ({
           latitude: route.maneuverPoint.coordinates[0],
           longitude: route.maneuverPoint.coordinates[1],
         }));
-        setRouteCoordinates([
-          { latitude: startPoint?.latitude, longitude: startPoint?.longitude },
-          ...routePath,
-          { latitude: endPoint?.latitude, longitude: endPoint?.longitude },
-        ]);
-        setDuration(res);
-      });
-  };
-  const updateMapDependOnShipperLocation = (shipperPoint, currentPost) => {
-    setStartPoint(shipperPoint);
-    if (
-      JOBSTATUS.FOUND_SHIPPER === currentPost?.status ||
-      JOBSTATUS.CONFIRM_WITH_CUSTOMER === currentPost?.status
-    ) {
-      const ePoint = {
-        latitude: currentPost?.pickupLocation.latitude,
-        longitude: currentPost?.pickupLocation.longitude,
-      };
-      if (endPoint != ePoint) {
-        setEndpoint(ePoint);
-        getDurationBetweenTwoPoint(shipperPoint, {
-          latitude: currentPost?.pickupLocation.latitude,
-          longitude: currentPost?.pickupLocation.longitude,
+        setMapViewData({
+          region: {
+            latitude: (p1.latitude + p2.latitude) / 2,
+            longitude: (p1.longitude + p2.longitude) / 2,
+            latitudeDelta: Math.abs(p1.latitude - p2.latitude) * 2,
+            longitudeDelta: Math.abs(p1.longitude - p2.longitude) * 2,
+          },
+          routeCoordinates: [p1, ...routePath, p2],
         });
-      }
-    } else if (JOBSTATUS.SHIPPED === currentPost?.status) {
-      const ePoint = {
-        latitude: currentPost?.dropLocation.latitude,
-        longitude: currentPost?.dropLocation.longitude,
-      };
-      if (endPoint != ePoint) {
-        // switch endpoint to pickuplocation
-        setEndpoint(ePoint);
-        getDurationBetweenTwoPoint(ePoint, ePoint);
-      }
-    }
+        setLoading(false);
+      })
+      .catch((e) => {
+        setLoading(false);
+      });
   };
   //--------fetch post by id-------------
   useEffect(() => {
@@ -180,18 +159,42 @@ const OrderStatus = ({ navigation, route }) => {
           if (messageBody.messageType === "FOUND_SHIPPER") {
             setPost(messageBody.post);
             setShipper(messageBody.shipper);
+            setLoading(true);
+            dispatch(
+              getCurrentShipperLocation({
+                access_token: access_token,
+                shipperId: messageBody.shipper.id,
+              })
+            )
+              .then(unwrapResult)
+              .then((shipperLocation) => {
+                const sPoint = {
+                  latitude: shipperLocation.latitude,
+                  longitude: shipperLocation.longitude,
+                };
+                const ePoint = {
+                  latitude: res?.pickupLocation?.latitude,
+                  longitude: res?.pickupLocation?.longitude,
+                };
+                setStartPoint(sPoint);
+                setEndpoint(ePoint);
+                setShipperPoint(sPoint);
+                getRoutePaths(sPoint, ePoint);
+                setLoading(false);
+              })
+              .catch((e) => {
+                setLoading(false);
+              });
             Toast.show({
               type: ALERT_TYPE.SUCCESS,
               title: `Tìm thấy một shipper`,
             });
           } else if (messageBody.messageType === "SHIPPER_LOCATION") {
-            const shipperLocation = {
+            setShipperPoint({
               latitude: messageBody.latitude,
               longitude: messageBody.longitude,
-            };
-            updateMapDependOnShipperLocation(shipperLocation, post);
+            });
           } else if (messageBody.messageType === "UPDATE_POST_STATUS") {
-            setPost({ ...post, status: messageBody.content });
             //-------------Done------------
             if (JOBSTATUS.DELIVERED === messageBody.content) {
               Toast.show({
@@ -199,11 +202,20 @@ const OrderStatus = ({ navigation, route }) => {
                 title: `Đơn Hàng Của Bạn Đã Được Giao`,
               });
               navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, {
-                orderId: post?.id,
+                orderId: post.id,
               });
-            } else {
-              setPost((prev) => ({ ...prev, status: messageBody.content }));
+            } else if (JOBSTATUS.SHIPPED === messageBody.content) {
+              //-------------The order has been picked up and is currently being shipped
+              const ePoint = {
+                latitude: post.pickupLocation.latitude,
+                longitude: post.pickupLocation.longitude,
+              };
+              setEndpoint(ePoint);
+              getRoutePaths(shipperPoint, ePoint);
             }
+            setPost((prev) => {
+              return { ...prev, status: messageBody.content };
+            });
           }
         });
         //-----------------get winner---------------------
@@ -224,11 +236,24 @@ const OrderStatus = ({ navigation, route }) => {
               )
                 .then(unwrapResult)
                 .then((shipperLocation) => {
-                  const s = {
+                  const sPoint = {
                     latitude: shipperLocation.latitude,
                     longitude: shipperLocation.longitude,
                   };
-                  updateMapDependOnShipperLocation(s, res);
+                  const ePoint =
+                    JOBSTATUS.SHIPPED === res.status
+                      ? {
+                          latitude: res?.dropLocation?.latitude,
+                          longitude: res?.dropLocation?.longitude,
+                        }
+                      : {
+                          latitude: res?.pickupLocation?.latitude,
+                          longitude: res?.pickupLocation?.longitude,
+                        };
+                  setStartPoint(sPoint);
+                  setEndpoint(ePoint);
+                  setShipperPoint(sPoint);
+                  getRoutePaths(sPoint, ePoint);
                   setLoading(false);
                 })
                 .catch((e) => {
@@ -240,8 +265,6 @@ const OrderStatus = ({ navigation, route }) => {
             });
         }
       });
-    //---------------header style----------------
-
     return () => {
       if (chanel) {
         ws.unsubscribe(chanel);
@@ -306,27 +329,30 @@ const OrderStatus = ({ navigation, route }) => {
           </Marker>
         </MapView>
       ) : (
-        duration && (
+        mapViewData.routeCoordinates.length > 0 && (
           <MapView
             className="w-full h-full"
-            region={region}
+            region={mapViewData.region}
             // provider={PROVIDER_GOOGLE}
           >
-            <Marker.Animated coordinate={startPoint}>
-              <Image
-                source={{ uri: shipper?.vehicle?.icon }}
-                style={{
-                  width: 30,
-                  height: 30,
-                }}
-                resizeMode="contain"
-              />
-            </Marker.Animated>
+            <Marker coordinate={startPoint} />
+            {shipperPoint && (
+              <Marker.Animated coordinate={shipperPoint}>
+                <Image
+                  source={{ uri: shipper?.vehicle?.icon }}
+                  style={{
+                    width: 30,
+                    height: 30,
+                  }}
+                  resizeMode="contain"
+                />
+              </Marker.Animated>
+            )}
             <Marker coordinate={endPoint} />
             <Polyline
               strokeWidth={4}
               strokeColor="#3422F1"
-              coordinates={routeCoordinates}
+              coordinates={mapViewData.routeCoordinates}
             />
           </MapView>
         )

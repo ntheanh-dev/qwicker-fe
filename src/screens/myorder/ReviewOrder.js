@@ -166,321 +166,332 @@ const ReviewOrder = ({ navigation, route }) => {
         animation="fade"
         className="z-50 absolute left-0 top-0 right-0 bottom-0"
       />
-      <ScrollView contentContinaerStyle={{ flexGrow: 1 }}>
-        {/* ---------Driver infor---------- */}
-        {post?.status === JOBSTATUS.DELIVERED && (
-          <View className="bg-white p-4 flex-col mb-2">
-            <View className="flex-row space-x-4">
-              <View className="basis-1/6 px-3 ">
-                <Image
-                  source={{ uri: shipper?.user?.avatar }}
-                  className="h-12 w-12 rounded-full"
-                />
-              </View>
-              <View className="basis-5/6 flex-col space-y-1">
-                <Text>{`${shipper?.user?.firstName} ${shipper?.user?.lastName}`}</Text>
-                <View
-                  className="bg-gray-100 rounded-md px-1"
-                  style={{ alignSelf: "flex-start" }}
-                >
-                  <Text className="text-xs text-gray-600 font-semibold">{`${shipper?.vehicleNumber} ${shipper?.vehicle?.name}`}</Text>
+      {post && (
+        <>
+          <ScrollView contentContinaerStyle={{ flexGrow: 1 }}>
+            {/* ---------Driver infor---------- */}
+            {post?.status === JOBSTATUS.DELIVERED && (
+              <View className="bg-white p-4 flex-col mb-2">
+                <View className="flex-row space-x-4">
+                  <View className="basis-1/6 px-3 ">
+                    <Image
+                      source={{ uri: shipper?.user?.avatar }}
+                      className="h-12 w-12 rounded-full"
+                    />
+                  </View>
+                  <View className="basis-5/6 flex-col space-y-1">
+                    <Text>{`${shipper?.user?.firstName} ${shipper?.user?.lastName}`}</Text>
+                    <View
+                      className="bg-gray-100 rounded-md px-1"
+                      style={{ alignSelf: "flex-start" }}
+                    >
+                      <Text className="text-xs text-gray-600 font-semibold">{`${shipper?.vehicleNumber} ${shipper?.vehicle?.name}`}</Text>
+                    </View>
+
+                    <View className="flex-row items-center space-x-1">
+                      <AntDesign name="star" size={20} color="yellow" />
+                      <Text className="text-sm text-gray-600 font-semibold">
+                        {shipper?.ratings &&
+                          averageRatingPoint(shipper?.ratings)}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
-
-                <View className="flex-row items-center space-x-1">
-                  <AntDesign name="star" size={20} color="yellow" />
-                  <Text className="text-sm text-gray-600 font-semibold">
-                    {shipper?.ratings && averageRatingPoint(shipper?.ratings)}
-                  </Text>
+                <View className="flex-row pt-4">
+                  <View className="flex-1 flex-row space-x-2 justify-center items-center">
+                    <MaterialCommunityIcons
+                      name="android-messages"
+                      size={24}
+                      color="#3422F1"
+                    />
+                    <Text className="text-base font-semibold">Nhắn ngay</Text>
+                  </View>
+                  <View className="flex-1 flex-row space-x-2 justify-center items-center">
+                    <Feather name="phone" size={24} color="#3422F1" />
+                    <Text className="text-base font-semibold">Gọi ngay</Text>
+                  </View>
                 </View>
-              </View>
-            </View>
-            <View className="flex-row pt-4">
-              <View className="flex-1 flex-row space-x-2 justify-center items-center">
-                <MaterialCommunityIcons
-                  name="android-messages"
-                  size={24}
-                  color="#3422F1"
-                />
-                <Text className="text-base font-semibold">Nhắn ngay</Text>
-              </View>
-              <View className="flex-1 flex-row space-x-2 justify-center items-center">
-                <Feather name="phone" size={24} color="#3422F1" />
-                <Text className="text-base font-semibold">Gọi ngay</Text>
-              </View>
-            </View>
-          </View>
-        )}
-        {/* ---------  Price-------------- */}
-        <View className="flex-row bg-white p-4 space-x-4 items-center mb-2">
-          <Ionicons name="cash-outline" size={24} color="#3422F1" />
-          <View className="flex-col">
-            <Text className="text-xl font-semibold">
-              {formatCurrency(post?.payment?.price)}
-            </Text>
-            <Text className="text-base font-medium text-gray-400 ">
-              {post?.payment?.method?.name}
-            </Text>
-          </View>
-        </View>
-        {/* -----------Location, date time, uuid----------- */}
-        <View className="flex-col bg-white p-4 mb-2">
-          <View className="flex-row items-center justify-between pb-3">
-            <Text className="text-base text-gray-500">
-              {post?.payment?.paidAt &&
-                formatMomentDateToVietnamese2(post?.payment?.paidAt)}
-            </Text>
-            <Text className="text-gray-600 text-base">
-              {post?.id && `#${uuidToNumber(post?.id)}`}
-            </Text>
-          </View>
-
-          <View className="flex-row space-x-2">
-            <View className="mt-2 relative">
-              <Entypo name="circle" size={18} color="#3422F1" />
-              {/* <View className="border-l-2 border-dotted border-[#3422F1] flex-1 absolute top-6 bottom-0 left-1/2" style={{ width: 1 }}></View> */}
-            </View>
-
-            <View className="flex-col pr-2">
-              <Text className="text-xl font-semibold">
-                {post?.pickupLocation?.addressLine}
-              </Text>
-              <Text className="text-lg text-gray-600">
-                {post?.pickupLocation?.formattedAddress}
-              </Text>
-              <Text className="text-lg text-gray-600">{`${post?.pickupLocation?.contact}: ${post?.pickupLocation?.phoneNumber}`}</Text>
-            </View>
-          </View>
-          <View className="flex-row space-x-2">
-            <View className="mt-2 relative">
-              <Foundation name="marker" size={22} color="#3422F1" />
-            </View>
-
-            <View className="flex-col pr-2 mt-2">
-              <Text className="text-xl font-semibold">
-                {post?.dropLocation?.addressLine}
-              </Text>
-              <Text className="text-lg text-gray-600">
-                {post?.dropLocation?.formattedAddress}
-              </Text>
-              <Text className="text-lg text-gray-600">{`${post?.dropLocation?.contact}: ${post?.dropLocation?.phoneNumber}`}</Text>
-            </View>
-          </View>
-        </View>
-        {/* -------------Vehicle----------- */}
-        <View className="flex-col bg-white p-4 mb-2 ">
-          <Text className="font-semibold text-xl">
-            {post?.vehicleType?.name}
-          </Text>
-          {post?.description && (
-            <View className="flex-row items-center space-x-4 px-4 mt-2">
-              <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
-              <Text className="text-base text-gray-600">
-                {post?.description}
-              </Text>
-            </View>
-          )}
-        </View>
-        {/* -------------ProductType----------- */}
-        <View className="flex-row bg-white p-4 mb-2 space-x-2 items-center">
-          <MaterialCommunityIcons
-            name="format-list-bulleted-type"
-            size={24}
-            color="black"
-          />
-          <View className="flex-col">
-            <Text className="text-xl font-semibold">
-              {post?.product?.category?.name}
-            </Text>
-          </View>
-        </View>
-        {/* ----------Hình ảnh------------- */}
-        <TouchableOpacity
-          onPress={() => setShowImage(!showImage)}
-          className="flex-col bg-white p-4 mb-2 space-x-2"
-        >
-          <View className="flex-col">
-            <View className="flex-row justify-between">
-              <Text className="text-lg font-medium">Hình ảnh</Text>
-              {showImage ? (
-                <MaterialIcons
-                  name="keyboard-arrow-up"
-                  size={24}
-                  color="black"
-                />
-              ) : (
-                <MaterialIcons
-                  name="keyboard-arrow-down"
-                  size={24}
-                  color="black"
-                />
-              )}
-            </View>
-            {showImage && (
-              <View className="flex justify-center items-center">
-                <Image
-                  source={{ uri: post?.product?.image }}
-                  className="w-[150] h-[150]"
-                />
               </View>
             )}
-          </View>
-        </TouchableOpacity>
-        {/* -----------Feedback Space----------- */}
-        {feedback && (
-          <View className="flex-col bg-white p-4 border-b border-gray-300">
-            <Text className="font-semibold text-xl">Đánh giá của bạn</Text>
-            <View className="flex-row py-2">
-              <StarRatingDisplay rating={feedback?.rating} />
-            </View>
-            <Text className="text-base font-normal py-1">
-              {feedback?.feedback}
-            </Text>
-            <View className="flex-row justify-between mt-2">
-              <Text className="text-xs font-normal text-gray-500">
-                {moment(feedback?.createdAt).format("yy-MM-d")}
-              </Text>
-              <View className="flex-row space-x-5 justify-center items-center">
-                <Entypo name="dots-three-horizontal" size={20} color="gray" />
+            {/* ---------  Price-------------- */}
+            <View className="flex-row bg-white p-4 space-x-4 items-center mb-2">
+              <Ionicons name="cash-outline" size={24} color="#3422F1" />
+              <View className="flex-col">
+                <Text className="text-xl font-semibold">
+                  {formatCurrency(post?.payment?.price)}
+                </Text>
+                <Text className="text-base font-medium text-gray-400 ">
+                  {post?.payment?.method?.name}
+                </Text>
               </View>
             </View>
-          </View>
-        )}
-        {/* ----------Time line------------- */}
-        <TouchableOpacity
-          onPress={() => setShowTimeLine(!showTimeLine)}
-          className="flex-col bg-white p-4 mb-2 space-x-2"
-        >
-          <View className="flex-col">
-            <View className="flex-row justify-between">
-              <Text className="text-lg font-medium">Time Line</Text>
+            {/* -----------Location, date time, uuid----------- */}
+            <View className="flex-col bg-white p-4 mb-2">
+              <View className="flex-row items-center justify-between pb-3">
+                <Text className="text-base text-gray-500">
+                  {post?.payment?.paidAt &&
+                    formatMomentDateToVietnamese2(post?.payment?.paidAt)}
+                </Text>
+                <Text className="text-gray-600 text-base">
+                  {post?.id && `#${uuidToNumber(post?.id)}`}
+                </Text>
+              </View>
+
+              <View className="flex-row space-x-2">
+                <View className="mt-2 relative">
+                  <Entypo name="circle" size={18} color="#3422F1" />
+                  {/* <View className="border-l-2 border-dotted border-[#3422F1] flex-1 absolute top-6 bottom-0 left-1/2" style={{ width: 1 }}></View> */}
+                </View>
+
+                <View className="flex-col pr-2">
+                  <Text className="text-xl font-semibold">
+                    {post?.pickupLocation?.addressLine}
+                  </Text>
+                  <Text className="text-lg text-gray-600">
+                    {post?.pickupLocation?.formattedAddress}
+                  </Text>
+                  <Text className="text-lg text-gray-600">{`${post?.pickupLocation?.contact}: ${post?.pickupLocation?.phoneNumber}`}</Text>
+                </View>
+              </View>
+              <View className="flex-row space-x-2">
+                <View className="mt-2 relative">
+                  <Foundation name="marker" size={22} color="#3422F1" />
+                </View>
+
+                <View className="flex-col pr-2 mt-2">
+                  <Text className="text-xl font-semibold">
+                    {post?.dropLocation?.addressLine}
+                  </Text>
+                  <Text className="text-lg text-gray-600">
+                    {post?.dropLocation?.formattedAddress}
+                  </Text>
+                  <Text className="text-lg text-gray-600">{`${post?.dropLocation?.contact}: ${post?.dropLocation?.phoneNumber}`}</Text>
+                </View>
+              </View>
             </View>
-            <Timeline
-              lineColor="rgb(45,156,219)"
-              circleColor="rgb(45,156,219)"
-              timeContainerStyle={{ minWidth: 52, marginTop: 5 }}
-              timeStyle={{
-                textAlign: "center",
-                backgroundColor: "#ff9797",
-                color: "white",
-                padding: 5,
-                borderRadius: 13,
-              }}
-              circleStyle={{ marginTop: 10 }}
-              data={postHistoryToTimeData(post?.history)}
-              options={{
-                style: { paddingTop: 5 },
-              }}
-              renderFullLine={true}
-              renderCircle={false}
-            />
-          </View>
-        </TouchableOpacity>
-
-        <View className="h-40"></View>
-      </ScrollView>
-
-      <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
-        {/* --------------Place order again----------- */}
-        {post?.status == JOBSTATUS.DONE && (
-          <TouchableOpacity
-            className={`rounded-lg w-full flex justify-center items-center h-14 bg-[#3422F1]`}
-          >
-            <Text className="text-lg font-medium text-white">
-              Đặt lại đơn hàng
-            </Text>
-          </TouchableOpacity>
-        )}
-        {/* --------------Payment------------------- */}
-        {post?.status == JOBSTATUS.WAITING_PAY && (
-          <TouchableOpacity
-            onPress={handlePayment}
-            className={`rounded-lg w-full flex justify-center items-center h-14 bg-[#3422F1]`}
-          >
-            <Text className="text-lg font-medium text-white">
-              Thanh toán ngay
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {!feedback && post?.status !== POSTSTATUS.WAITING_PAY && (
-        <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
-          <TouchableOpacity
-            onPress={() => refRBSheet.current.open()}
-            className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
-          >
-            <Text className="text-lg font-medium text-white">Đánh Giá</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      {/* --------------Feadback bottom sheet---------- */}
-      <RBSheet
-        ref={refRBSheet}
-        customStyles={{
-          wrapper: {
-            backgroundColor: "rgba(0,0,0,0.3)",
-          },
-          draggableIcon: {
-            backgroundColor: "#000",
-          },
-          container: {
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            overflow: "hidden",
-          },
-        }}
-        height={410}
-      >
-        <View className="h-full w-full flex-col">
-          <View className="py-3 border-b border-gray-300 relative">
-            <Text className="text-center text-lg font-semibold">
-              Đánh giá theo trải nghiệm của bạn
-            </Text>
-            <TouchableOpacity
-              onPress={() => refRBSheet.current.close()}
-              className="absolute right-4 top-1/2"
-            >
+            {/* -------------Vehicle----------- */}
+            <View className="flex-col bg-white p-4 mb-2 ">
+              <Text className="font-semibold text-xl">
+                {post?.vehicleType?.name}
+              </Text>
+              {post?.description && (
+                <View className="flex-row items-center space-x-4 px-4 mt-2">
+                  <Octicons name="note" size={24} color="rgb(75 ,85 ,99)" />
+                  <Text className="text-base text-gray-600">
+                    {post?.description}
+                  </Text>
+                </View>
+              )}
+            </View>
+            {/* -------------ProductType----------- */}
+            <View className="flex-row bg-white p-4 mb-2 space-x-2 items-center">
               <MaterialCommunityIcons
-                name="window-close"
+                name="format-list-bulleted-type"
                 size={24}
                 color="black"
               />
-            </TouchableOpacity>
-          </View>
-          <View className="flex-row justify-center space-x-2 py-4">
-            <StarRating rating={rating} onChange={setRating} />
-          </View>
-          <View className="flex-row flex-wrap justify-center">
-            {comments.map((ele) => (
-              <TouchableOpacity
-                onPress={() => handleChooseRecommedFeadback(ele.content)}
-                key={ele.id}
-                underlayColor={"white"}
-                className="rounded-3xl p-3 border border-gray-600 m-2"
-              >
-                <Text className="text-base font-medium">{ele.content}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <View className="px-4 mt-4">
-            <TextInput
-              className="bg-gray-200 rounded-lg text-lg py-2 px-4 mb-4"
-              placeholder="Nhập bình luận của bạn"
-              onChangeText={(txt) => setText(txt)}
-              value={text}
-            />
+              <View className="flex-col">
+                <Text className="text-xl font-semibold">
+                  {post?.product?.category?.name}
+                </Text>
+              </View>
+            </View>
+            {/* ----------Hình ảnh------------- */}
             <TouchableOpacity
-              onPress={handleFeedback}
-              className={`rounded-lg w-full flex justify-center items-center h-14 ${
-                text.length > 0 ? "bg-[#3422F1]" : "bg-gray-400"
-              }`}
+              onPress={() => setShowImage(!showImage)}
+              className="flex-col bg-white p-4 mb-2 space-x-2"
             >
-              <Text className="text-lg font-medium text-white">ĐÁNH GIÁ</Text>
+              <View className="flex-col">
+                <View className="flex-row justify-between">
+                  <Text className="text-lg font-medium">Hình ảnh</Text>
+                  {showImage ? (
+                    <MaterialIcons
+                      name="keyboard-arrow-up"
+                      size={24}
+                      color="black"
+                    />
+                  ) : (
+                    <MaterialIcons
+                      name="keyboard-arrow-down"
+                      size={24}
+                      color="black"
+                    />
+                  )}
+                </View>
+                {showImage && (
+                  <View className="flex justify-center items-center">
+                    <Image
+                      source={{ uri: post?.product?.image }}
+                      className="w-[150] h-[150]"
+                    />
+                  </View>
+                )}
+              </View>
             </TouchableOpacity>
+            {/* -----------Feedback Space----------- */}
+            {feedback && (
+              <View className="flex-col bg-white p-4 border-b border-gray-300">
+                <Text className="font-semibold text-xl">Đánh giá của bạn</Text>
+                <View className="flex-row py-2">
+                  <StarRatingDisplay rating={feedback?.rating} />
+                </View>
+                <Text className="text-base font-normal py-1">
+                  {feedback?.feedback}
+                </Text>
+                <View className="flex-row justify-between mt-2">
+                  <Text className="text-xs font-normal text-gray-500">
+                    {moment(feedback?.createdAt).format("yy-MM-d")}
+                  </Text>
+                  <View className="flex-row space-x-5 justify-center items-center">
+                    <Entypo
+                      name="dots-three-horizontal"
+                      size={20}
+                      color="gray"
+                    />
+                  </View>
+                </View>
+              </View>
+            )}
+            {/* ----------Time line------------- */}
+            <TouchableOpacity
+              onPress={() => setShowTimeLine(!showTimeLine)}
+              className="flex-col bg-white p-4 mb-2 space-x-2"
+            >
+              <View className="flex-col">
+                <View className="flex-row justify-between">
+                  <Text className="text-lg font-medium">Time Line</Text>
+                </View>
+                <Timeline
+                  lineColor="rgb(45,156,219)"
+                  circleColor="rgb(45,156,219)"
+                  timeContainerStyle={{ minWidth: 52, marginTop: 5 }}
+                  timeStyle={{
+                    textAlign: "center",
+                    backgroundColor: "#ff9797",
+                    color: "white",
+                    padding: 5,
+                    borderRadius: 13,
+                  }}
+                  circleStyle={{ marginTop: 10 }}
+                  data={postHistoryToTimeData(post?.history)}
+                  options={{
+                    style: { paddingTop: 5 },
+                  }}
+                  renderFullLine={true}
+                  renderCircle={false}
+                />
+              </View>
+            </TouchableOpacity>
+
+            <View className="h-40"></View>
+          </ScrollView>
+
+          <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
+            {/* --------------Place order again----------- */}
+            {post?.status == JOBSTATUS.DONE && (
+              <TouchableOpacity
+                className={`rounded-lg w-full flex justify-center items-center h-14 bg-[#3422F1]`}
+              >
+                <Text className="text-lg font-medium text-white">
+                  Đặt lại đơn hàng
+                </Text>
+              </TouchableOpacity>
+            )}
+            {/* --------------Payment------------------- */}
+            {post?.status == JOBSTATUS.WAITING_PAY && (
+              <TouchableOpacity
+                onPress={handlePayment}
+                className={`rounded-lg w-full flex justify-center items-center h-14 bg-[#3422F1]`}
+              >
+                <Text className="text-lg font-medium text-white">
+                  Thanh toán ngay
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
-        </View>
-      </RBSheet>
+
+          {!feedback && post?.status !== POSTSTATUS.WAITING_PAY && (
+            <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
+              <TouchableOpacity
+                onPress={() => refRBSheet.current.open()}
+                className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
+              >
+                <Text className="text-lg font-medium text-white">Đánh Giá</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* --------------Feadback bottom sheet---------- */}
+          <RBSheet
+            ref={refRBSheet}
+            customStyles={{
+              wrapper: {
+                backgroundColor: "rgba(0,0,0,0.3)",
+              },
+              draggableIcon: {
+                backgroundColor: "#000",
+              },
+              container: {
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                overflow: "hidden",
+              },
+            }}
+            height={410}
+          >
+            <View className="h-full w-full flex-col">
+              <View className="py-3 border-b border-gray-300 relative">
+                <Text className="text-center text-lg font-semibold">
+                  Đánh giá theo trải nghiệm của bạn
+                </Text>
+                <TouchableOpacity
+                  onPress={() => refRBSheet.current.close()}
+                  className="absolute right-4 top-1/2"
+                >
+                  <MaterialCommunityIcons
+                    name="window-close"
+                    size={24}
+                    color="black"
+                  />
+                </TouchableOpacity>
+              </View>
+              <View className="flex-row justify-center space-x-2 py-4">
+                <StarRating rating={rating} onChange={setRating} />
+              </View>
+              <View className="flex-row flex-wrap justify-center">
+                {comments.map((ele) => (
+                  <TouchableOpacity
+                    onPress={() => handleChooseRecommedFeadback(ele.content)}
+                    key={ele.id}
+                    underlayColor={"white"}
+                    className="rounded-3xl p-3 border border-gray-600 m-2"
+                  >
+                    <Text className="text-base font-medium">{ele.content}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <View className="px-4 mt-4">
+                <TextInput
+                  className="bg-gray-200 rounded-lg text-lg py-2 px-4 mb-4"
+                  placeholder="Nhập bình luận của bạn"
+                  onChangeText={(txt) => setText(txt)}
+                  value={text}
+                />
+                <TouchableOpacity
+                  onPress={handleFeedback}
+                  className={`rounded-lg w-full flex justify-center items-center h-14 ${
+                    text.length > 0 ? "bg-[#3422F1]" : "bg-gray-400"
+                  }`}
+                >
+                  <Text className="text-lg font-medium text-white">
+                    ĐÁNH GIÁ
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </RBSheet>
+        </>
+      )}
     </View>
   );
 };

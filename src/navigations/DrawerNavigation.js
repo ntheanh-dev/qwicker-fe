@@ -79,7 +79,7 @@ const DrawerNavigation = () => {
           headerLeft: (props) => (
             <TouchableOpacity
               className="ml-3"
-              onPress={() => navigation.navigate(ROUTES.HOME_DRAWER)}
+              onPress={() => navigation.navigate(ROUTES.HOME_STACK)}
             >
               <MaterialIcons
                 name="keyboard-arrow-left"

@@ -24,6 +24,9 @@ const Home = ({ navigation }) => {
         .then((res) => setVehicles(res))
         .catch((e) => console.log(e));
     }
+    navigation.getParent().setOptions({
+      headerShown: true,
+    });
   }, []);
 
   const [selectedVehicle, setSelectedVehicle] = useState(null);
