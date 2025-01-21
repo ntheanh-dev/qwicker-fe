@@ -1,5 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+const INIT_STATE = {
+  vehicle: {},
+  temp: {},
+};
+
 const orderSlice = createSlice({
   name: "order",
   initialState: {
@@ -13,11 +18,11 @@ const orderSlice = createSlice({
   },
   reducers: {
     resetOrderSlice: (state, action) => {
-      Object.assign(state, {});
+      Object.assign(state, INIT_STATE);
     },
     saveStateAsTemp: (state, action) => {
       const temp = state;
-      Object.assign(state, { temp: temp });
+      Object.assign(state, { temp: INIT_STATE });
     },
     restoreStateFromTemp: (state, action) => {
       Object.assign(state, state.temp);

@@ -6,7 +6,7 @@ import LocationDatePicker from "./LocationDatePicker";
 import { AntDesign } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchVehicles, getVehicles } from "../../redux/appSlice";
-import { isLocationAndShipmentFulfill } from "../../redux/store";
+import { isLocationAndShipmentFulfill, store } from "../../redux/store";
 import { ROUTES } from "../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { formatCurrency } from "../../features/ultils";
@@ -16,9 +16,8 @@ import { getSelectedVehicle } from "../../redux/orderSlice";
 const Home = ({ navigation }) => {
   // === STATE ===
   const [vehicles, setVehicles] = useState(useSelector(getVehicles));
-  const [selectedVehicle, setSelectedVehicle] = useState(
-    useSelector(getSelectedVehicle)
-  );
+  const storedSelectedVehicle = useSelector(getSelectedVehicle);
+  const [selectedVehicle, setSelectedVehicle] = useState(storedSelectedVehicle);
   // === REF ===
   const scrollY = useRef(new Animated.Value(0)).current;
   const scrollView = useRef();
@@ -37,6 +36,9 @@ const Home = ({ navigation }) => {
       headerShown: true,
     });
   }, []);
+  useEffect(() => {
+    setSelectedVehicle(storedSelectedVehicle);
+  }, [storedSelectedVehicle]); // Khi giá trị từ Redux store thay đổi, update selectedVehicle
   // === MEMO ===
   const cost = useMemo(() => (Math.floor(Math.random() * 200) + 50) * 1000);
   // === HELPER ===
