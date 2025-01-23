@@ -176,7 +176,6 @@ const AddMoreOrderDetail = ({ navigation }) => {
   const handlePlaceOrder = () => {
     placeOrderBTS.current.close();
     setLoading(true);
-
     dispatch(
       postJob({
         access_token: access_token,

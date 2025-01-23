@@ -21,11 +21,18 @@ const orderSlice = createSlice({
       Object.assign(state, INIT_STATE);
     },
     saveStateAsTemp: (state, action) => {
-      const temp = state;
-      Object.assign(state, { temp: INIT_STATE });
+      return {
+        ...INIT_STATE,
+        temp: { ...state },
+      };
     },
     restoreStateFromTemp: (state, action) => {
-      Object.assign(state, state.temp);
+      if (state.temp) {
+        return {
+          ...state.temp,
+        };
+      }
+      return state;
     },
     addVehicle: (state, action) => {
       state.vehicle = action.payload;

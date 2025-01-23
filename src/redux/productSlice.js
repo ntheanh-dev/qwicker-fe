@@ -18,18 +18,24 @@ const productSlice = createSlice({
   name: "productSlice",
   initialState: {
     product: INIT_PRODUCT2,
-    status: "idle",
   },
   reducers: {
     resetProductSlice: (state, action) => {
       Object.assign(state.product, INIT_PRODUCT);
     },
     saveStateAsTemp: (state, action) => {
-      const temp = state;
-      Object.assign(state, { temp: temp });
+      return {
+        product: { ...INIT_PRODUCT },
+        temp: { ...state },
+      };
     },
     restoreStateFromTemp: (state, action) => {
-      Object.assign(state, state.temp);
+      if (state.temp) {
+        return {
+          ...state.temp,
+        };
+      }
+      return state;
     },
     removeProductData: (state, action) => {
       state.product = INIT_PRODUCT;

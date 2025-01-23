@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Button,
 } from "react-native";
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
@@ -70,8 +71,8 @@ const OrderStatus = ({ navigation, route }) => {
       routeCoordinates: [],
     }
   );
+  const [isNotFoundShipper, setIsNotFoundShipper] = useState(true);
   // === REF ===
-  const notFoundShipperState = useRef();
   const animatedColor = useRef(new Animated.Value(0)).current;
   const animatedScale = useRef(new Animated.Value(0)).current;
   const scale = animatedScale.interpolate({
@@ -264,7 +265,6 @@ const OrderStatus = ({ navigation, route }) => {
         </TouchableOpacity>
       ),
     });
-    notFoundShipperState.current.open();
   }, []);
   // === HELPER ===
   const getRoutePaths = (p1, p2) => {
@@ -309,6 +309,7 @@ const OrderStatus = ({ navigation, route }) => {
     dispatch(restoreStateFromTempOrder());
     dispatch(restoreStateFromTempShipment());
     dispatch(restoreStateFromTempProduct());
+    navigation.navigate("Đơn hàng");
   };
   return (
     <View className="flex-1 relative">
@@ -378,246 +379,235 @@ const OrderStatus = ({ navigation, route }) => {
         )
       )}
 
-      <ScrollView className="absolute left-0 top-2/4 right-0 bottom-0 px-4">
-        {/* ------------Finding------------ */}
-        <View className="flex-col items-center bg-white rounded-lg pt-4 mb-5">
-          <MaterialIcons name="keyboard-arrow-up" size={24} color="#e5e7eb" />
-          {post?.status == JOBSTATUS.PENDING && (
-            <>
-              <Text className="text-lg font-semibold py-1">
-                Đang tìm tất cả shipper gần bạn
+      {isNotFoundShipper ? (
+        <View
+          style={{ backgroundColor: "rgba(0,0,0,0.3)" }}
+          className="absolute top-0 left-0 right-0 bottom-0 flex justify-end "
+        >
+          <View className="px-4 pb-8 flex-col justify-between bg-white rounded-lg">
+            <View className="flex-col py-4 items-center">
+              <Image
+                className="w-60 h-40"
+                source={require("../../assets/animations/looking.gif")}
+              />
+            </View>
+            <View className="mb-4">
+              <Text className="text-2xl font-bold">
+                Rất tiếc, không tìm thấy bác tài gần bạn
               </Text>
-              <Text className="text-gray-500 mb-4">
-                Vui lòng đợi trong ít phút
+              <Text className="text-base mt-2">
+                Chúng tôi đang cố gắng hết sức để khắc phục tình huống này. Vui
+                lòng thử lại nếu bạn vẫn cần tìm người giao đơn hàng của bạn.
               </Text>
-            </>
-          )}
-          {shipper && (
-            <View className="flex-col bg-white rounded-lg">
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate(ROUTES.VIEW_FEEDBACK_STACK, {
-                    shipper: shipper,
-                  })
-                }
-                className="flex-row px-3 py-4"
-              >
-                <View className="basis-2/6 px-3">
-                  <Image
-                    source={{ uri: shipper?.user.avatar }}
-                    className="h-14 w-14 rounded-full"
-                  />
-                </View>
-                <View className="basis-4/6 flex-col space-y-1">
-                  <Text>{`${shipper?.user?.firstName} ${shipper?.user?.lastName}`}</Text>
-                  <View className="flex-row items-center space-x-1">
-                    <AntDesign name="star" size={15} color="#FFB534" />
-                    <Text className="text-xs text-gray-600">
-                      {shipper?.ratings && averageRatingPoint(shipper?.ratings)}
-                    </Text>
-                  </View>
-                  <View className="bg-gray-100 rounded-md px-1">
-                    <Text className="text-xs text-gray-600 font-semibold">{`${shipper?.vehicleNumber} ${shipper?.vehicle.name}`}</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-              <View className="flex-row border-t border-gray-200">
+            </View>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={placeOrderAgain}
+              className="flex justify-center items-center bg-[#3422F1] py-3 rounded-lg"
+            >
+              <Text className="text-lg font-bold text-white">Ok</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : (
+        <ScrollView className="absolute left-0 top-2/4 right-0 bottom-0 px-4">
+          {/* ------------Finding------------ */}
+          <View className="flex-col items-center bg-white rounded-lg pt-4 mb-5">
+            <MaterialIcons name="keyboard-arrow-up" size={24} color="#e5e7eb" />
+            {post?.status == JOBSTATUS.PENDING && (
+              <>
+                <Text className="text-lg font-semibold py-1">
+                  Đang tìm tất cả shipper gần bạn
+                </Text>
+                <Text className="text-gray-500 mb-4">
+                  Vui lòng đợi trong ít phút
+                </Text>
+              </>
+            )}
+            {shipper && (
+              <View className="flex-col bg-white rounded-lg">
                 <TouchableOpacity
-                  activeOpacity={1}
-                  className="flex-row flex-1 items-center justify-center py-3 border-r border-gray-100 space-x-2"
-                >
-                  <MaterialCommunityIcons
-                    name="android-messages"
-                    size={24}
-                    color="#3422F1"
-                  />
-                  <Text className="font-medium">Nhắn Tin</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  activeOpacity={1}
                   onPress={() =>
-                    call({
-                      number: 123456789, // String value with the number to call
-                      prompt: false, // Optional boolean property. Determines if the user should be prompted prior to the call
-                      skipCanOpen: true, // Skip the canOpenURL check
+                    navigation.navigate(ROUTES.VIEW_FEEDBACK_STACK, {
+                      shipper: shipper,
                     })
                   }
-                  className="flex-row flex-1 items-center justify-center space-x-2"
+                  className="flex-row px-3 py-4"
                 >
-                  <Feather name="phone" size={24} color="#3422F1" />
-                  <Text className="font-medium">Gọi Điện</Text>
+                  <View className="basis-2/6 px-3">
+                    <Image
+                      source={{ uri: shipper?.user.avatar }}
+                      className="h-14 w-14 rounded-full"
+                    />
+                  </View>
+                  <View className="basis-4/6 flex-col space-y-1">
+                    <Text>{`${shipper?.user?.firstName} ${shipper?.user?.lastName}`}</Text>
+                    <View className="flex-row items-center space-x-1">
+                      <AntDesign name="star" size={15} color="#FFB534" />
+                      <Text className="text-xs text-gray-600">
+                        {shipper?.ratings &&
+                          averageRatingPoint(shipper?.ratings)}
+                      </Text>
+                    </View>
+                    <View className="bg-gray-100 rounded-md px-1">
+                      <Text className="text-xs text-gray-600 font-semibold">{`${shipper?.vehicleNumber} ${shipper?.vehicle.name}`}</Text>
+                    </View>
+                  </View>
                 </TouchableOpacity>
-              </View>
-            </View>
-          )}
-        </View>
-        {/* ------------ Order sumary---------- */}
-        <View className="flex-col bg-white rounded-lg mb-5">
-          <View className="border-b border-gray-300 py-2">
-            <Text className="text-gray-600 pl-4 py-1">
-              {post?.vehicleType?.name}
-            </Text>
-          </View>
-          {/* -----Time----- */}
-          <View className="flex-col px-4 pt-6">
-            <View className="flex-row">
-              <View className="basis-1/6"></View>
-              <View>
-                <Text className="basis-5/6 text-gray-600">
-                  {/* {pickupDatetime} */}
-                </Text>
-              </View>
-            </View>
-          </View>
-          {/* -----Places and Payment method----- */}
-          <View className="flex-col px-4 pb-4 space-y-4">
-            {/* -----------Drop Location------------- */}
-            <View className="flex-row ">
-              <View className="basis-1/6 flex justify-center items-center">
-                <Entypo name="circle" size={18} color="#3422F1" />
-              </View>
-              <View className="flex-col basis-5/6 ">
-                <View className="flex-row items-center ">
-                  <Text className="text-lg font-semibold">
-                    {post?.pickupLocation?.addressLine}
-                  </Text>
-                  {post?.payment?.posterPay && (
-                    <View className="ml-2 p-1 rounded-md bg-gray-300">
-                      <Text>
-                        {getVNPaymentMethodName(post?.payment?.paymentMethod)}
-                      </Text>
-                    </View>
-                  )}
+                <View className="flex-row border-t border-gray-200">
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    className="flex-row flex-1 items-center justify-center py-3 border-r border-gray-100 space-x-2"
+                  >
+                    <MaterialCommunityIcons
+                      name="android-messages"
+                      size={24}
+                      color="#3422F1"
+                    />
+                    <Text className="font-medium">Nhắn Tin</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    activeOpacity={1}
+                    onPress={() =>
+                      call({
+                        number: 123456789, // String value with the number to call
+                        prompt: false, // Optional boolean property. Determines if the user should be prompted prior to the call
+                        skipCanOpen: true, // Skip the canOpenURL check
+                      })
+                    }
+                    className="flex-row flex-1 items-center justify-center space-x-2"
+                  >
+                    <Feather name="phone" size={24} color="#3422F1" />
+                    <Text className="font-medium">Gọi Điện</Text>
+                  </TouchableOpacity>
                 </View>
-                <Text className="text-gray-600">
-                  {post?.pickupLocation?.formattedAddress}
-                </Text>
               </View>
+            )}
+          </View>
+          {/* ------------ Order sumary---------- */}
+          <View className="flex-col bg-white rounded-lg mb-5">
+            <View className="border-b border-gray-300 py-2">
+              <Text className="text-gray-600 pl-4 py-1">
+                {post?.vehicleType?.name}
+              </Text>
             </View>
-            {/* -----------Pick up location------------- */}
-            <View className="flex-row ">
-              <View className="basis-1/6 flex justify-center items-center">
-                <Foundation name="marker" size={28} color="#3422F1" />
-              </View>
-              <View className="flex-col basis-5/6 ">
-                <View className="flex-row items-center ">
-                  <Text className="text-lg font-semibold">
-                    {post?.dropLocation?.addressLine}
+            {/* -----Time----- */}
+            <View className="flex-col px-4 pt-6">
+              <View className="flex-row">
+                <View className="basis-1/6"></View>
+                <View>
+                  <Text className="basis-5/6 text-gray-600">
+                    {/* {pickupDatetime} */}
                   </Text>
-                  {!post?.payment?.posterPay && (
-                    <View className="ml-2 p-1 rounded-md bg-gray-300">
-                      <Text>
-                        {getVNPaymentMethodName(post?.payment?.paymentMethod)}
-                      </Text>
-                    </View>
-                  )}
                 </View>
-                <Text className="text-gray-600">
-                  {post?.dropLocation?.formattedAddress}
-                </Text>
+              </View>
+            </View>
+            {/* -----Places and Payment method----- */}
+            <View className="flex-col px-4 pb-4 space-y-4">
+              {/* -----------Drop Location------------- */}
+              <View className="flex-row ">
+                <View className="basis-1/6 flex justify-center items-center">
+                  <Entypo name="circle" size={18} color="#3422F1" />
+                </View>
+                <View className="flex-col basis-5/6 ">
+                  <View className="flex-row items-center ">
+                    <Text className="text-lg font-semibold">
+                      {post?.pickupLocation?.addressLine}
+                    </Text>
+                    {post?.payment?.posterPay && (
+                      <View className="ml-2 p-1 rounded-md bg-gray-300">
+                        <Text>
+                          {getVNPaymentMethodName(post?.payment?.paymentMethod)}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text className="text-gray-600">
+                    {post?.pickupLocation?.formattedAddress}
+                  </Text>
+                </View>
+              </View>
+              {/* -----------Pick up location------------- */}
+              <View className="flex-row ">
+                <View className="basis-1/6 flex justify-center items-center">
+                  <Foundation name="marker" size={28} color="#3422F1" />
+                </View>
+                <View className="flex-col basis-5/6 ">
+                  <View className="flex-row items-center ">
+                    <Text className="text-lg font-semibold">
+                      {post?.dropLocation?.addressLine}
+                    </Text>
+                    {!post?.payment?.posterPay && (
+                      <View className="ml-2 p-1 rounded-md bg-gray-300">
+                        <Text>
+                          {getVNPaymentMethodName(post?.payment?.paymentMethod)}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text className="text-gray-600">
+                    {post?.dropLocation?.formattedAddress}
+                  </Text>
+                </View>
+              </View>
+            </View>
+            {/* -----------------Share location---------------- */}
+            <View className="border-t border-gray-300 py-4 flex justify-center items-center">
+              <View className="flex-row items-center space-x-1">
+                <Ionicons name="share-outline" size={24} color="black" />
+                <Text className="text-lg font-semibold">Chia sẻ</Text>
               </View>
             </View>
           </View>
-          {/* -----------------Share location---------------- */}
-          <View className="border-t border-gray-300 py-4 flex justify-center items-center">
-            <View className="flex-row items-center space-x-1">
-              <Ionicons name="share-outline" size={24} color="black" />
-              <Text className="text-lg font-semibold">Chia sẻ</Text>
-            </View>
-          </View>
-        </View>
 
-        {/* ------------ Additional info ---------- */}
-        <View className="flex-col bg-white rounded-lg mb-5 ">
-          <View className="border-b border-gray-300 py-2">
-            <Text className="text-gray-600 pl-4 py-1">Thông tin thêm</Text>
-          </View>
-          <View className="px-4 border-b border-gray-300">
-            <View className="flex-row justify-between items-center py-3">
-              <View className="flex-col">
-                <Text className="text-base  font-semibold">
-                  {post?.id && uuidToNumber(post?.id)}
-                </Text>
-                <Text className="text-gray-600">Mã đơn hàng</Text>
-              </View>
-              <View>
-                <MaterialIcons name="content-copy" size={24} color="black" />
+          {/* ------------ Additional info ---------- */}
+          <View className="flex-col bg-white rounded-lg mb-5 ">
+            <View className="border-b border-gray-300 py-2">
+              <Text className="text-gray-600 pl-4 py-1">Thông tin thêm</Text>
+            </View>
+            <View className="px-4 border-b border-gray-300">
+              <View className="flex-row justify-between items-center py-3">
+                <View className="flex-col">
+                  <Text className="text-base  font-semibold">
+                    {post?.id && uuidToNumber(post?.id)}
+                  </Text>
+                  <Text className="text-gray-600">Mã đơn hàng</Text>
+                </View>
+                <View>
+                  <MaterialIcons name="content-copy" size={24} color="black" />
+                </View>
               </View>
             </View>
-          </View>
-          <View className="px-4 border-b border-gray-300">
-            <View className="flex-col py-3">
-              <Text className="text-base  font-semibold">{`${post?.pickupLocation?.contact} ${post?.pickupLocation?.phoneNumber}`}</Text>
-              <Text className="text-gray-600">Thông tin liên hệ</Text>
+            <View className="px-4 border-b border-gray-300">
+              <View className="flex-col py-3">
+                <Text className="text-base  font-semibold">{`${post?.pickupLocation?.contact} ${post?.pickupLocation?.phoneNumber}`}</Text>
+                <Text className="text-gray-600">Thông tin liên hệ</Text>
+              </View>
+            </View>
+            <View className="flex-col px-4 pt-3 pb-5">
+              <Text className="text-base font-semibold">
+                {post?.product?.category.name}
+              </Text>
+              <Text className="text-base  font-semibold">
+                {post?.product?.quantity} gói hàng
+              </Text>
+              <Text className="text-gray-600">Chi tiết đơn hàng</Text>
             </View>
           </View>
-          <View className="flex-col px-4 pt-3 pb-5">
-            <Text className="text-base font-semibold">
-              {post?.product?.category.name}
+          {/* -----------------Fee---------------- */}
+          <View className="flex-row justify-between items-center bg-white rounded-lg px-4 py-5 mb-14 ">
+            <Text className="text-base font-semibold text-gray-600">
+              {getVNPaymentMethodName(post?.payment?.paymentMethod)}
             </Text>
-            <Text className="text-base  font-semibold">
-              {post?.product?.quantity} gói hàng
-            </Text>
-            <Text className="text-gray-600">Chi tiết đơn hàng</Text>
+            <View className="flex-row space-x-2 items-center">
+              <Text className="text-lg font-bold">
+                {post?.payment?.price && formatCurrency(post?.payment?.price)}
+              </Text>
+              <AntDesign name="exclamationcircleo" size={20} color="black" />
+            </View>
           </View>
-        </View>
-        {/* -----------------Fee---------------- */}
-        <View className="flex-row justify-between items-center bg-white rounded-lg px-4 py-5 mb-14 ">
-          <Text className="text-base font-semibold text-gray-600">
-            {getVNPaymentMethodName(post?.payment?.paymentMethod)}
-          </Text>
-          <View className="flex-row space-x-2 items-center">
-            <Text className="text-lg font-bold">
-              {post?.payment?.price && formatCurrency(post?.payment?.price)}
-            </Text>
-            <AntDesign name="exclamationcircleo" size={20} color="black" />
-          </View>
-        </View>
-      </ScrollView>
-
-      <RBSheet
-        ref={notFoundShipperState}
-        closeOnPressMask={false}
-        customStyles={{
-          wrapper: {
-            backgroundColor: "rgba(0,0,0,0.3)",
-          },
-          draggableIcon: {
-            backgroundColor: "#000",
-          },
-          container: {
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
-            overflow: "hidden",
-            height: 450,
-          },
-        }}
-      >
-        <View className="px-4 pb-8 flex-col justify-between">
-          <View className="flex-col py-4 items-center">
-            <Image
-              className="w-60 h-40"
-              source={require("../../assets/animations/looking.gif")}
-            />
-          </View>
-          <View className="mb-4">
-            <Text className="text-2xl font-bold">
-              Rất tiếc, không tìm thấy bác tài gần bạn
-            </Text>
-            <Text className="text-base mt-2">
-              Chúng tôi đang cố gắng hết sức để khắc phục tình huống này. Vui
-              lòng thử lại nếu bạn vẫn cần tìm người giao đơn hàng của bạn.
-            </Text>
-          </View>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={placeOrderAgain}
-            className="flex justify-center items-center bg-[#3422F1] py-3 rounded-lg"
-          >
-            <Text className="text-lg font-bold text-white">Ok</Text>
-          </TouchableOpacity>
-        </View>
-      </RBSheet>
+        </ScrollView>
+      )}
     </View>
   );
 };

@@ -19,9 +19,7 @@ export const INITIAL_ADDRESS = {
 };
 
 export const INIT_STATE = {
-  pickupLocation: {
-    addressLine: "",
-  },
+  pickupLocation: INITIAL_ADDRESS,
   dropLocation: INITIAL_ADDRESS,
   deliveryTimeType: DELIVERY_TIME_TYPE.NOW,
   pickupDatetime: {
@@ -69,11 +67,18 @@ const shipmentSlice = createSlice({
       Object.assign(state, INIT_STATE);
     },
     saveStateAsTemp: (state, action) => {
-      const temp = state;
-      Object.assign(state, { temp: temp });
+      return {
+        ...INIT_STATE,
+        temp: { ...state },
+      };
     },
     restoreStateFromTemp: (state, action) => {
-      Object.assign(state, state.temp);
+      if (state.temp) {
+        return {
+          ...state.temp,
+        };
+      }
+      return state;
     },
     addPickUp: (state, action) => {
       for (var key in action.payload) {

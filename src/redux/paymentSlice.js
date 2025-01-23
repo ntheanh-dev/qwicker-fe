@@ -12,18 +12,24 @@ const paymentSlice = createSlice({
   name: "orderdetail",
   initialState: {
     payment: INIT_PAYMENT,
-    status: "idle",
   },
   reducers: {
     resetPaymentSlice: (state, action) => {
       Object.assign(state, INIT_PAYMENT);
     },
     saveStateAsTemp: (state, action) => {
-      const temp = state;
-      Object.assign(state, { temp: temp });
+      return {
+        payment: { ...INIT_PAYMENT },
+        temp: { ...state },
+      };
     },
     restoreStateFromTemp: (state, action) => {
-      Object.assign(state, state.temp);
+      if (state.temp) {
+        return {
+          ...state.temp,
+        };
+      }
+      return state;
     },
     addPayment: (state, action) => {
       state.payment = action.payload;
