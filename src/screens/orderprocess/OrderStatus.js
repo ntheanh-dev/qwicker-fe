@@ -27,7 +27,7 @@ import {
   getVNPaymentMethodName,
   uuidToNumber,
 } from "../../features/ultils";
-import { JOBSTATUS, POSTSTATUS, ROUTES } from "../../constants";
+import { JOBSTATUS, POSTSTATUS, ROUTES, WS_MSG_TYPE } from "../../constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getBasicUserToken,
@@ -71,7 +71,7 @@ const OrderStatus = ({ navigation, route }) => {
       routeCoordinates: [],
     }
   );
-  const [isNotFoundShipper, setIsNotFoundShipper] = useState(true);
+  const [isRequestShipperTimeOut, setIsRequestShipperTimeOut] = useState(false);
   // === REF ===
   const animatedColor = useRef(new Animated.Value(0)).current;
   const animatedScale = useRef(new Animated.Value(0)).current;
@@ -135,70 +135,81 @@ const OrderStatus = ({ navigation, route }) => {
         //---------------------websocket-----------------
         chanel = `/topic/post/${orderId}`;
         ws.subscribe(chanel, (message) => {
-          const messageBody = JSON.parse(message.body);
-          if (messageBody.messageType === "FOUND_SHIPPER") {
-            setPost({
-              ...JSON.parse(messageBody.postResponse),
-              status: JOBSTATUS.FOUND_SHIPPER,
-            });
-            setShipper(JSON.parse(messageBody.shipperResponse));
-            setLoading(true);
-            dispatch(
-              getCurrentShipperLocation({
-                access_token: access_token,
-                shipperId: messageBody.shipper.id,
-              })
-            )
-              .then(unwrapResult)
-              .then((shipperLocation) => {
-                const sPoint = {
-                  latitude: shipperLocation.latitude,
-                  longitude: shipperLocation.longitude,
-                };
-                const ePoint = {
-                  latitude: res?.pickupLocation?.latitude,
-                  longitude: res?.pickupLocation?.longitude,
-                };
-                setStartPoint(sPoint);
-                setEndpoint(ePoint);
-                setShipperPoint(sPoint);
-                getRoutePaths(sPoint, ePoint);
-                setLoading(false);
-              })
-              .catch((e) => {
-                setLoading(false);
+          console.log("new message: ", JSON.parse(message.body));
+
+          const body = JSON.parse(message.body);
+          const type = body.postMessageType;
+          switch (type) {
+            case WS_MSG_TYPE.NOT_FOUND_SHIPPER:
+              setIsRequestShipperTimeOut(true);
+            case WS_MSG_TYPE.FOUND_SHIPPER:
+              setPost({
+                ...JSON.parse(messageBody.postResponse),
+                status: JOBSTATUS.FOUND_SHIPPER,
               });
-            Toast.show({
-              type: ALERT_TYPE.SUCCESS,
-              title: `Tìm thấy một shipper`,
-            });
-          } else if (messageBody.messageType === "SHIPPER_LOCATION") {
-            setShipperPoint({
-              latitude: messageBody.latitude,
-              longitude: messageBody.longitude,
-            });
-          } else if (messageBody.messageType === "UPDATE_POST_STATUS") {
-            //-------------Done------------
-            if (JOBSTATUS.DELIVERED === messageBody.content) {
+              setShipper(JSON.parse(messageBody.shipperResponse));
+              setLoading(true);
+              dispatch(
+                getCurrentShipperLocation({
+                  access_token: access_token,
+                  shipperId: messageBody.shipper.id,
+                })
+              )
+                .then(unwrapResult)
+                .then((shipperLocation) => {
+                  const sPoint = {
+                    latitude: shipperLocation.latitude,
+                    longitude: shipperLocation.longitude,
+                  };
+                  const ePoint = {
+                    latitude: res?.pickupLocation?.latitude,
+                    longitude: res?.pickupLocation?.longitude,
+                  };
+                  setStartPoint(sPoint);
+                  setEndpoint(ePoint);
+                  setShipperPoint(sPoint);
+                  getRoutePaths(sPoint, ePoint);
+                  setLoading(false);
+                })
+                .catch((e) => {
+                  setLoading(false);
+                });
               Toast.show({
                 type: ALERT_TYPE.SUCCESS,
-                title: `Đơn Hàng Của Bạn Đã Được Giao`,
+                title: `Tìm thấy một shipper`,
               });
-              navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, {
-                orderId: post.id,
+              break;
+            case POSTSTATUS.SHIPPER_LOCATION:
+              setShipperPoint({
+                latitude: messageBody.latitude,
+                longitude: messageBody.longitude,
               });
-            } else if (JOBSTATUS.SHIPPED === messageBody.content) {
-              //-------------The order has been picked up and is currently being shipped
-              const ePoint = {
-                latitude: post.pickupLocation.latitude,
-                longitude: post.pickupLocation.longitude,
-              };
-              setEndpoint(ePoint);
-              getRoutePaths(shipperPoint, ePoint);
-            }
-            setPost((prev) => {
-              return { ...prev, status: messageBody.content };
-            });
+              break;
+            case WS_MSG_TYPE.UPDATE_POST_STATUS:
+              //-------------Done------------
+              if (JOBSTATUS.DELIVERED === messageBody.content) {
+                Toast.show({
+                  type: ALERT_TYPE.SUCCESS,
+                  title: `Đơn Hàng Của Bạn Đã Được Giao`,
+                });
+                navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, {
+                  orderId: post.id,
+                });
+              } else if (JOBSTATUS.SHIPPED === messageBody.content) {
+                //-------------The order has been picked up and is currently being shipped
+                const ePoint = {
+                  latitude: post.pickupLocation.latitude,
+                  longitude: post.pickupLocation.longitude,
+                };
+                setEndpoint(ePoint);
+                getRoutePaths(shipperPoint, ePoint);
+              }
+              setPost((prev) => {
+                return { ...prev, status: messageBody.content };
+              });
+              break;
+            default:
+              console.log("NOT SUPPORT MESSAGE WITH TYPE: ", type);
           }
         });
         //-----------------get winner---------------------
@@ -379,7 +390,7 @@ const OrderStatus = ({ navigation, route }) => {
         )
       )}
 
-      {isNotFoundShipper ? (
+      {isRequestShipperTimeOut ? (
         <View
           style={{ backgroundColor: "rgba(0,0,0,0.3)" }}
           className="absolute top-0 left-0 right-0 bottom-0 flex justify-end "
