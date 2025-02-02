@@ -17,6 +17,7 @@ export const END_POINTS = {
   "find-user-profile": (type) => `profile/users/my-profile?type=${type}`,
   "find-shipper-profile": "profile/shippers/my-profile",
   token: "/identity/auth/token",
+  "shippment-accept": (id) => `post/posts/${id}/shipment-accept`,
 };
 
 export const authAPIv3 = (access_token) =>

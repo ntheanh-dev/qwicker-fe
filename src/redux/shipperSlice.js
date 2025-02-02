@@ -165,22 +165,6 @@ export const getDirection = createAsyncThunk(
   }
 );
 
-export const getNumShipperJoined = createAsyncThunk(
-  "numShipperJoined, getNumShipperJoined",
-  async (data, { rejectWithValue }) => {
-    const { token, jobId } = data;
-    try {
-      const res = await authAPI(token).get(
-        POST_ENDPOINTS["get-num-shipper-joined"](jobId)
-      );
-      return res.data.result.num;
-    } catch (err) {
-      console.log(err);
-      return rejectWithValue(err?.response);
-    }
-  }
-);
-
 export const getInComeStatistic = createAsyncThunk(
   "statistic, getStatistic",
   async (data, { rejectWithValue }) => {
@@ -195,15 +179,15 @@ export const getInComeStatistic = createAsyncThunk(
   }
 );
 
-export const joinJob = createAsyncThunk(
-  "job, joinJob",
+export const acceptDelivery = createAsyncThunk(
+  "accept, acceptDelivery",
   async (data, { rejectWithValue }) => {
     const { token, postId } = data;
     try {
-      const res = await authAPI(token).post(
-        POST_ENDPOINTS["get-post-by-id"](postId)
+      const res = await authAPIv3(token).post(
+        END_POINTS["shippment-accept"](postId)
       );
-      return res.status;
+      return res.data;
     } catch (err) {
       console.log(err);
       return rejectWithValue(err?.response);

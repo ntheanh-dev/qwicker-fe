@@ -144,36 +144,41 @@ const OrderStatus = ({ navigation, route }) => {
               setIsRequestShipperTimeOut(true);
             case WS_MSG_TYPE.FOUND_SHIPPER:
               setPost({
-                ...JSON.parse(messageBody.postResponse),
+                ...post,
                 status: JOBSTATUS.FOUND_SHIPPER,
               });
-              setShipper(JSON.parse(messageBody.shipperResponse));
-              setLoading(true);
-              dispatch(
-                getCurrentShipperLocation({
-                  access_token: access_token,
-                  shipperId: messageBody.shipper.id,
-                })
-              )
-                .then(unwrapResult)
-                .then((shipperLocation) => {
-                  const sPoint = {
-                    latitude: shipperLocation.latitude,
-                    longitude: shipperLocation.longitude,
-                  };
-                  const ePoint = {
-                    latitude: res?.pickupLocation?.latitude,
-                    longitude: res?.pickupLocation?.longitude,
-                  };
-                  setStartPoint(sPoint);
-                  setEndpoint(ePoint);
-                  setShipperPoint(sPoint);
-                  getRoutePaths(sPoint, ePoint);
-                  setLoading(false);
-                })
-                .catch((e) => {
-                  setLoading(false);
-                });
+              console.log(
+                "Shipper profile: ",
+                JSON.parse(messageBody.shipperProfile)
+              );
+
+              // setShipper(JSON.parse(messageBody.shipperProfile));
+              // setLoading(true);
+              // dispatch(
+              //   getCurrentShipperLocation({
+              //     access_token: access_token,
+              //     shipperId: messageBody.shipper.id,
+              //   })
+              // )
+              //   .then(unwrapResult)
+              //   .then((shipperLocation) => {
+              //     const sPoint = {
+              //       latitude: shipperLocation.latitude,
+              //       longitude: shipperLocation.longitude,
+              //     };
+              //     const ePoint = {
+              //       latitude: res?.pickupLocation?.latitude,
+              //       longitude: res?.pickupLocation?.longitude,
+              //     };
+              //     setStartPoint(sPoint);
+              //     setEndpoint(ePoint);
+              //     setShipperPoint(sPoint);
+              //     getRoutePaths(sPoint, ePoint);
+              //     setLoading(false);
+              //   })
+              //   .catch((e) => {
+              //     setLoading(false);
+              //   });
               Toast.show({
                 type: ALERT_TYPE.SUCCESS,
                 title: `Tìm thấy một shipper`,

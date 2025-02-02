@@ -11,7 +11,6 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getDistance,
-  getNumShipperJoined,
   getShipperProfile,
   getToken,
 } from "../../../redux/shipperSlice";
@@ -37,9 +36,6 @@ const PickOrder = ({ route, navigation }) => {
   const [showImage, setShowImage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [distance, setDistance] = useState();
-  const [numShipperJoin, setNumShipperJoin] = useState(2);
-  const [isJoined, setIsJoined] = useState(false);
-  const [isPostTaken, setIsPostTaken] = useState(false);
   // === SELECTOR ===
   const { id } = useSelector(getShipperProfile);
   const { access_token } = useSelector(getToken);
@@ -116,52 +112,50 @@ const PickOrder = ({ route, navigation }) => {
   }, [data]);
   // === HELPER ===
   const handleJoinJob = () => {
-    if (!isJoined && !isPostTaken) {
-      setIsJoined(true);
-      if (ws && ws.connected) {
-        ws.publish({
-          destination: `/app/post/${data.id}`,
-          body: {
-            messageType: "REQUEST_JOIN_POST",
-          },
+    dispatch(acceptDelivery({ access_token: access_token, postId: data.id }))
+      .then(unwrapResult)
+      .then((res) => {
+        Toast.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: "Nhận đơn hàng thành công!",
         });
-      } else {
+        navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, { data: post });
+      })
+      .catch((res) => {
         Toast.show({
           type: ALERT_TYPE.WARNING,
           title: "Tham gia thất bại",
-          textBody: "Lỗi hệ thống do websocket",
+          textBody: "Đơn hàng này đã được nhận bởi người khác",
         });
-      }
-    } else {
-      Toast.show({
-        type: ALERT_TYPE.WARNING,
-        title: "Tham gia thất bại",
-        textBody: "Đơn hàng này đã được nhận bởi người khác",
+        navigation.navigate(ROUTES.FIND_ORDER_DRIVER_TAB, {
+          removePostID: data.id,
+        });
       });
-      navigation.navigate(ROUTES.FIND_ORDER_DRIVER_TAB, {
-        removePostID: data.id,
-      });
-    }
   };
 
   const viewDistance = async (type) => {
     setLoading(true);
     const startPoint = await getCurrentLocation();
     setLoading(false);
-    if (type === LOCATION.pickupLocation) {
-      navigation.navigate(ROUTES.DRIVER_VIEW_DISTANCE, {
-        locationType: type,
-        startPoint: startPoint,
-        endPoint: pickupLocation,
-        data: data,
-      });
-    } else {
-      navigation.navigate(ROUTES.DRIVER_VIEW_DISTANCE, {
-        startPoint: startPoint,
-        endPoint: dropLocation,
-        locationType: type,
-        data: data,
-      });
+    switch (type) {
+      case LOCATION.pickupLocation:
+        navigation.navigate(ROUTES.DRIVER_VIEW_DISTANCE, {
+          locationType: type,
+          startPoint: startPoint,
+          endPoint: pickupLocation,
+          data: data,
+        });
+        break;
+      case LOCATION.dropLocation:
+        navigation.navigate(ROUTES.DRIVER_VIEW_DISTANCE, {
+          startPoint: startPoint,
+          endPoint: dropLocation,
+          locationType: type,
+          data: data,
+        });
+        break;
+      default:
+        console.log("Unsupport type: ", type);
     }
   };
 
@@ -313,9 +307,6 @@ const PickOrder = ({ route, navigation }) => {
             <View className="flex items-start">
               <Text className="text-xl font-semibold">
                 {isJoined ? "Đừng rời đi" : "Hãy trở thành người đầu tiên"}
-              </Text>
-              <Text className="text-base font-medium text-gray-400 ">
-                {numShipperJoin} Tài xế đang tham gia
               </Text>
             </View>
           </View>
