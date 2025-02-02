@@ -8,6 +8,7 @@ import STATISTIC_TYPE from "./statisticType";
 import PROFILE_TYPE from "./profileType";
 import PAYMENT_METHOD from "./paymentMethod";
 import DELIVERY_TIME_TYPE from "./deliveryTimeType";
+import WS_MSG_TYPE from "./wsMessageType";
 export {
   ROUTES,
   COLORS,
@@ -19,4 +20,5 @@ export {
   PROFILE_TYPE,
   PAYMENT_METHOD,
   DELIVERY_TIME_TYPE,
+  WS_MSG_TYPE,
 };

@@ -1,6 +1,7 @@
 import axios from "axios";
-export const BASE_URL = "http://192.168.100.36:8888/api/v3/";
-export const webSocketUrl = "http://192.168.100.36:8088/websocket/ws";
+const IP = "172.20.10.5";
+export const BASE_URL = `http://${IP}:8888/api/v3/`;
+export const webSocketUrl = `http://${IP}:8088/websocket/ws`;
 export const END_POINTS = {
   "check-username-exists": "identity/accounts/check-username-exists",
   "check-email-exists": "identity/accounts/check-email-exists",
@@ -10,6 +11,7 @@ export const END_POINTS = {
   "find-all-vehicel": "post/vehicles",
   "find-all-product-category": "post/product-category",
   "create-post": "post/posts",
+  "change-status": "identity/accounts/change-status",
   "find-post-by-id": (id) => `post/posts/${id}`,
   "find-post-by-status-list": (params) => `/api/posts?${params}`,
   "find-user-profile": (type) => `profile/users/my-profile?type=${type}`,

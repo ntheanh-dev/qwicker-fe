@@ -280,6 +280,15 @@ export const setOnline = createAsyncThunk(
     const { ws, shipperId } = data;
     try {
       if (ws.connected) {
+        // Change status
+        const { shipperSlice } = getState();
+        const access_token = shipperSlice?.token?.access_token;
+        console.log("access_token: ", access_token);
+
+        await authAPIv3(access_token).post(END_POINTS["change-status"], {
+          status: "READY_FOR_TAKE_ORDER",
+        });
+
         return setInterval(async () => {
           const newLocation = await getCurrentLocation();
           const { shipperSlice } = getState();
@@ -301,7 +310,7 @@ export const setOnline = createAsyncThunk(
             body: body,
           });
           dispatch(setLocation(newLocation));
-        }, 5000);
+        }, 10000);
       }
     } catch (err) {
       console.error("Error in setOnline:", err);
@@ -315,9 +324,14 @@ export const setOfflie = createAsyncThunk(
   async (ws, { getState, rejectWithValue, dispatch }) => {
     const { shipperSlice } = getState();
     const { lastTimeoutId } = shipperSlice;
-    console.log("LastTimeoutId: ", lastTimeoutId);
-
     try {
+      // Change status
+      const { shipperSlice } = getState();
+      const access_token = shipperSlice?.token?.access_token;
+      await authAPIv3(access_token).post(END_POINTS["change-status"], {
+        status: "ONLINE",
+      });
+
       if (lastTimeoutId) {
         clearInterval(lastTimeoutId);
         ws.deactivate();
