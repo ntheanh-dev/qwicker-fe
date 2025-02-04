@@ -182,14 +182,14 @@ export const getInComeStatistic = createAsyncThunk(
 export const acceptDelivery = createAsyncThunk(
   "accept, acceptDelivery",
   async (data, { rejectWithValue }) => {
-    const { token, postId } = data;
+    const { access_token, postId } = data;
     try {
-      const res = await authAPIv3(token).post(
-        END_POINTS["shippment-accept"](postId)
+      const res = await authAPIv3(access_token).post(
+        END_POINTS["shipment-accept"](postId)
       );
       return res.data;
     } catch (err) {
-      console.log(err);
+      console.log(err?.response);
       return rejectWithValue(err?.response);
     }
   }
