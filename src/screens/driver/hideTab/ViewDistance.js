@@ -4,7 +4,7 @@ import MapView, { Marker, Polyline } from "react-native-maps";
 import { MaterialIcons, Entypo } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "react-native-loading-spinner-overlay";
-import { calculateInitialRegion } from "../../../features/ultils";
+import { calculateRegionWithTowPoint } from "../../../features/ultils";
 import { LOCATION, ROUTES } from "../../../constants";
 import { getDirection, getShipperProfile } from "../../../redux/shipperSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
@@ -26,10 +26,11 @@ const ViewDistance = ({ navigation, route }) => {
     )
       .then(unwrapResult)
       .then((res) => {
-        const points = polyline
-          .decode(res?.overview_polyline?.points)
-          .map(([latitude, longitude]) => ({ latitude, longitude }));
-        setCoordinates(points);
+        setCoordinates(res);
+        mapRef.current.fitToCoordinates(res, {
+          edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
+          animated: true,
+        });
         setLoading(false);
       })
       .catch((err) => {
@@ -37,15 +38,6 @@ const ViewDistance = ({ navigation, route }) => {
         console.error(err);
       });
   }, []);
-
-  useEffect(() => {
-    if (mapRef.current) {
-      mapRef.current.fitToCoordinates([{ ...startPoint }, { ...endPoint }], {
-        edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
-        animated: true,
-      });
-    }
-  }, [startPoint, endPoint]);
 
   const handleBack = () => {
     navigation.navigate(ROUTES.PICK_ORDER_DRIVER_TAB, { data: data });
@@ -57,7 +49,7 @@ const ViewDistance = ({ navigation, route }) => {
       <MapView
         className="w-full h-full"
         ref={mapRef}
-        initialRegion={calculateInitialRegion(startPoint, endPoint)}
+        initialRegion={calculateRegionWithTowPoint(startPoint, endPoint)}
       >
         <Marker.Animated coordinate={startPoint}>
           <Image

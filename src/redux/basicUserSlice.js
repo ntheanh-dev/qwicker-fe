@@ -9,8 +9,14 @@ import API, {
   POST_ENDPOINTS,
 } from "../configs/API";
 import { objectToFormData } from "../features/ultils";
-import APIv3, { authAPIv3, END_POINTS, ENG_POINTS } from "../configs/APIv3";
+import APIv3, {
+  authAPIv3,
+  END_POINTS,
+  ENG_POINTS,
+  googMapDirection,
+} from "../configs/APIv3";
 import { PROFILE_TYPE } from "../constants";
+var polyline = require("@mapbox/polyline");
 
 const INIT_STATE = {
   user: {},
@@ -265,17 +271,31 @@ export const getWinShipper = createAsyncThunk(
   }
 );
 
-export const getCurrentShipperLocation = createAsyncThunk(
+export const getCurrentShipperLocationAndGetRoute = createAsyncThunk(
   "shipperLocation,getWinShipperLocation",
   async (data, { rejectWithValue }) => {
-    const { access_token, shipperId } = data;
+    const { access_token, shipperId, destination } = data;
     try {
-      const res = await authAPI(access_token).get(
-        ENDPOINTS["current-shipper-location"](shipperId)
+      const r1 = await authAPIv3(access_token).get(
+        END_POINTS["shipper-location"](shipperId)
       );
-      return res.data.result;
+
+      const r2 = await googMapDirection(
+        `${r1.data?.result.latitude},${r1.data?.result.longitude}`,
+        `${destination.latitude},${destination.longitude}`
+      ).get();
+
+      const points = polyline
+        .decode(r2?.data?.routes[0].overview_polyline?.points)
+        .map(([latitude, longitude]) => ({ latitude, longitude }));
+
+      return {
+        shipperLocation: r1.data?.result,
+        routes: points,
+      };
     } catch (err) {
-      return rejectWithValue(err?.response.data);
+      console.log("Error while getting shipperlocation: ", err);
+      return rejectWithValue(err?.response?.data);
     }
   }
 );

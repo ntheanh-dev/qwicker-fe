@@ -15,6 +15,7 @@ import APIv3, {
   googMapDistanceMatrix,
   virtualearthDrivingv3,
 } from "../configs/APIv3";
+var polyline = require("@mapbox/polyline");
 
 const INIT_STATE = {
   user: {},
@@ -158,7 +159,10 @@ export const getDirection = createAsyncThunk(
     const { origin, destination } = data;
     try {
       const res = await googMapDirection(origin, destination).get();
-      return res?.data?.routes[0];
+      const points = polyline
+        .decode(res?.data?.routes[0].overview_polyline?.points)
+        .map(([latitude, longitude]) => ({ latitude, longitude }));
+      return points;
     } catch (err) {
       return rejectWithValue(err);
     }

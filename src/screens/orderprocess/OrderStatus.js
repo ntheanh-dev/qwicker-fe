@@ -8,7 +8,13 @@ import {
   ScrollView,
   Button,
 } from "react-native";
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import call from "react-native-phone-call";
 import {
@@ -23,6 +29,8 @@ import {
 import { Easing } from "react-native-reanimated";
 import {
   averageRatingPoint,
+  calculateInitialRegion,
+  calculateRegionWithTowPoint,
   formatCurrency,
   getVNPaymentMethodName,
   uuidToNumber,
@@ -31,22 +39,22 @@ import { JOBSTATUS, POSTSTATUS, ROUTES, WS_MSG_TYPE } from "../../constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getBasicUserToken,
-  getCurrentShipperLocation,
+  getCurrentShipperLocationAndGetRoute,
   getWinShipper,
   retrieve,
 } from "../../redux/basicUserSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { getSocket } from "../../redux/socketSlice";
-import { getDuration } from "../../redux/shipperSlice";
+import { getDirection, getDuration } from "../../redux/shipperSlice";
 import Spinner from "react-native-loading-spinner-overlay";
 import RBSheet from "react-native-raw-bottom-sheet";
 import { restoreStateFromTemp as restoreStateFromTempPayment } from "../../redux/paymentSlice";
 import { restoreStateFromTemp as restoreStateFromTempShipment } from "../../redux/shipmentSlice";
 import { restoreStateFromTemp as restoreStateFromTempOrder } from "../../redux/orderSlice";
 import { restoreStateFromTemp as restoreStateFromTempProduct } from "../../redux/productSlice";
+import { getVehicles } from "../../redux/appSlice";
 const { width, height } = Dimensions.get("window");
-
 const OrderStatus = ({ navigation, route }) => {
   // === PARAMS ===
   let { orderId } = route.params;
@@ -55,19 +63,29 @@ const OrderStatus = ({ navigation, route }) => {
   const { access_token } = useSelector(getBasicUserToken);
   const ws = useSelector(getSocket);
   // === STATE ===
-  const [post, setPost] = useState();
-  const [shipper, setShipper] = useState();
-  const [startPoint, setStartPoint] = useState();
-  const [endPoint, setEndpoint] = useState();
-  const [shipperPoint, setShipperPoint] = useState();
   const [loading, setLoading] = useState(false);
+  const [vehicles] = useState(useSelector(getVehicles));
+  const [postData, setPostData] = useReducer(
+    (prev, next) => ({
+      ...prev,
+      ...next,
+    }),
+    {
+      post: null,
+      status: JOBSTATUS.PENDING,
+      shipper: null,
+      startPoint: null,
+      endPoint: null,
+      shipperPoint: null,
+    }
+  );
   const [mapViewData, setMapViewData] = useReducer(
     (prev, next) => ({
       ...prev,
       ...next,
     }),
     {
-      region: "",
+      region: null,
       routeCoordinates: [],
     }
   );
@@ -75,6 +93,8 @@ const OrderStatus = ({ navigation, route }) => {
   // === REF ===
   const animatedColor = useRef(new Animated.Value(0)).current;
   const animatedScale = useRef(new Animated.Value(0)).current;
+  const mapRef = useRef(null);
+
   const scale = animatedScale.interpolate({
     inputRange: [0, 1],
     outputRange: [0, 1],
@@ -92,26 +112,26 @@ const OrderStatus = ({ navigation, route }) => {
   // === EFFECT ===
   useEffect(() => {
     let title = "Thông Tin Đơn Hàng Của Bạn";
-    if (post?.status === JOBSTATUS.PENDING) {
-      title = "Đang Tìm Shipper";
-    } else if (
-      post?.status === JOBSTATUS.FOUND_SHIPPER ||
-      post?.status === JOBSTATUS.CONFIRM_WITH_CUSTOMER
-    ) {
-      title = "Đợi Shipper";
-    } else {
-      title = "Shipper Đang Giao Hàng";
+    switch (postData?.postData?.status) {
+      case JOBSTATUS.PENDING:
+        title = "Đang Tìm Shipper";
+        break;
+      case JOBSTATUS.FOUND_SHIPPER:
+      case JOBSTATUS.CONFIRM_WITH_CUSTOMER:
+        title = "Đợi Shipper";
+      default:
+        title = "Shipper Đang Giao Hàng";
     }
     navigation.setOptions({
       headerTitle: title,
     });
-  }, [post]);
+  }, [postData?.status]);
   useEffect(() => {
     let chanel = null;
     dispatch(retrieve({ access_token: access_token, orderId: orderId }))
       .then(unwrapResult)
       .then((res) => {
-        setPost(res);
+        setPostData({ post: res });
         setLoading(false);
         //----------------animation-------------------
         if (res.status === POSTSTATUS.PENDING) {
@@ -135,59 +155,68 @@ const OrderStatus = ({ navigation, route }) => {
         //---------------------websocket-----------------
         chanel = `/topic/post/${orderId}`;
         ws.subscribe(chanel, (message) => {
-          console.log("new message: ", JSON.parse(message.body));
-
           const body = JSON.parse(message.body);
           const type = body.postMessageType;
+          const pickupLoc = {
+            latitude: res?.pickupLocation?.latitude,
+            longitude: res?.pickupLocation?.longitude,
+          };
           switch (type) {
             case WS_MSG_TYPE.NOT_FOUND_SHIPPER:
               setIsRequestShipperTimeOut(true);
             case WS_MSG_TYPE.FOUND_SHIPPER:
-              setPost({
-                ...post,
-                status: JOBSTATUS.FOUND_SHIPPER,
-              });
-              console.log(
-                "Shipper profile: ",
-                JSON.parse(messageBody.shipperProfile)
-              );
-
-              // setShipper(JSON.parse(messageBody.shipperProfile));
-              // setLoading(true);
-              // dispatch(
-              //   getCurrentShipperLocation({
-              //     access_token: access_token,
-              //     shipperId: messageBody.shipper.id,
-              //   })
-              // )
-              //   .then(unwrapResult)
-              //   .then((shipperLocation) => {
-              //     const sPoint = {
-              //       latitude: shipperLocation.latitude,
-              //       longitude: shipperLocation.longitude,
-              //     };
-              //     const ePoint = {
-              //       latitude: res?.pickupLocation?.latitude,
-              //       longitude: res?.pickupLocation?.longitude,
-              //     };
-              //     setStartPoint(sPoint);
-              //     setEndpoint(ePoint);
-              //     setShipperPoint(sPoint);
-              //     getRoutePaths(sPoint, ePoint);
-              //     setLoading(false);
-              //   })
-              //   .catch((e) => {
-              //     setLoading(false);
-              //   });
+              setLoading(true);
+              dispatch(
+                getCurrentShipperLocationAndGetRoute({
+                  access_token: access_token,
+                  shipperId: body.shipperId,
+                  destination: pickupLoc,
+                })
+              )
+                .then(unwrapResult)
+                .then((r) => {
+                  const sPoint = {
+                    latitude: r.shipperLocation.latitude,
+                    longitude: r.shipperLocation.longitude,
+                  };
+                  const ePoint = pickupLoc;
+                  mapRef.current.fitToCoordinates(r.routes, {
+                    edgePadding: {
+                      top: 50,
+                      right: 100,
+                      bottom: 500,
+                      left: 100,
+                    },
+                    animated: true,
+                  });
+                  setMapViewData({
+                    region: calculateRegionWithTowPoint(sPoint, ePoint),
+                    routeCoordinates: [r.routes],
+                  });
+                  setPostData({
+                    status: JOBSTATUS.FOUND_SHIPPER,
+                    shipper: JSON.parse(body.shipperProfile),
+                    startPoint: sPoint,
+                    endPoint: ePoint,
+                    shipperPoint: sPoint,
+                  });
+                  setLoading(false);
+                })
+                .catch((e) => {
+                  console.log(e);
+                  setLoading(false);
+                });
               Toast.show({
                 type: ALERT_TYPE.SUCCESS,
                 title: `Tìm thấy một shipper`,
               });
               break;
             case POSTSTATUS.SHIPPER_LOCATION:
-              setShipperPoint({
-                latitude: messageBody.latitude,
-                longitude: messageBody.longitude,
+              setPostData({
+                shipperPoint: {
+                  latitude: messageBody.latitude,
+                  longitude: messageBody.longitude,
+                },
               });
               break;
             case WS_MSG_TYPE.UPDATE_POST_STATUS:
@@ -198,34 +227,34 @@ const OrderStatus = ({ navigation, route }) => {
                   title: `Đơn Hàng Của Bạn Đã Được Giao`,
                 });
                 navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, {
-                  orderId: post.id,
+                  orderId: postData?.post?.id,
                 });
               } else if (JOBSTATUS.SHIPPED === messageBody.content) {
                 //-------------The order has been picked up and is currently being shipped
                 const ePoint = {
-                  latitude: post.pickupLocation.latitude,
-                  longitude: post.pickupLocation.longitude,
+                  latitude: postData?.pickupLocation.latitude,
+                  longitude: postData?.pickupLocation.longitude,
                 };
-                setEndpoint(ePoint);
-                getRoutePaths(shipperPoint, ePoint);
+                setPostData({
+                  post: { ...postData.post, status: JOBSTATUS.FOUND_SHIPPER },
+                  endPoint: ePoint,
+                });
+                getRoutePaths(postData?.shipperPoint, ePoint);
               }
-              setPost((prev) => {
-                return { ...prev, status: messageBody.content };
-              });
               break;
             default:
               console.log("NOT SUPPORT MESSAGE WITH TYPE: ", type);
           }
         });
         //-----------------get winner---------------------
-        if (!shipper && res.status != JOBSTATUS.PENDING) {
+        // FIXME
+        if (!postData.shipper && res.status != JOBSTATUS.PENDING) {
           setLoading(true);
           dispatch(
             getWinShipper({ access_token: access_token, orderId: res.id })
           )
             .then(unwrapResult)
             .then((shipper) => {
-              setShipper(shipper);
               //------------get current shipper location--------------
               dispatch(
                 getCurrentShipperLocation({
@@ -249,13 +278,17 @@ const OrderStatus = ({ navigation, route }) => {
                           latitude: res?.pickupLocation?.latitude,
                           longitude: res?.pickupLocation?.longitude,
                         };
-                  setStartPoint(sPoint);
-                  setEndpoint(ePoint);
-                  setShipperPoint(sPoint);
+                  setPostData({
+                    startPoint: sPoint,
+                    endPoint: ePoint,
+                    shipperPoint: sPoint,
+                    shipper: shipper,
+                  });
                   getRoutePaths(sPoint, ePoint);
                   setLoading(false);
                 })
                 .catch((e) => {
+                  console.log(e);
                   setLoading(false);
                 });
             })
@@ -286,32 +319,22 @@ const OrderStatus = ({ navigation, route }) => {
   const getRoutePaths = (p1, p2) => {
     setLoading(true);
     dispatch(
-      getDuration({
-        lat1: p1.latitude,
-        long1: p1.longitude,
-        lat2: p2.latitude,
-        long2: p2.longitude,
+      getDirection({
+        origin: `${p1.latitude},${p1.longitude}`,
+        destination: `${p2.latitude},${p2.longitude}`,
       })
     )
       .then(unwrapResult)
       .then((res) => {
-        const routePath = res.routeLegs[0].itineraryItems.map((route) => ({
-          latitude: route.maneuverPoint.coordinates[0],
-          longitude: route.maneuverPoint.coordinates[1],
-        }));
         setMapViewData({
-          region: {
-            latitude: (p1.latitude + p2.latitude) / 2,
-            longitude: (p1.longitude + p2.longitude) / 2,
-            latitudeDelta: Math.abs(p1.latitude - p2.latitude) * 2,
-            longitudeDelta: Math.abs(p1.longitude - p2.longitude) * 2,
-          },
-          routeCoordinates: [p1, ...routePath, p2],
+          region: calculateRegionWithTowPoint(p1, p2),
+          routeCoordinates: [res],
         });
         setLoading(false);
       })
-      .catch((e) => {
+      .catch((err) => {
         setLoading(false);
+        console.error(err);
       });
   };
   const handleBack = () => {
@@ -327,29 +350,44 @@ const OrderStatus = ({ navigation, route }) => {
     dispatch(restoreStateFromTempProduct());
     navigation.navigate("Đơn hàng");
   };
+  const getVehicleFromReduxById = useCallback((id) => {
+    const expectVehicle = vehicles.find((v) => v.id == id);
+    return expectVehicle;
+  }, []);
   return (
     <View className="flex-1 relative">
-      {/* <Spinner
+      <Spinner
         visible={loading}
-        spinnerKey={post?.id}
+        spinnerKey={postData?.post?.id}
         size="large"
         animation="fade"
         className="z-50 absolute left-0 top-0 right-0 bottom-0"
-      /> */}
-      {JOBSTATUS.PENDING === post?.status ? (
-        <MapView
-          region={{
-            latitude: post?.pickupLocation?.latitude,
-            longitude: post?.pickupLocation?.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01 * (width / height),
-          }}
-          className="h-full w-full"
-        >
+      />
+
+      <MapView
+        initialRegion={calculateInitialRegion(
+          postData?.post?.pickupLocation?.latitude,
+          postData?.post?.pickupLocation?.longitude,
+          width,
+          height
+        )}
+        region={
+          mapViewData.region ||
+          calculateInitialRegion(
+            postData?.post?.pickupLocation?.latitude,
+            postData?.post?.pickupLocation?.longitude,
+            width,
+            height
+          )
+        }
+        className="h-full w-full"
+        ref={mapRef}
+      >
+        {JOBSTATUS.PENDING === postData?.status ? (
           <Marker
             coordinate={{
-              latitude: post?.pickupLocation?.latitude,
-              longitude: post?.pickupLocation?.longitude,
+              latitude: postData?.post?.pickupLocation?.latitude,
+              longitude: postData?.post?.pickupLocation?.longitude,
             }}
             className="relative flex justify-center items-center w-80 h-80"
           >
@@ -364,19 +402,13 @@ const OrderStatus = ({ navigation, route }) => {
             ></Animated.View>
             <View className="w-4 h-4 bg-red-500 rounded-full absolute bottom-1/2 right-1/2 translate-x-2 translate-y-2"></View>
           </Marker>
-        </MapView>
-      ) : (
-        mapViewData.routeCoordinates.length > 0 && (
-          <MapView
-            className="w-full h-full"
-            region={mapViewData.region}
-            // provider={PROVIDER_GOOGLE}
-          >
-            <Marker coordinate={startPoint} />
-            {shipperPoint && (
-              <Marker.Animated coordinate={shipperPoint}>
+        ) : (
+          <>
+            <Marker coordinate={postData?.startPoint} />
+            {postData?.shipperPoint && (
+              <Marker.Animated coordinate={postData?.shipperPoint}>
                 <Image
-                  source={{ uri: shipper?.vehicle?.icon }}
+                  source={{ uri: postData?.post?.vehicleType?.icon }}
                   style={{
                     width: 30,
                     height: 30,
@@ -385,16 +417,17 @@ const OrderStatus = ({ navigation, route }) => {
                 />
               </Marker.Animated>
             )}
-            <Marker coordinate={endPoint} />
-            <Polyline
-              strokeWidth={4}
-              strokeColor="#3422F1"
-              coordinates={mapViewData.routeCoordinates}
-            />
-          </MapView>
-        )
-      )}
-
+            <Marker coordinate={postData?.endPoint} />
+            {mapViewData.routeCoordinates.length > 0 && (
+              <Polyline
+                strokeWidth={4}
+                strokeColor="#3422F1"
+                coordinates={mapViewData.routeCoordinates}
+              />
+            )}
+          </>
+        )}
+      </MapView>
       {isRequestShipperTimeOut ? (
         <View
           style={{ backgroundColor: "rgba(0,0,0,0.3)" }}
@@ -430,7 +463,7 @@ const OrderStatus = ({ navigation, route }) => {
           {/* ------------Finding------------ */}
           <View className="flex-col items-center bg-white rounded-lg pt-4 mb-5">
             <MaterialIcons name="keyboard-arrow-up" size={24} color="#e5e7eb" />
-            {post?.status == JOBSTATUS.PENDING && (
+            {postData?.status == JOBSTATUS.PENDING && (
               <>
                 <Text className="text-lg font-semibold py-1">
                   Đang tìm tất cả shipper gần bạn
@@ -440,33 +473,39 @@ const OrderStatus = ({ navigation, route }) => {
                 </Text>
               </>
             )}
-            {shipper && (
+            {postData?.shipper && (
               <View className="flex-col bg-white rounded-lg">
                 <TouchableOpacity
                   onPress={() =>
                     navigation.navigate(ROUTES.VIEW_FEEDBACK_STACK, {
-                      shipper: shipper,
+                      shipper: postData?.shipper,
                     })
                   }
                   className="flex-row px-3 py-4"
                 >
                   <View className="basis-2/6 px-3">
                     <Image
-                      source={{ uri: shipper?.user.avatar }}
+                      source={{
+                        uri: postData?.postData?.shipper?.profile.avatar,
+                      }}
                       className="h-14 w-14 rounded-full"
                     />
                   </View>
                   <View className="basis-4/6 flex-col space-y-1">
-                    <Text>{`${shipper?.user?.firstName} ${shipper?.user?.lastName}`}</Text>
+                    <Text>{`${postData?.shipper?.profile?.firstName} ${postData?.shipper?.profile?.lastName}`}</Text>
                     <View className="flex-row items-center space-x-1">
                       <AntDesign name="star" size={15} color="#FFB534" />
                       <Text className="text-xs text-gray-600">
-                        {shipper?.ratings &&
-                          averageRatingPoint(shipper?.ratings)}
+                        {postData?.shipper?.ratings &&
+                          averageRatingPoint(postData?.shipper?.ratings)}
                       </Text>
                     </View>
                     <View className="bg-gray-100 rounded-md px-1">
-                      <Text className="text-xs text-gray-600 font-semibold">{`${shipper?.vehicleNumber} ${shipper?.vehicle.name}`}</Text>
+                      <Text className="text-xs text-gray-600 font-semibold">
+                        {`${postData?.shipper?.vehicleNumber} ` +
+                          getVehicleFromReduxById(postData?.shipper?.vehicleId)
+                            ?.name}
+                      </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -504,7 +543,7 @@ const OrderStatus = ({ navigation, route }) => {
           <View className="flex-col bg-white rounded-lg mb-5">
             <View className="border-b border-gray-300 py-2">
               <Text className="text-gray-600 pl-4 py-1">
-                {post?.vehicleType?.name}
+                {postData?.post?.vehicleType?.name}
               </Text>
             </View>
             {/* -----Time----- */}
@@ -528,18 +567,20 @@ const OrderStatus = ({ navigation, route }) => {
                 <View className="flex-col basis-5/6 ">
                   <View className="flex-row items-center ">
                     <Text className="text-lg font-semibold">
-                      {post?.pickupLocation?.addressLine}
+                      {postData?.post?.pickupLocation?.addressLine}
                     </Text>
-                    {post?.payment?.posterPay && (
+                    {postData?.post?.payment?.posterPay && (
                       <View className="ml-2 p-1 rounded-md bg-gray-300">
                         <Text>
-                          {getVNPaymentMethodName(post?.payment?.paymentMethod)}
+                          {getVNPaymentMethodName(
+                            postData?.post?.payment?.paymentMethod
+                          )}
                         </Text>
                       </View>
                     )}
                   </View>
                   <Text className="text-gray-600">
-                    {post?.pickupLocation?.formattedAddress}
+                    {postData?.post?.pickupLocation?.formattedAddress}
                   </Text>
                 </View>
               </View>
@@ -551,18 +592,20 @@ const OrderStatus = ({ navigation, route }) => {
                 <View className="flex-col basis-5/6 ">
                   <View className="flex-row items-center ">
                     <Text className="text-lg font-semibold">
-                      {post?.dropLocation?.addressLine}
+                      {postData?.post?.dropLocation?.addressLine}
                     </Text>
-                    {!post?.payment?.posterPay && (
+                    {!postData?.post?.payment?.posterPay && (
                       <View className="ml-2 p-1 rounded-md bg-gray-300">
                         <Text>
-                          {getVNPaymentMethodName(post?.payment?.paymentMethod)}
+                          {getVNPaymentMethodName(
+                            postData?.post?.payment?.paymentMethod
+                          )}
                         </Text>
                       </View>
                     )}
                   </View>
                   <Text className="text-gray-600">
-                    {post?.dropLocation?.formattedAddress}
+                    {postData?.post?.dropLocation?.formattedAddress}
                   </Text>
                 </View>
               </View>
@@ -585,7 +628,7 @@ const OrderStatus = ({ navigation, route }) => {
               <View className="flex-row justify-between items-center py-3">
                 <View className="flex-col">
                   <Text className="text-base  font-semibold">
-                    {post?.id && uuidToNumber(post?.id)}
+                    {postData?.post?.id && uuidToNumber(postData?.post?.id)}
                   </Text>
                   <Text className="text-gray-600">Mã đơn hàng</Text>
                 </View>
@@ -596,16 +639,16 @@ const OrderStatus = ({ navigation, route }) => {
             </View>
             <View className="px-4 border-b border-gray-300">
               <View className="flex-col py-3">
-                <Text className="text-base  font-semibold">{`${post?.pickupLocation?.contact} ${post?.pickupLocation?.phoneNumber}`}</Text>
+                <Text className="text-base  font-semibold">{`${postData?.post?.pickupLocation?.contact} ${postData?.post?.pickupLocation?.phoneNumber}`}</Text>
                 <Text className="text-gray-600">Thông tin liên hệ</Text>
               </View>
             </View>
             <View className="flex-col px-4 pt-3 pb-5">
               <Text className="text-base font-semibold">
-                {post?.product?.category.name}
+                {postData?.post?.product?.category.name}
               </Text>
               <Text className="text-base  font-semibold">
-                {post?.product?.quantity} gói hàng
+                {postData?.post?.product?.quantity} gói hàng
               </Text>
               <Text className="text-gray-600">Chi tiết đơn hàng</Text>
             </View>
@@ -613,11 +656,12 @@ const OrderStatus = ({ navigation, route }) => {
           {/* -----------------Fee---------------- */}
           <View className="flex-row justify-between items-center bg-white rounded-lg px-4 py-5 mb-14 ">
             <Text className="text-base font-semibold text-gray-600">
-              {getVNPaymentMethodName(post?.payment?.paymentMethod)}
+              {getVNPaymentMethodName(postData?.post?.payment?.paymentMethod)}
             </Text>
             <View className="flex-row space-x-2 items-center">
               <Text className="text-lg font-bold">
-                {post?.payment?.price && formatCurrency(post?.payment?.price)}
+                {postData?.post?.payment?.price &&
+                  formatCurrency(postData?.post?.payment?.price)}
               </Text>
               <AntDesign name="exclamationcircleo" size={20} color="black" />
             </View>

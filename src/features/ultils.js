@@ -247,7 +247,7 @@ export function getVNPaymentMethodName(method) {
   } else return "Tien Mat";
 }
 
-export function calculateInitialRegion(startPoint, endPoint) {
+export function calculateRegionWithTowPoint(startPoint, endPoint) {
   if (!startPoint || !endPoint) {
     throw new Error("Both startPoint and endPoint are required.");
   }
@@ -264,4 +264,13 @@ export function calculateInitialRegion(startPoint, endPoint) {
   };
 
   return initialRegion;
+}
+
+export function calculateInitialRegion(latitude, longitude, width, height) {
+  return {
+    latitude: latitude,
+    longitude: longitude,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01 * (width / height),
+  };
 }
