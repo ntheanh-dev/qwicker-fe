@@ -340,10 +340,10 @@ export const viewFeedback = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     const { access_token, shipperId } = data;
     try {
-      const res = await authAPI(access_token).get(
-        basicUserEndpoints["view_feedbacks"](shipperId)
+      const res = await authAPIv3(access_token).get(
+        END_POINTS["getRatingsByShipperId"](shipperId)
       );
-      return res.data;
+      return res.data.result;
     } catch (err) {
       return rejectWithValue(err?.response.data);
     }

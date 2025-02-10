@@ -417,14 +417,12 @@ const OrderStatus = ({ navigation, route }) => {
                 />
               </Marker.Animated>
             )}
-            <Marker coordinate={postData?.endPoint} />
-            {mapViewData.routeCoordinates.length > 0 && (
-              <Polyline
-                strokeWidth={4}
-                strokeColor="#3422F1"
-                coordinates={mapViewData.routeCoordinates}
-              />
-            )}
+            <Marker.Animated coordinate={postData?.endPoint} />
+            {/* <Polyline
+              strokeWidth={4}
+              strokeColor="#3422F1"
+              coordinates={mapViewData.routeCoordinates}
+            /> */}
           </>
         )}
       </MapView>
@@ -496,8 +494,7 @@ const OrderStatus = ({ navigation, route }) => {
                     <View className="flex-row items-center space-x-1">
                       <AntDesign name="star" size={15} color="#FFB534" />
                       <Text className="text-xs text-gray-600">
-                        {postData?.shipper?.ratings &&
-                          averageRatingPoint(postData?.shipper?.ratings)}
+                        {postData?.shipper?.ratingAverage}
                       </Text>
                     </View>
                     <View className="bg-gray-100 rounded-md px-1">

@@ -8,11 +8,30 @@ import { MaterialIcons, AntDesign, Entypo } from "@expo/vector-icons";
 import { StarRatingDisplay } from "react-native-star-rating-widget";
 
 const ViewFeedback = ({ navigation, route }) => {
-  const { ratings } = route.params.shipper;
-  //   const dispatch = useDispatch();
-  //   const { access_token } = useSelector(getBasicUserToken);
+  const { shipper } = route.params;
+  const dispatch = useDispatch();
+  const { access_token } = useSelector(getBasicUserToken);
   const [refreshing, setRefreshing] = useState(false);
+  const [ratings, setRatings] = useState([]);
   //   const fetcher = useFetchPaginatedData(access_token);
+
+  useEffect(() => {
+    setRefreshing(true);
+    dispatch(
+      viewFeedback({ access_token: access_token, shipperId: shipper.accountId })
+    )
+      .then(unwrapResult)
+      .then((res) => {
+        setRatings(res);
+        const headerTitle =
+          res.length > 0 ? `Đánh giá (${res.length})` : "Đánh giá";
+        navigation.setOptions({
+          headerTitle: headerTitle,
+        });
+        setRefreshing(false);
+      })
+      .catch((e) => setRefreshing(false));
+  }, []);
 
   const onRefresh = useCallback(() => {
     // setRefreshing(true);
@@ -53,9 +72,9 @@ const ViewFeedback = ({ navigation, route }) => {
       }}
       scrollEventThrottle={1}
     >
-      {ratings ? (
+      {ratings.length > 0 ? (
         ratings.map((ele, index) => {
-          const { firstName, lastName, avatar } = ele.user;
+          const { firstName, lastName, avatar } = ele.raterInfo;
           var moment = require("moment-timezone");
           moment.tz.setDefault("Asia/Ho_Chi_Minh");
           const date = moment(ele.createdAt).format("yy-MM-d");
@@ -63,7 +82,14 @@ const ViewFeedback = ({ navigation, route }) => {
             <View key={index} className="flex-col p-4 border-b border-gray-300">
               <View className="flex-row space-x-2 items-center">
                 <View className="rounded-full overflow-hidden">
-                  <Image className="h-10 w-10" source={{ uri: avatar }} />
+                  <Image
+                    className="h-10 w-10"
+                    source={{
+                      uri:
+                        avatar ||
+                        "https://www.google.com/imgres?q=avata%20default&imgurl=https%3A%2F%2Fstatic-00.iconduck.com%2Fassets.00%2Favatar-default-icon-2048x2048-h6w375ur.png&imgrefurl=https%3A%2F%2Ficonduck.com%2Ficons%2F313107%2Favatar-default&docid=IosoBBNdscmpGM&tbnid=qkHhA_QXFuuovM&vet=12ahUKEwiIiNSysLmLAxWoxzgGHZblFvgQM3oFCIEBEAA..i&w=2048&h=2048&hcb=2&ved=2ahUKEwiIiNSysLmLAxWoxzgGHZblFvgQM3oFCIEBEAA",
+                    }}
+                  />
                 </View>
                 <Text className="text-lg font-medium">{`${firstName} ${lastName}`}</Text>
               </View>
