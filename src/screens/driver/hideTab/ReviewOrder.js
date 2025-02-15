@@ -14,7 +14,7 @@ import {
   formatMomentDateToVietnamese2,
   uuidToNumber,
 } from "../../../features/ultils";
-import { JOBSTATUS, POSTSTATUS } from "../../../constants";
+import { POSTSTATUS } from "../../../constants";
 import Timeline from "react-native-timeline-flatlist";
 import { useDispatch, useSelector } from "react-redux";
 import { getToken } from "../../../redux/shipperSlice";
@@ -258,9 +258,9 @@ const postHistoryToTimeData = (history) => {
 };
 const translatePostStatus = (status) => {
   switch (status) {
-    case POSTSTATUS.PENDING:
+    case POSTSTATUS.ORDER_CREATED:
       return "Tạo Đơn Hàng";
-    case POSTSTATUS.FOUND_SHIPPER:
+    case POSTSTATUS.SHIPPER_FOUND:
       return "Tìm Thấy Shipper";
     case POSTSTATUS.CONFIRM_WITH_CUSTOMER:
       return "Shipper Đã Xác Nhận Đơn Hàng";

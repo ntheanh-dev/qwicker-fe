@@ -9,7 +9,7 @@ const OrderItem = ({ data }) => {
   const navigation = useNavigation();
   const handleNavigate = () => {
     switch (data.status) {
-      case JOBSTATUS.PENDING:
+      case JOBSTATUS.ORDER_CREATED:
         navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
           orderId: data.id,
           data: data,

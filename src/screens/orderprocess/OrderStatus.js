@@ -35,7 +35,7 @@ import {
   getVNPaymentMethodName,
   uuidToNumber,
 } from "../../features/ultils";
-import { JOBSTATUS, POSTSTATUS, ROUTES, WS_MSG_TYPE } from "../../constants";
+import { POSTSTATUS, ROUTES, WS_MSG_TYPE } from "../../constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getBasicUserToken,
@@ -72,7 +72,7 @@ const OrderStatus = ({ navigation, route }) => {
     }),
     {
       post: null,
-      status: JOBSTATUS.PENDING,
+      status: POSTSTATUS.ORDER_CREATED,
       shipper: null,
       startPoint: null,
       endPoint: null,
@@ -113,11 +113,11 @@ const OrderStatus = ({ navigation, route }) => {
   useEffect(() => {
     let title = "Thông Tin Đơn Hàng Của Bạn";
     switch (postData?.postData?.status) {
-      case JOBSTATUS.PENDING:
+      case POSTSTATUS.ORDER_CREATED:
         title = "Đang Tìm Shipper";
         break;
-      case JOBSTATUS.FOUND_SHIPPER:
-      case JOBSTATUS.CONFIRM_WITH_CUSTOMER:
+      case POSTSTATUS.SHIPPER_FOUND:
+      case POSTSTATUS.CONFIRM_WITH_CUSTOMER:
         title = "Đợi Shipper";
       default:
         title = "Shipper Đang Giao Hàng";
@@ -132,9 +132,8 @@ const OrderStatus = ({ navigation, route }) => {
       .then(unwrapResult)
       .then((res) => {
         setPostData({ post: res });
-        setLoading(false);
         //----------------animation-------------------
-        if (res.status === POSTSTATUS.PENDING) {
+        if (res.status === POSTSTATUS.ORDER_CREATED) {
           Animated.loop(
             Animated.timing(animatedColor, {
               toValue: 1,
@@ -162,10 +161,9 @@ const OrderStatus = ({ navigation, route }) => {
             longitude: res?.pickupLocation?.longitude,
           };
           switch (type) {
-            case WS_MSG_TYPE.NOT_FOUND_SHIPPER:
+            case WS_MSG_TYPE.SEARCH_TIMEOUT:
               setIsRequestShipperTimeOut(true);
-            case WS_MSG_TYPE.FOUND_SHIPPER:
-              setLoading(true);
+            case WS_MSG_TYPE.SHIPPER_FOUND:
               dispatch(
                 getCurrentShipperLocationAndGetRoute({
                   access_token: access_token,
@@ -194,61 +192,59 @@ const OrderStatus = ({ navigation, route }) => {
                     routeCoordinates: [r.routes],
                   });
                   setPostData({
-                    status: JOBSTATUS.FOUND_SHIPPER,
+                    status: POSTSTATUS.SHIPPER_FOUND,
                     shipper: JSON.parse(body.shipperProfile),
                     startPoint: sPoint,
                     endPoint: ePoint,
                     shipperPoint: sPoint,
                   });
-                  setLoading(false);
                 })
                 .catch((e) => {
                   console.log(e);
-                  setLoading(false);
                 });
               Toast.show({
                 type: ALERT_TYPE.SUCCESS,
                 title: `Tìm thấy một shipper`,
               });
               break;
-            case POSTSTATUS.SHIPPER_LOCATION:
-              setPostData({
-                shipperPoint: {
-                  latitude: messageBody.latitude,
-                  longitude: messageBody.longitude,
-                },
-              });
-              break;
-            case WS_MSG_TYPE.UPDATE_POST_STATUS:
-              //-------------Done------------
-              if (JOBSTATUS.DELIVERED === messageBody.content) {
-                Toast.show({
-                  type: ALERT_TYPE.SUCCESS,
-                  title: `Đơn Hàng Của Bạn Đã Được Giao`,
-                });
-                navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, {
-                  orderId: postData?.post?.id,
-                });
-              } else if (JOBSTATUS.SHIPPED === messageBody.content) {
-                //-------------The order has been picked up and is currently being shipped
-                const ePoint = {
-                  latitude: postData?.pickupLocation.latitude,
-                  longitude: postData?.pickupLocation.longitude,
-                };
-                setPostData({
-                  post: { ...postData.post, status: JOBSTATUS.FOUND_SHIPPER },
-                  endPoint: ePoint,
-                });
-                getRoutePaths(postData?.shipperPoint, ePoint);
-              }
-              break;
+            // case POSTSTATUS.SHIPPER_LOCATION:
+            //   setPostData({
+            //     shipperPoint: {
+            //       latitude: messageBody.latitude,
+            //       longitude: messageBody.longitude,
+            //     },
+            //   });
+            //   break;
+            // case WS_MSG_TYPE.UPDATE_POST_STATUS:
+            //   //-------------Done------------
+            //   if (POSTSTATUS.DELIVERED === messageBody.content) {
+            //     Toast.show({
+            //       type: ALERT_TYPE.SUCCESS,
+            //       title: `Đơn Hàng Của Bạn Đã Được Giao`,
+            //     });
+            //     navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, {
+            //       orderId: postData?.post?.id,
+            //     });
+            //   } else if (POSTSTATUS.SHIPPED === messageBody.content) {
+            //     //-------------The order has been picked up and is currently being shipped
+            //     const ePoint = {
+            //       latitude: postData?.pickupLocation.latitude,
+            //       longitude: postData?.pickupLocation.longitude,
+            //     };
+            //     setPostData({
+            //       post: { ...postData.post, status: POSTSTATUS.SHIPPER_FOUND },
+            //       endPoint: ePoint,
+            //     });
+            //     getRoutePaths(postData?.shipperPoint, ePoint);
+            //   }
+            //   break;
             default:
               console.log("NOT SUPPORT MESSAGE WITH TYPE: ", type);
           }
         });
         //-----------------get winner---------------------
         // FIXME
-        if (!postData.shipper && res.status != JOBSTATUS.PENDING) {
+        if (!postData.shipper && res.status != POSTSTATUS.ORDER_CREATED) {
           setLoading(true);
           dispatch(
             getWinShipper({ access_token: access_token, orderId: res.id })
@@ -269,7 +265,7 @@ const OrderStatus = ({ navigation, route }) => {
                     longitude: shipperLocation.longitude,
                   };
                   const ePoint =
-                    JOBSTATUS.SHIPPED === res.status
+                    POSTSTATUS.SHIPPED === res.status
                       ? {
                           latitude: res?.dropLocation?.latitude,
                           longitude: res?.dropLocation?.longitude,
@@ -317,7 +313,6 @@ const OrderStatus = ({ navigation, route }) => {
   }, []);
   // === HELPER ===
   const getRoutePaths = (p1, p2) => {
-    setLoading(true);
     dispatch(
       getDirection({
         origin: `${p1.latitude},${p1.longitude}`,
@@ -330,10 +325,8 @@ const OrderStatus = ({ navigation, route }) => {
           region: calculateRegionWithTowPoint(p1, p2),
           routeCoordinates: [res],
         });
-        setLoading(false);
       })
       .catch((err) => {
-        setLoading(false);
         console.error(err);
       });
   };
@@ -356,13 +349,13 @@ const OrderStatus = ({ navigation, route }) => {
   }, []);
   return (
     <View className="flex-1 relative">
-      <Spinner
+      {/* <Spinner
         visible={loading}
         spinnerKey={postData?.post?.id}
         size="large"
         animation="fade"
         className="z-50 absolute left-0 top-0 right-0 bottom-0"
-      />
+      /> */}
 
       <MapView
         initialRegion={calculateInitialRegion(
@@ -383,7 +376,7 @@ const OrderStatus = ({ navigation, route }) => {
         className="h-full w-full"
         ref={mapRef}
       >
-        {JOBSTATUS.PENDING === postData?.status ? (
+        {POSTSTATUS.ORDER_CREATED === postData?.status ? (
           <Marker
             coordinate={{
               latitude: postData?.post?.pickupLocation?.latitude,
@@ -461,7 +454,7 @@ const OrderStatus = ({ navigation, route }) => {
           {/* ------------Finding------------ */}
           <View className="flex-col items-center bg-white rounded-lg pt-4 mb-5">
             <MaterialIcons name="keyboard-arrow-up" size={24} color="#e5e7eb" />
-            {postData?.status == JOBSTATUS.PENDING && (
+            {postData?.status == POSTSTATUS.ORDER_CREATED && (
               <>
                 <Text className="text-lg font-semibold py-1">
                   Đang tìm tất cả shipper gần bạn

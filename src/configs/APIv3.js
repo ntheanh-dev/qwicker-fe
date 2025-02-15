@@ -1,5 +1,5 @@
 import axios from "axios";
-const IP = "192.168.100.23";
+const IP = "172.20.10.5";
 export const BASE_URL = `http://${IP}:8888/api/v3/`;
 export const webSocketUrl = `http://${IP}:8088/websocket/ws`;
 export const END_POINTS = {
@@ -12,8 +12,9 @@ export const END_POINTS = {
   "find-all-product-category": "post/product-category",
   "create-post": "post/posts",
   "change-status": "identity/accounts/change-status",
+  "update-post-status": (id) => `post/posts/${id}/update`,
   "find-post-by-id": (id) => `post/posts/${id}`,
-  "find-post-by-status-list": (params) => `/api/posts?${params}`,
+  "find-post-by-status-list": (params) => `post/posts?${params}`,
   "find-user-profile": (type) => `profile/users/my-profile?type=${type}`,
   "find-shipper-profile": "profile/shippers/my-profile",
   token: "/identity/auth/token",

@@ -1,4 +1,4 @@
-import { JOBSTATUS, PAYMENT_METHOD } from "../constants";
+import { PAYMENT_METHOD, POSTSTATUS } from "../constants";
 import * as Location from "expo-location";
 
 export const formatDate = (date, time) => {
@@ -170,19 +170,20 @@ export const formatCurrency = (amount) => {
 
 export const getTitleDependStatus = (status) => {
   switch (status) {
-    case JOBSTATUS.PENDING:
+    case POSTSTATUS.ORDER_CREATED:
       return "Đang tìm shipper";
-    case JOBSTATUS.FOUND_SHIPPER:
+    case POSTSTATUS.SHIPPER_FOUND:
       return "Đang đợi shipper";
-    case JOBSTATUS.CONFIRM_WITH_CUSTOMER:
+    case POSTSTATUS.SHIPPER_CONFIRMING:
       return "Đã xác nhận với khách hàng";
-    case JOBSTATUS.WAITING_PAY:
+    case POSTSTATUS.WAITING_PAY:
       return "Chờ thanh toán";
-    case JOBSTATUS.SHIPPED:
+    case POSTSTATUS.SHIPPER_ON_THE_WAY:
       return "Đang giao";
-    case JOBSTATUS.DELIVERED:
+    case POSTSTATUS.DELIVERED:
       return "Hoàn thành";
-    case JOBSTATUS.CANCELLED:
+    case POSTSTATUS.CANCELED_BY_SHIPPER:
+    case POSTSTATUS.CANCELED_BY_USER:
       return "Đã huỷ";
     default:
       return "Undefine";
