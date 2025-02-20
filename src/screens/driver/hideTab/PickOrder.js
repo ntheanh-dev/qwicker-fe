@@ -19,7 +19,7 @@ import { unwrapResult } from "@reduxjs/toolkit";
 import { formatCurrency, getCurrentLocation } from "../../../features/ultils";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import Spinner from "react-native-loading-spinner-overlay";
-import { LOCATION, ROUTES } from "../../../constants";
+import { LOCATION, POSTSTATUS, ROUTES } from "../../../constants";
 import { CountdownCircleTimer } from "react-native-countdown-circle-timer";
 import { getSocket } from "../../../redux/socketSlice";
 const DURATION = 7;
@@ -123,10 +123,14 @@ const PickOrder = ({ route, navigation }) => {
             type: ALERT_TYPE.SUCCESS,
             title: "Nhận đơn hàng thành công!",
           });
-          navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, { data: data });
+          navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, {
+            data: { ...data, status: POSTSTATUS.SHIPPER_FOUND },
+          });
         }, DURATION);
       })
       .catch((res) => {
+        console.log("tham gia that bai: ", res);
+
         Toast.show({
           type: ALERT_TYPE.WARNING,
           title: "Tham gia thất bại",

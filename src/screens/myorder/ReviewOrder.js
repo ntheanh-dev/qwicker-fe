@@ -43,13 +43,14 @@ const comments = [
 var moment = require("moment-timezone");
 moment.tz.setDefault("Asia/Ho_Chi_Minh");
 const ReviewOrder = ({ navigation, route }) => {
+  // ### ROUTE ###
   const dispatch = useDispatch();
   const { orderId } = route.params;
+  // ### REDUX ###
   const { access_token } = useSelector(getBasicUserToken);
-
+  // ### STATE ###
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState();
-
   const [post, setPost] = useState({});
   const [loading, setLoading] = useState(false);
   const [showImage, setShowImage] = useState(false);
@@ -68,6 +69,8 @@ const ReviewOrder = ({ navigation, route }) => {
       .then(unwrapResult)
       .then((res) => {
         setPost(res);
+        console.log("post: " + res);
+
         if (res.status === POSTSTATUS.WAITING_PAY) {
           navigation.setOptions({
             headerTitle: () => (
@@ -516,13 +519,13 @@ const postHistoryToTimeData = (history) => {
 
 const translatePostStatus = (status) => {
   switch (status) {
-    case POSTSTATUS.PENDING:
+    case POSTSTATUS.ORDER_CREATED:
       return "Tạo Đơn Hàng";
     case POSTSTATUS.PAID_BY_VNPAY:
       return "Đã thanh toán bằng VNPay";
     case POSTSTATUS.COLLECTED_CASH:
       return "Đã thanh toán bằng tiền mặt";
-    case POSTSTATUS.FOUND_SHIPPER:
+    case POSTSTATUS.SHIPPER_FOUND:
       return "Tìm Thấy Shipper";
     case POSTSTATUS.CONFIRM_WITH_CUSTOMER:
       return "Shipper Đã Xác Nhận Đơn Hàng";

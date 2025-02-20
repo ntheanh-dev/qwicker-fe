@@ -1,86 +1,68 @@
-import { View, Text, Dimensions, TouchableOpacity, Image } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import { View, Text, TouchableOpacity, Image } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "react-native-loading-spinner-overlay";
 import {
-  getDuration,
+  getDirection,
   getShipperProfile,
   getToken,
   updateOrder,
 } from "../../../redux/shipperSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { Feather, Entypo, AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { Feather, AntDesign, MaterialIcons } from "@expo/vector-icons";
 import call from "react-native-phone-call";
 import RBSheet from "react-native-raw-bottom-sheet";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import { LOCATION, POSTSTATUS, ROUTES } from "../../../constants";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
-
-const { width, height } = Dimensions.get("window");
-const ASPECT_RATIO = width / height;
-const LATITUDE_DELTA = 0.01;
-const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-const INIT_REGION = {
-  latitude: 10.8203378,
-  longitude: 106.6788052,
-  latitudeDelta: LATITUDE_DELTA,
-  longitudeDelta: LONGITUDE_DELTA,
-};
+import { calculateRegionWithTowPoint } from "../../../features/ultils";
+import { getVehicles } from "../../../redux/appSlice";
 const Routing = ({ navigation, route }) => {
+  // ### PARAMS ###
   let { startPoint, endPoint, locationType } = route.params;
   const [data, setData] = useState(route.params.data);
+  // ### REDUX ###
   const dispatch = useDispatch();
   const { access_token } = useSelector(getToken);
-  const [region, setRegion] = useState();
-  const { vehicle } = useSelector(getShipperProfile);
+  const [vehicles] = useState(useSelector(getVehicles));
+  const { vehicleId } = useSelector(getShipperProfile);
+  // ### STATE ###
   const [loading, setLoading] = useState(false);
-  const [routeCoordinates, setRouteCoordinates] = useState([]);
-  const [duration, setDuration] = useState();
+  const [coordinates, setCoordinates] = useState([]);
   const [processArrived, setProcessArrived] = useState(0); //0: init, 1: show confirm box
-  const fetchData = async () => {
+  // ### REF ###
+  const mapRef = useRef(null);
+  const takePhotoRBS = useRef();
+  // ### EFFECT ###
+  useEffect(() => {
     setLoading(true);
     dispatch(
-      getDuration({
-        lat1: startPoint.latitude,
-        long1: startPoint.longitude,
-        lat2: endPoint.latitude,
-        long2: endPoint.longitude,
+      getDirection({
+        origin: `${startPoint.latitude},${startPoint.longitude}`,
+        destination: `${endPoint.latitude},${endPoint.longitude}`,
       })
     )
       .then(unwrapResult)
       .then((res) => {
-        setDuration(res);
-        const route = res.routeLegs[0].itineraryItems;
-        const routePath = route.map((route) => ({
-          latitude: route.maneuverPoint.coordinates[0],
-          longitude: route.maneuverPoint.coordinates[1],
-        }));
-        setRouteCoordinates([
-          { latitude: startPoint.latitude, longitude: startPoint.longitude },
-          ...routePath,
-          { latitude: endPoint.latitude, longitude: endPoint.longitude },
-        ]);
-        setRegion({
-          latitude: (startPoint.latitude + endPoint.latitude) / 2,
-          longitude: (startPoint.longitude + endPoint.longitude) / 2,
-          latitudeDelta:
-            Math.abs(startPoint.latitude - endPoint.latitude) * 1.5,
-          longitudeDelta:
-            Math.abs(startPoint.longitude - endPoint.longitude) * 1.5,
+        setCoordinates(res);
+        mapRef.current.fitToCoordinates(res, {
+          edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
+          animated: true,
         });
         setLoading(false);
       })
-      .catch((e) => {
-        console.log(e);
+      .catch((err) => {
         setLoading(false);
+        console.error(err);
       });
-  };
-  useEffect(() => {
-    fetchData();
   }, [locationType, data, endPoint]);
-  const takePhotoRBS = useRef();
+  // ### HELPER
+  const getVehicleFromReduxById = useCallback((id) => {
+    const expectVehicle = vehicles.find((v) => v.id == id);
+    return expectVehicle;
+  }, []);
 
   const updatePost = (base64) => {
     setLoading(true);
@@ -90,21 +72,20 @@ const Routing = ({ navigation, route }) => {
           access_token: access_token,
           orderId: data?.id,
           body: {
-            status: POSTSTATUS.SHIPPED,
+            status: POSTSTATUS.PICKED_UP,
             photo: base64,
           },
         })
       )
         .then(unwrapResult)
-        .then((res) => {
-          setData(res);
+        .then(() => {
           Toast.show({
             type: ALERT_TYPE.SUCCESS,
             title: "Lấy Hàng Thành Công!",
             textBody: "Giờ Hãy Giao Đến Điểm Hẹn",
           });
           navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, {
-            data: res,
+            data: { ...data, status: POSTSTATUS.PICKED_UP },
           });
           setLoading(false);
         })
@@ -124,15 +105,14 @@ const Routing = ({ navigation, route }) => {
         })
       )
         .then(unwrapResult)
-        .then((res) => {
-          setData(res);
+        .then(() => {
           setLoading(false);
           Toast.show({
             type: ALERT_TYPE.SUCCESS,
             title: "Giao Hàng Thành Công Thành Công!",
           });
           navigation.navigate(ROUTES.VIEW_ORDER_BEFORE_SHIP, {
-            data: res,
+            data: { ...data, status: POSTSTATUS.DELIVERED },
           });
         })
         .catch((e) => {
@@ -192,31 +172,26 @@ const Routing = ({ navigation, route }) => {
       />
       <MapView
         className="w-full h-full"
-        region={region}
-        initialRegion={INIT_REGION}
-        loadingEnabled={true}
-        loadingIndicatorColor="#3422F1"
-        // provider={PROVIDER_GOOGLE}
+        ref={mapRef}
+        initialRegion={calculateRegionWithTowPoint(startPoint, endPoint)}
       >
-        {duration && (
-          <Marker.Animated coordinate={startPoint}>
-            <Image
-              source={{ uri: vehicle?.icon }}
-              style={{
-                width: 30,
-                height: 30,
-              }}
-              resizeMode="contain"
-            />
-          </Marker.Animated>
-        )}
-        {duration && <Marker coordinate={endPoint} />}
+        <Marker.Animated coordinate={startPoint}>
+          <Image
+            source={{ uri: getVehicleFromReduxById(vehicleId)?.icon }}
+            style={{
+              width: 30,
+              height: 30,
+            }}
+            resizeMode="contain"
+          />
+        </Marker.Animated>
+        <Marker coordinate={endPoint} />
 
-        {routeCoordinates.length > 0 && (
+        {coordinates.length > 0 && (
           <Polyline
             strokeWidth={4}
             strokeColor="#3422F1"
-            coordinates={routeCoordinates}
+            coordinates={coordinates}
           />
         )}
       </MapView>

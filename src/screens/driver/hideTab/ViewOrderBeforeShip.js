@@ -9,7 +9,6 @@ import {
   Foundation,
   Entypo,
   FontAwesome,
-  AntDesign,
   MaterialIcons,
 } from "@expo/vector-icons";
 import {
@@ -37,19 +36,20 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
   const [showImage, setShowImage] = useState(false);
   const [loading, setLoading] = useState(false);
   const handleConfirmWithCustomer = () => {
-    call({
-      number: data?.pickupLocation.phoneNumber, // String value with the number to call
-      prompt: false, // Optional boolean property. Determines if the user should be prompted prior to the call
-      skipCanOpen: true, // Skip the canOpenURL check
-    }).then(() => {
-      if (data?.status === POSTSTATUS.FOUND_SHIPPER) {
-        handleUpdateOrder(POSTSTATUS.CONFIRM_WITH_CUSTOMER);
-      }
-    });
+    handleUpdateOrder(POSTSTATUS.SHIPPER_CONFIRMING);
+    //FIXME: react-native-phone-call is not working on simulator, this only work on an actual device
+    // call({
+    //   number: data?.pickupLocation.phoneNumber, // String value with the number to call
+    //   prompt: false, // Optional boolean property. Determines if the user should be prompted prior to the call
+    //   skipCanOpen: true, // Skip the canOpenURL check
+    // }).then(() => {
+    //   if (data?.status === POSTSTATUS.SHIPPER_FOUND) {
+    //     handleUpdateOrder(POSTSTATUS.SHIPPER_CONFIRMING);
+    //   }
+    // });
   };
-
-  const handleUpdateOrder = (status) => {
-    setLoading(false);
+  const handleUpdateOrder = (status, callback) => {
+    setLoading(true);
     dispatch(
       updateOrder({
         access_token: access_token,
@@ -61,8 +61,9 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
     )
       .then(unwrapResult)
       .then((res) => {
-        setData(res);
+        setData((res) => ({ ...res, status: status }));
         setLoading(false);
+        callback && callback();
       })
       .catch((e) => {
         console.log(e);
@@ -87,17 +88,21 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
         setLoading(false);
       });
   };
+  console.log("status: ", data?.status);
+
   const goToPickUpLocation = async () => {
-    if (data?.status === POSTSTATUS.CONFIRM_WITH_CUSTOMER) {
+    if (data?.status === POSTSTATUS.SHIPPER_FOUND) {
       setLoading(true);
       const startPoint = await getCurrentLocation();
       setLoading(false);
-      navigation.navigate(ROUTES.ROUTING_TAB, {
-        locationType: LOCATION.pickupLocation,
-        startPoint: startPoint,
-        endPoint: data?.pickupLocation,
-        data: data,
-        title: "Lấy hàng...",
+      handleUpdateOrder(POSTSTATUS.SHIPPER_ON_THE_WAY, () => {
+        navigation.navigate(ROUTES.ROUTING_TAB, {
+          locationType: LOCATION.pickupLocation,
+          startPoint: startPoint,
+          endPoint: data?.pickupLocation,
+          data: data,
+          title: "Lấy hàng...",
+        });
       });
     } else {
       Toast.show({
@@ -108,7 +113,7 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
     }
   };
   const goToDropLocation = async () => {
-    if (data?.status === POSTSTATUS.SHIPPED) {
+    if (data?.status === POSTSTATUS.PICKED_UP) {
       setLoading(true);
       const startPoint = await getCurrentLocation();
       setLoading(false);
@@ -180,9 +185,9 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
                 data?.pickupDatetime ? data?.pickupDatetime : data?.postTime
               )}
             </Text>
-            <Text className="text-gray-600 text-base">{`#${uuidToNumber(
+            {/* <Text className="text-gray-600 text-base">{`#${uuidToNumber(
               data?.id
-            )}`}</Text>
+            )}`}</Text> */}
           </View>
           <TouchableOpacity className="bg-blue-100 rounded-md flex-row space-x-2 py-3 px-6 my-4 items-center">
             <Foundation name="clipboard-pencil" size={24} color="black" />
@@ -203,7 +208,7 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
               </Text>
               <Text className="text-lg text-gray-600">{`${data?.pickupLocation.contact}: ${data?.pickupLocation.phoneNumber}`}</Text>
             </View>
-            {data?.status === POSTSTATUS.CONFIRM_WITH_CUSTOMER && (
+            {data?.status === POSTSTATUS.SHIPPER_FOUND && (
               <TouchableOpacity
                 onPress={goToPickUpLocation}
                 className="basis-1/6 flex justify-center items-start"
@@ -226,7 +231,7 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
               </Text>
               <Text className="text-lg text-gray-600">{`${data?.dropLocation.contact}: ${data?.dropLocation.phoneNumber}`}</Text>
             </View>
-            {data?.status === POSTSTATUS.SHIPPED && (
+            {data?.status === POSTSTATUS.PICKED_UP && (
               <TouchableOpacity
                 onPress={goToDropLocation}
                 className="basis-1/6 flex justify-center items-start"
@@ -298,7 +303,7 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
         <View className="h-80"></View>
       </ScrollView>
       {/* -----------Confirm bottom btn---------- */}
-      {data?.status === POSTSTATUS.FOUND_SHIPPER && (
+      {/* {data?.status === POSTSTATUS.SHIPPER_FOUND && (
         <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
           <Text className="text-sm font-medium text-gray-400 text-center ">
             Xác nhận với khách hàng về các loại phí phát sinh
@@ -312,8 +317,8 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
             </Text>
           </TouchableOpacity>
         </View>
-      )}
-      {data?.status === POSTSTATUS.CONFIRM_WITH_CUSTOMER && (
+      )} */}
+      {data?.status === POSTSTATUS.SHIPPER_FOUND && (
         <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
           <TouchableOpacity
             onPress={goToPickUpLocation}
@@ -325,7 +330,7 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
       )}
-      {data?.status === POSTSTATUS.SHIPPED && (
+      {data?.status === POSTSTATUS.PICKED_UP && (
         <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
           <TouchableOpacity
             onPress={goToDropLocation}

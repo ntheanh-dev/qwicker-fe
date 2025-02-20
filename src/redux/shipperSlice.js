@@ -3,9 +3,7 @@ import API, {
   ENDPOINTS,
   POST_ENDPOINTS,
   ShipperJobEndpoints,
-  accountEndpoints,
   authAPI,
-  shipperEndpoints,
 } from "../configs/API";
 import { getCurrentLocation, objectToFormData } from "../features/ultils";
 import APIv3, {
@@ -13,7 +11,6 @@ import APIv3, {
   END_POINTS,
   googMapDirection,
   googMapDistanceMatrix,
-  virtualearthDrivingv3,
 } from "../configs/APIv3";
 var polyline = require("@mapbox/polyline");
 
@@ -220,13 +217,13 @@ export const updateOrder = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     const { access_token, orderId, body } = data;
     try {
-      const res = await authAPI(access_token).post(
-        POST_ENDPOINTS["update-post-by-id"](orderId),
+      const res = await authAPIv3(access_token).post(
+        END_POINTS["update-post-status"](orderId),
         body
       );
       return res.data.result;
     } catch (err) {
-      console.log(err);
+      console.log(err || err?.response?.data);
       return rejectWithValue(err?.response?.data);
     }
   }
@@ -336,4 +333,5 @@ export const { setToken, resetShipperSlice, setLocation } =
   shipperSlice.actions;
 export const getToken = (state) => state.shipperSlice.token;
 export const getShipperProfile = (state) => state.shipperSlice.user;
+export const getShipperVihicle = (state) => state.shipperSlice.vehicle;
 export default shipperSlice.reducer;
