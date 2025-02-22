@@ -4,7 +4,7 @@ import OrderItem from "./OrderItem";
 import OrderItemNotFound from "./OrderItemNotFound";
 import { useDispatch, useSelector } from "react-redux";
 import { getBasicUserToken, myJob } from "../../redux/basicUserSlice";
-import { JOBSTATUS } from "../../constants";
+import { POSTSTATUS } from "../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useFetchPaginatedData } from "../../hooks/useFetchPaginatedData";
 const DoneOrderTab = () => {
@@ -25,7 +25,7 @@ const DoneOrderTab = () => {
     (isRefresh) => {
       const form = {
         access_token: access_token,
-        params: `status=${JOBSTATUS.DELIVERED}`,
+        params: `status=${POSTSTATUS.DELIVERED}`,
       };
       distpatch(myJob(form))
         .then(unwrapResult)

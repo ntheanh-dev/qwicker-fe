@@ -303,8 +303,8 @@ export const myFeedback = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     const { access_token, orderId } = data;
     try {
-      const res = await authAPI(access_token).get(
-        POST_ENDPOINTS["get-feedback"](orderId)
+      const res = await authAPIv3(access_token).get(
+        END_POINTS["get-feedback"](orderId)
       );
       return res.data.result;
     } catch (err) {

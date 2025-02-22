@@ -10,7 +10,7 @@ import ProcessingOrderTab from "./ProcessingOrderTab";
 import DoneOrderTab from "./DoneOrderTab";
 import CanceledOrderTab from "./CanceledOrderTab";
 import { ROUTES } from "../../constants";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 export default function MyOrder({ navigation, route }) {
   const tabIndex = route?.params?.tabIndex || 0;
@@ -23,7 +23,7 @@ export default function MyOrder({ navigation, route }) {
     { key: 1, title: "Đã hoàn thành" },
     { key: 2, title: "Đã huỷ" },
   ]);
-  const renderScene = ({ route, jumpTo }) => {
+  const renderScene = useCallback(({ route }) => {
     switch (route.key) {
       case 0:
         return (
@@ -33,8 +33,10 @@ export default function MyOrder({ navigation, route }) {
         return <DoneOrderTab parentRoute={route.key} parentIndex={index} />;
       case 2:
         return <CanceledOrderTab parentRoute={route.key} parentIndex={index} />;
+      default:
+        return null;
     }
-  };
+  }, []);
   return (
     <View className="flex-1">
       <TouchableOpacity
@@ -63,18 +65,22 @@ export default function MyOrder({ navigation, route }) {
         renderScene={renderScene}
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
-        renderTabBar={(props) => (
-          <TabBar
-            {...props}
-            style={{ backgroundColor: "white" }}
-            activeColor={"black"}
-            inactiveColor={"gray"}
-            indicatorStyle={{
-              backgroundColor: "#3422F1",
-            }}
-            pressColor="rgba(0, 0, 0, 0)"
-          />
-        )}
+        renderTabBar={(props) => {
+          const { key, ...restProps } = props;
+          return (
+            <TabBar
+              {...restProps}
+              style={{ backgroundColor: "white" }}
+              activeColor={"black"}
+              inactiveColor={"gray"}
+              indicatorStyle={{
+                backgroundColor: "#3422F1",
+              }}
+              pressColor="rgba(0, 0, 0, 0)"
+              key={index}
+            />
+          );
+        }}
       />
     </View>
   );

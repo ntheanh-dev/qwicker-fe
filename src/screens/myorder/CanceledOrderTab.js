@@ -4,7 +4,7 @@ import OrderItem from "./OrderItem";
 import OrderItemNotFound from "./OrderItemNotFound";
 import { useDispatch, useSelector } from "react-redux";
 import { getBasicUserToken, myJob } from "../../redux/basicUserSlice";
-import { JOBSTATUS } from "../../constants";
+import { JOBSTATUS, POSTSTATUS } from "../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useFetchPaginatedData } from "../../hooks/useFetchPaginatedData";
 const CanceledOrderTab = () => {
@@ -25,7 +25,9 @@ const CanceledOrderTab = () => {
     (isRefresh) => {
       const form = {
         access_token: access_token,
-        params: `status=${JOBSTATUS.CANCELLED}`,
+        params: `status=${POSTSTATUS.CANCELED_BY_SHIPPER}
+              ,${POSTSTATUS.CANCELED_BY_USER}
+              ,${POSTSTATUS.CANCELED_SYSTEM_ERROR}`,
       };
       distpatch(myJob(form))
         .then(unwrapResult)

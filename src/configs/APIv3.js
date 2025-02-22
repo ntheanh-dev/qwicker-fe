@@ -1,5 +1,5 @@
 import axios from "axios";
-const IP = "192.168.100.28";
+const IP = "172.20.10.5";
 export const BASE_URL = `http://${IP}:8888/api/v3/`;
 export const webSocketUrl = `http://${IP}:8088/websocket/ws`;
 export const END_POINTS = {
@@ -23,6 +23,7 @@ export const END_POINTS = {
   getRatingsByShipperId: (id) => `post/ratings/shipper/${id}`,
   "get-accepted-shipper": (id) => `post/posts/${id}/shippers?status=ACCEPTED`,
   "sent-rating": "post/ratings",
+  "get-feedback": (id) => `post/ratings/posts/${id}`,
 };
 
 export const authAPIv3 = (access_token) =>

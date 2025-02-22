@@ -3,7 +3,7 @@ import React, { memo, useCallback, useEffect, useState } from "react";
 import OrderItem from "./OrderItem";
 import { useDispatch, useSelector } from "react-redux";
 import { getToken, myJobs } from "../../../redux/shipperSlice";
-import { JOBSTATUS, ROUTES } from "../../../constants";
+import { ROUTES, POSTSTATUS } from "../../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
 import OrderItemNotFound from "./OrderItemNotFound";
 
@@ -23,17 +23,18 @@ const ProcessingOrderTab = ({ parentIndex, parentRoute }) => {
     fetchData();
   }, []);
 
-  const fetchData = () => {
-    const form = {
-      access_token: access_token,
-      params: `status=${JOBSTATUS.PENDING},${JOBSTATUS.FOUND_SHIPPER},${JOBSTATUS.SHIPPED},${JOBSTATUS.CONFIRM_WITH_CUSTOMER}`,
-    };
-    dispatch(myJobs(form))
-      .then(unwrapResult)
-      .then((res) => {
-        setData(res);
-      });
-  };
+  // const fetchData = () => {
+  //   const form = {
+  //     access_token: access_token,
+  //     //TODO: change status
+  //     params: `status=${POSTSTATUS.ORDER_CREATED},${POSTSTATUS.SHIPPER_FOUND},${POSTSTATUS.SHIPPED},${POSTSTATUS.CONFIRM_WITH_CUSTOMER}`,
+  //   };
+  //   dispatch(myJobs(form))
+  //     .then(unwrapResult)
+  //     .then((res) => {
+  //       setData(res);
+  //     });
+  // };
   return (
     <FlatList
       className="px-2"
