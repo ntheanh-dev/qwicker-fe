@@ -4,7 +4,6 @@ import API, {
   authAPI,
   baseEndpoints,
   basicUserEndpoints,
-  ENDPOINTS,
   jobEndpoints,
   POST_ENDPOINTS,
 } from "../configs/API";
@@ -12,7 +11,6 @@ import { objectToFormData } from "../features/ultils";
 import APIv3, {
   authAPIv3,
   END_POINTS,
-  ENG_POINTS,
   googMapDirection,
 } from "../configs/APIv3";
 import { PROFILE_TYPE } from "../constants";
@@ -256,13 +254,13 @@ export const getJoinedShipper = createAsyncThunk(
   }
 );
 
-export const getWinShipper = createAsyncThunk(
-  "shipper,getWinShipper",
+export const getAcceptedShipper = createAsyncThunk(
+  "shipper,getAcceptedShipper",
   async (data, { rejectWithValue }) => {
     const { access_token, orderId } = data;
     try {
-      const res = await authAPI(access_token).get(
-        POST_ENDPOINTS["get-winner"](orderId)
+      const res = await authAPIv3(access_token).get(
+        END_POINTS["get-accepted-shipper"](orderId)
       );
       return res.data.result;
     } catch (err) {
@@ -294,7 +292,7 @@ export const getCurrentShipperLocationAndGetRoute = createAsyncThunk(
         routes: points,
       };
     } catch (err) {
-      console.log("Error while getting shipperlocation: ", err);
+      console.log("Error while getting shipperlocation: ", err?.response);
       return rejectWithValue(err?.response?.data);
     }
   }
@@ -321,10 +319,10 @@ export const myFeedback = createAsyncThunk(
 export const sendFeedback = createAsyncThunk(
   "job,sendFeedback",
   async (data, { rejectWithValue }) => {
-    const { access_token, body, postId } = data;
+    const { access_token, body } = data;
     try {
-      const res = await authAPI(access_token).post(
-        POST_ENDPOINTS["sent-feedback"](postId),
+      const res = await authAPIv3(access_token).post(
+        END_POINTS["sent-rating"],
         body
       );
       return res?.data?.result;

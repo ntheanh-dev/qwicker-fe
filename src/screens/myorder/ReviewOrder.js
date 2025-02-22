@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, Image, TextInput } from "react-native";
 import { ScrollView } from "react-native-virtualized-view";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
 
 import {
@@ -14,7 +14,6 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import {
-  averageRatingPoint,
   formatCurrency,
   formatMomentDateToVietnamese2,
   uuidToNumber,
@@ -34,6 +33,7 @@ import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { JOBSTATUS, POSTSTATUS, ROUTES } from "../../constants";
 import Timeline from "react-native-timeline-flatlist";
 import StarRating, { StarRatingDisplay } from "react-native-star-rating-widget";
+import { getVehicles } from "../../redux/appSlice";
 const comments = [
   { id: 1, content: "Thái độ tốt" },
   { id: 2, content: "Tình trạng phương tiện tốt" },
@@ -56,6 +56,10 @@ const ReviewOrder = ({ navigation, route }) => {
   const [showImage, setShowImage] = useState(false);
   const [showTimeLine, setShowTimeLine] = useState(false);
   const [shipper, setShipper] = useState();
+  const [vehicles] = useState(useSelector(getVehicles));
+  const [text, setText] = useState("");
+
+  // ### USEEFFECT ###
   useEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
@@ -69,8 +73,6 @@ const ReviewOrder = ({ navigation, route }) => {
       .then(unwrapResult)
       .then((res) => {
         setPost(res);
-        console.log("post: " + res);
-
         if (res.status === POSTSTATUS.WAITING_PAY) {
           navigation.setOptions({
             headerTitle: () => (
@@ -82,16 +84,15 @@ const ReviewOrder = ({ navigation, route }) => {
           .then(unwrapResult)
           .then((feedback) => {
             if (feedback) setFeedback(feedback);
-            setLoading(false);
           });
         if (res?.status === POSTSTATUS.DELIVERED) {
           dispatch(getAcceptedShipper(data))
             .then(unwrapResult)
             .then((res) => {
               setShipper(res);
-              console.log("winner: " + res);
             });
         }
+        setLoading(false);
       })
       .catch((e) => {
         console.log(e);
@@ -100,8 +101,7 @@ const ReviewOrder = ({ navigation, route }) => {
   }, [orderId]);
 
   const refRBSheet = useRef();
-  const [text, setText] = useState("");
-
+  // ### HELPER ###
   const handleChooseRecommedFeadback = (comment) => {
     if (text === "") {
       setText(comment);
@@ -115,8 +115,8 @@ const ReviewOrder = ({ navigation, route }) => {
       setLoading(true);
       const data = {
         access_token: access_token,
-        postId: post?.id,
         body: {
+          postId: orderId,
           rating: rating,
           feedback: text,
         },
@@ -161,6 +161,12 @@ const ReviewOrder = ({ navigation, route }) => {
       });
   };
 
+  const getVehicleFromReduxById = useCallback((id) => {
+    if (id === null || id === undefined) return null;
+    const expectVehicle = vehicles.find((v) => v.id == id);
+    return expectVehicle;
+  }, []);
+
   return (
     <View className="p-2 flex-1 flex-col relative">
       <Spinner
@@ -178,24 +184,27 @@ const ReviewOrder = ({ navigation, route }) => {
                 <View className="flex-row space-x-4">
                   <View className="basis-1/6 px-3 ">
                     <Image
-                      source={{ uri: shipper?.user?.avatar }}
+                      source={{ uri: shipper?.profile?.avatar }}
                       className="h-12 w-12 rounded-full"
                     />
                   </View>
                   <View className="basis-5/6 flex-col space-y-1">
-                    <Text>{`${shipper?.user?.firstName} ${shipper?.user?.lastName}`}</Text>
+                    <Text>{`${shipper?.profile.firstName} ${shipper?.profile.lastName}`}</Text>
                     <View
                       className="bg-gray-100 rounded-md px-1"
                       style={{ alignSelf: "flex-start" }}
                     >
-                      <Text className="text-xs text-gray-600 font-semibold">{`${shipper?.vehicleNumber} ${shipper?.vehicle?.name}`}</Text>
+                      <Text className="text-xs text-gray-600 font-semibold">{`${
+                        shipper?.vehicleNumber
+                      } ${
+                        getVehicleFromReduxById(shipper?.vehicleId)?.name
+                      }`}</Text>
                     </View>
 
                     <View className="flex-row items-center space-x-1">
                       <AntDesign name="star" size={20} color="yellow" />
                       <Text className="text-sm text-gray-600 font-semibold">
-                        {shipper?.ratings &&
-                          averageRatingPoint(shipper?.ratings)}
+                        {shipper?.ratings.length > 0 && shipper?.ratingAverage}
                       </Text>
                     </View>
                   </View>
@@ -521,14 +530,18 @@ const translatePostStatus = (status) => {
   switch (status) {
     case POSTSTATUS.ORDER_CREATED:
       return "Tạo Đơn Hàng";
+    case POSTSTATUS.SHIPPER_INVITED:
+      return "Mời Shipper";
     case POSTSTATUS.PAID_BY_VNPAY:
       return "Đã thanh toán bằng VNPay";
     case POSTSTATUS.COLLECTED_CASH:
       return "Đã thanh toán bằng tiền mặt";
     case POSTSTATUS.SHIPPER_FOUND:
       return "Tìm Thấy Shipper";
-    case POSTSTATUS.CONFIRM_WITH_CUSTOMER:
-      return "Shipper Đã Xác Nhận Đơn Hàng";
+    case POSTSTATUS.SHIPPER_ON_THE_WAY:
+      return "Shipper Đang Đến Noi Lấy Hàng";
+    case POSTSTATUS.PICKED_UP:
+      return "Shipper Đã Lấy Hàng";
     case POSTSTATUS.SHIPPED:
       return "Shipper Đã Nhận Hàng";
     case POSTSTATUS.DELIVERED:

@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import React, { useEffect, useState } from "react";
+import { Text, StyleSheet, TouchableOpacity } from "react-native";
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { ROUTES } from "../constants";
 import Wallet from "../screens/Wallet";
@@ -7,7 +7,6 @@ import {
   Feather,
   MaterialCommunityIcons,
   AntDesign,
-  FontAwesome,
   Ionicons,
 } from "@expo/vector-icons";
 import Notification from "../screens/Notification";
