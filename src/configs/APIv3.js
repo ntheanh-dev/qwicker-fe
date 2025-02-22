@@ -21,6 +21,7 @@ export const END_POINTS = {
   "shipment-accept": (id) => `post/posts/${id}/shipment-accept`,
   "shipper-location": (id) => `location/shipper-location/${id}`,
   getRatingsByShipperId: (id) => `post/ratings/shipper/${id}`,
+  "get-accepted-shipper": (id) => `post/posts/${id}/shippers?status=ACCEPTED`,
 };
 
 export const authAPIv3 = (access_token) =>

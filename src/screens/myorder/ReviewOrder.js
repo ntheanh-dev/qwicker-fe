@@ -22,7 +22,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
   getBasicUserToken,
-  getWinShipper,
+  getAcceptedShipper,
   myFeedback,
   retrieve,
   sendFeedback,
@@ -85,7 +85,7 @@ const ReviewOrder = ({ navigation, route }) => {
             setLoading(false);
           });
         if (res?.status === POSTSTATUS.DELIVERED) {
-          dispatch(getWinShipper(data))
+          dispatch(getAcceptedShipper(data))
             .then(unwrapResult)
             .then((res) => {
               setShipper(res);
