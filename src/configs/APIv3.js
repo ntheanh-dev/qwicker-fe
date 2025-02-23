@@ -24,6 +24,7 @@ export const END_POINTS = {
   "get-accepted-shipper": (id) => `post/posts/${id}/shippers?status=ACCEPTED`,
   "sent-rating": "post/ratings",
   "get-feedback": (id) => `post/ratings/posts/${id}`,
+  "collect-cash": (id) => `payment/posts/${id}/collect-cash`,
 };
 
 export const authAPIv3 = (access_token) =>
