@@ -234,8 +234,8 @@ export const collectCash = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     const { access_token, orderId } = data;
     try {
-      const res = await authAPI(access_token).post(
-        ENDPOINTS["collect-cash"](orderId)
+      const res = await authAPIv3(access_token).post(
+        END_POINTS["collect-cash"](orderId)
       );
       return res.data.result;
     } catch (err) {

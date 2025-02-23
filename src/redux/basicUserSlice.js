@@ -256,13 +256,13 @@ export const getJoinedShipper = createAsyncThunk(
   }
 );
 
-export const getWinShipper = createAsyncThunk(
-  "shipper,getWinShipper",
+export const getAcceptedShipper = createAsyncThunk(
+  "shipper,getAcceptedShipper",
   async (data, { rejectWithValue }) => {
     const { access_token, orderId } = data;
     try {
-      const res = await authAPI(access_token).get(
-        POST_ENDPOINTS["get-winner"](orderId)
+      const res = await authAPIv3(access_token).get(
+        END_POINTS["get-winner"](orderId)
       );
       return res.data.result;
     } catch (err) {
