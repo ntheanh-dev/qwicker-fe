@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Button,
 } from "react-native";
 import React, {
   useCallback,
@@ -28,7 +27,6 @@ import {
 } from "@expo/vector-icons";
 import { Easing } from "react-native-reanimated";
 import {
-  averageRatingPoint,
   calculateInitialRegion,
   calculateRegionWithTowPoint,
   formatCurrency,
@@ -46,9 +44,7 @@ import {
 import { unwrapResult } from "@reduxjs/toolkit";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 import { getSocket } from "../../redux/socketSlice";
-import { getDirection, getDuration } from "../../redux/shipperSlice";
-import Spinner from "react-native-loading-spinner-overlay";
-import RBSheet from "react-native-raw-bottom-sheet";
+import { getDirection } from "../../redux/shipperSlice";
 import { restoreStateFromTemp as restoreStateFromTempPayment } from "../../redux/paymentSlice";
 import { restoreStateFromTemp as restoreStateFromTempShipment } from "../../redux/shipmentSlice";
 import { restoreStateFromTemp as restoreStateFromTempOrder } from "../../redux/orderSlice";
@@ -184,18 +180,10 @@ const OrderStatus = ({ navigation, route }) => {
                     longitude: r.shipperLocation.longitude,
                   };
                   const ePoint = pickupLoc;
-                  mapRef.current.fitToCoordinates(r.routes, {
-                    edgePadding: {
-                      top: 50,
-                      right: 100,
-                      bottom: 500,
-                      left: 100,
-                    },
-                    animated: true,
-                  });
+
                   setMapViewData({
                     region: calculateRegionWithTowPoint(sPoint, ePoint),
-                    routeCoordinates: [r.routes],
+                    routeCoordinates: r.routes,
                   });
                   setPostData({
                     status: POSTSTATUS.SHIPPER_FOUND,
@@ -204,7 +192,18 @@ const OrderStatus = ({ navigation, route }) => {
                     endPoint: ePoint,
                     shipperPoint: sPoint,
                   });
+
                   shipperId = body.shipperId;
+
+                  mapRef.current.fitToCoordinates(r.routes, {
+                    edgePadding: {
+                      top: 100,
+                      right: 100,
+                      bottom: 10,
+                      left: 100,
+                    },
+                    animated: true,
+                  });
                 })
                 .catch((e) => {
                   console.log(e);
@@ -217,7 +216,6 @@ const OrderStatus = ({ navigation, route }) => {
             case WS_MSG_TYPE.SHIPPER_ON_THE_WAY:
               break;
             case WS_MSG_TYPE.PICKED_UP:
-              console.log("postData: ", postData);
               dispatch(
                 getCurrentShipperLocationAndGetRoute({
                   access_token: access_token,
@@ -232,18 +230,10 @@ const OrderStatus = ({ navigation, route }) => {
                     longitude: r.shipperLocation.longitude,
                   };
                   const ePoint = dropLoc;
-                  mapRef.current.fitToCoordinates(r.routes, {
-                    edgePadding: {
-                      top: 50,
-                      right: 100,
-                      bottom: 500,
-                      left: 100,
-                    },
-                    animated: true,
-                  });
+
                   setMapViewData({
                     region: calculateRegionWithTowPoint(sPoint, ePoint),
-                    routeCoordinates: [r.routes],
+                    routeCoordinates: r.routes,
                   });
                   setPostData({
                     status: POSTSTATUS.PICKED_UP,
@@ -251,6 +241,15 @@ const OrderStatus = ({ navigation, route }) => {
                     startPoint: sPoint,
                     endPoint: ePoint,
                     shipperPoint: sPoint,
+                  });
+                  mapRef.current.fitToCoordinates(r.routes, {
+                    edgePadding: {
+                      top: 100,
+                      right: 100,
+                      bottom: 10,
+                      left: 100,
+                    },
+                    animated: true,
                   });
                 })
                 .catch((e) => {
@@ -387,6 +386,7 @@ const OrderStatus = ({ navigation, route }) => {
     const expectVehicle = vehicles.find((v) => v.id == id);
     return expectVehicle;
   }, []);
+
   return (
     <View className="flex-1 relative">
       {/* <Spinner
@@ -451,11 +451,13 @@ const OrderStatus = ({ navigation, route }) => {
               </Marker.Animated>
             )}
             <Marker coordinate={postData?.endPoint} />
-            {/* <Polyline
-              strokeWidth={4}
-              strokeColor="#3422F1"
-              coordinates={mapViewData.routeCoordinates}
-            /> */}
+            {mapViewData.routeCoordinates.length > 0 && (
+              <Polyline
+                strokeWidth={4}
+                strokeColor="#3422F1"
+                coordinates={mapViewData.routeCoordinates}
+              />
+            )}
           </>
         )}
       </MapView>
