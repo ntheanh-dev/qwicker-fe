@@ -450,7 +450,7 @@ const OrderStatus = ({ navigation, route }) => {
                 />
               </Marker.Animated>
             )}
-            <Marker.Animated coordinate={postData?.endPoint} />
+            <Marker coordinate={postData?.endPoint} />
             {/* <Polyline
               strokeWidth={4}
               strokeColor="#3422F1"

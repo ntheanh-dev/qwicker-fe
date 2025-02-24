@@ -77,7 +77,7 @@ export default function MyOrder({ navigation, route }) {
                 backgroundColor: "#3422F1",
               }}
               pressColor="rgba(0, 0, 0, 0)"
-              key={index}
+              key={key}
             />
           );
         }}

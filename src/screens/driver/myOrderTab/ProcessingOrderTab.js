@@ -23,18 +23,17 @@ const ProcessingOrderTab = ({ parentIndex, parentRoute }) => {
     fetchData();
   }, []);
 
-  // const fetchData = () => {
-  //   const form = {
-  //     access_token: access_token,
-  //     //TODO: change status
-  //     params: `status=${POSTSTATUS.ORDER_CREATED},${POSTSTATUS.SHIPPER_FOUND},${POSTSTATUS.SHIPPED},${POSTSTATUS.CONFIRM_WITH_CUSTOMER}`,
-  //   };
-  //   dispatch(myJobs(form))
-  //     .then(unwrapResult)
-  //     .then((res) => {
-  //       setData(res);
-  //     });
-  // };
+  const fetchData = () => {
+    const form = {
+      access_token: access_token,
+      params: `status=${POSTSTATUS.ORDER_CREATED},${POSTSTATUS.SHIPPER_FOUND},${POSTSTATUS.SHIPPED},${POSTSTATUS.CONFIRM_WITH_CUSTOMER}`,
+    };
+    dispatch(myJobs(form))
+      .then(unwrapResult)
+      .then((res) => {
+        setData(res);
+      });
+  };
   return (
     <FlatList
       className="px-2"

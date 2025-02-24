@@ -3,7 +3,7 @@ import React, { memo, useCallback, useEffect, useState } from "react";
 import OrderItem from "./OrderItem";
 import { useDispatch, useSelector } from "react-redux";
 import { getToken, myJobs } from "../../../redux/shipperSlice";
-import { JOBSTATUS, ROUTES } from "../../../constants";
+import { POSTSTATUS, ROUTES } from "../../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
 import OrderItemNotFound from "./OrderItemNotFound";
 
@@ -26,7 +26,7 @@ const CanceledOrderTab = ({ parentIndex, parentRoute }) => {
   const fetchData = () => {
     const form = {
       access_token: access_token,
-      params: `status=${JOBSTATUS.CANCELLED}`,
+      params: `status=${POSTSTATUS.CANCELED_BY_USER}`,
     };
     dispatch(myJobs(form))
       .then(unwrapResult)

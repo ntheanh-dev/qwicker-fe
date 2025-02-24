@@ -15,9 +15,13 @@ import {
   formatCurrency,
   formatMomentDateToVietnamese2,
   getCurrentLocation,
-  uuidToNumber,
 } from "../../../features/ultils";
-import { LOCATION, POSTSTATUS, ROUTES } from "../../../constants";
+import {
+  LOCATION,
+  PAYMENT_METHOD,
+  POSTSTATUS,
+  ROUTES,
+} from "../../../constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
   updateOrder,
@@ -26,7 +30,6 @@ import {
   collectCash,
 } from "../../../redux/shipperSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
-import call from "react-native-phone-call";
 import Spinner from "react-native-loading-spinner-overlay";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 const ViewOrderBeforeShip = ({ navigation, route }) => {
@@ -71,7 +74,7 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
       });
   };
   const handlePayment = () => {
-    setLoading(false);
+    setLoading(true);
     dispatch(
       collectCash({
         access_token: access_token,
@@ -84,12 +87,10 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
         setLoading(false);
       })
       .catch((e) => {
-        console.log(e);
+        console.log("error while collecting cash: ", e);
         setLoading(false);
       });
   };
-  console.log("status: ", data?.status);
-
   const goToPickUpLocation = async () => {
     if (data?.status === POSTSTATUS.SHIPPER_FOUND) {
       setLoading(true);
@@ -343,7 +344,7 @@ const ViewOrderBeforeShip = ({ navigation, route }) => {
         </View>
       )}
       {data?.status === POSTSTATUS.DELIVERED &&
-        data?.payment.method?.id === "1" && (
+        data?.payment.paymentMethod === PAYMENT_METHOD.CASH && (
           <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
             <TouchableOpacity
               onPress={handlePayment}

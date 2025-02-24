@@ -4,7 +4,7 @@ import OrderItem from "./OrderItem";
 import OrderItemNotFound from "./OrderItemNotFound";
 import { useDispatch, useSelector } from "react-redux";
 import { getBasicUserToken, myJob } from "../../redux/basicUserSlice";
-import { JOBSTATUS } from "../../constants";
+import { JOBSTATUS, POSTSTATUS } from "../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
 const ProcessingOrderTab = ({ parentIndex, parentRoute }) => {
   const dispatch = useDispatch();
@@ -24,7 +24,11 @@ const ProcessingOrderTab = ({ parentIndex, parentRoute }) => {
   const fetchData = () => {
     const form = {
       access_token: access_token,
-      params: `status=${JOBSTATUS.PENDING},${JOBSTATUS.FOUND_SHIPPER},${JOBSTATUS.WAITING_PAY},${JOBSTATUS.SHIPPED},${JOBSTATUS.CONFIRM_WITH_CUSTOMER}`,
+      params: `status=${POSTSTATUS.ORDER_CREATED}
+      ,${POSTSTATUS.FINDING_SHIPPER}
+      ,${POSTSTATUS.SHIPPER_ARRIVED}
+      ,${POSTSTATUS.SHIPPER_ON_THE_WAY}
+      ,${POSTSTATUS.DELIVERING}`,
     };
     dispatch(myJob(form))
       .then(unwrapResult)
