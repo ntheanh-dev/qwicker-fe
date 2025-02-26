@@ -26,7 +26,11 @@ const ProcessingOrderTab = ({ parentIndex, parentRoute }) => {
   const fetchData = () => {
     const form = {
       access_token: access_token,
-      params: `status=${POSTSTATUS.ORDER_CREATED},${POSTSTATUS.SHIPPER_FOUND},${POSTSTATUS.SHIPPED},${POSTSTATUS.CONFIRM_WITH_CUSTOMER}`,
+      params: `status=${POSTSTATUS.ORDER_CREATED}
+            ,${POSTSTATUS.FINDING_SHIPPER}
+            ,${POSTSTATUS.SHIPPER_ARRIVED}
+            ,${POSTSTATUS.SHIPPER_ON_THE_WAY}
+            ,${POSTSTATUS.DELIVERING}`,
     };
     dispatch(myJobs(form))
       .then(unwrapResult)

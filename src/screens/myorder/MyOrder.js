@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
-import { TabView, TabBar } from "react-native-tab-view";
+import { TabView, TabBar, TabBarItem } from "react-native-tab-view";
 import { Entypo, Feather } from "@expo/vector-icons";
 import ProcessingOrderTab from "./ProcessingOrderTab";
 import DoneOrderTab from "./DoneOrderTab";
@@ -65,22 +65,18 @@ export default function MyOrder({ navigation, route }) {
         renderScene={renderScene}
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
-        renderTabBar={(props) => {
-          const { key, ...restProps } = props;
-          return (
-            <TabBar
-              {...restProps}
-              style={{ backgroundColor: "white" }}
-              activeColor={"black"}
-              inactiveColor={"gray"}
-              indicatorStyle={{
-                backgroundColor: "#3422F1",
-              }}
-              pressColor="rgba(0, 0, 0, 0)"
-              key={key}
-            />
-          );
-        }}
+        renderTabBar={(props) => (
+          <TabBar
+            {...props}
+            style={{ backgroundColor: "white" }}
+            activeColor={"black"}
+            inactiveColor={"gray"}
+            indicatorStyle={{
+              backgroundColor: "#3422F1",
+            }}
+            pressColor="rgba(0, 0, 0, 0)"
+          />
+        )}
       />
     </View>
   );

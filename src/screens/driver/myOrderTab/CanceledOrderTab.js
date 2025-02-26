@@ -26,7 +26,9 @@ const CanceledOrderTab = ({ parentIndex, parentRoute }) => {
   const fetchData = () => {
     const form = {
       access_token: access_token,
-      params: `status=${POSTSTATUS.CANCELED_BY_USER}`,
+      params: `status=${POSTSTATUS.CANCELED_BY_SHIPPER}
+                    ,${POSTSTATUS.CANCELED_BY_USER}
+                    ,${POSTSTATUS.CANCELED_SYSTEM_ERROR}`,
     };
     dispatch(myJobs(form))
       .then(unwrapResult)

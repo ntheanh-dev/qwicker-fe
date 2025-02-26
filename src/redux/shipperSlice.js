@@ -197,17 +197,16 @@ export const acceptDelivery = createAsyncThunk(
 );
 
 export const myJobs = createAsyncThunk(
-  "job, myJobs",
+  "job,myJob",
   async (data, { rejectWithValue }) => {
     const { access_token, params } = data;
     try {
-      const res = await authAPI(access_token).get(
-        ENDPOINTS["shipper-post"](params)
+      const res = await authAPIv3(access_token).get(
+        END_POINTS["find-post-by-status-list"](params)
       );
-      return res?.data.result;
+      return res.data.result;
     } catch (err) {
-      console.log(err?.response?.data);
-      return rejectWithValue(err?.response?.data);
+      return rejectWithValue(err?.response.data);
     }
   }
 );

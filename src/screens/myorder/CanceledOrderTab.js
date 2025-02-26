@@ -4,14 +4,12 @@ import OrderItem from "./OrderItem";
 import OrderItemNotFound from "./OrderItemNotFound";
 import { useDispatch, useSelector } from "react-redux";
 import { getBasicUserToken, myJob } from "../../redux/basicUserSlice";
-import { JOBSTATUS, POSTSTATUS } from "../../constants";
+import { POSTSTATUS } from "../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { useFetchPaginatedData } from "../../hooks/useFetchPaginatedData";
 const CanceledOrderTab = () => {
   const distpatch = useDispatch();
   const { access_token } = useSelector(getBasicUserToken);
   const [refreshing, setRefreshing] = useState(false);
-  const fetcher = useFetchPaginatedData(access_token);
   const [data, setData] = useState([]);
   useEffect(() => {
     fetchData(false);
