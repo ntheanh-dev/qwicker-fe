@@ -1,9 +1,9 @@
 {
   "android": {
-    "package": "com.theanhmgt.deliverymanagement"
+    "package": "com.theanhmgt.qwicker"
   },
   "ios": {
-    "bundleIdentifier": "com.theanhmgt.deliverymanagement"
+    "bundleIdentifier": "com.theanhmgt.qwicker"
   },
   "newArchEnabled": true
 }

@@ -25,6 +25,7 @@ export const END_POINTS = {
   "sent-rating": "post/ratings",
   "get-feedback": (id) => `post/ratings/posts/${id}`,
   "collect-cash": (id) => `payment/payments/posts/${id}/collect-cash`,
+  "shipper-income": (params) => `payment/statistic/shipper-income?${params}`,
 };
 
 export const authAPIv3 = (access_token) =>

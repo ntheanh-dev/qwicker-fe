@@ -169,9 +169,11 @@ export const getDirection = createAsyncThunk(
 export const getInComeStatistic = createAsyncThunk(
   "statistic, getStatistic",
   async (data, { rejectWithValue }) => {
-    const { token, body } = data;
+    const { token, params } = data;
     try {
-      const res = await authAPI(token).post(ENDPOINTS["statistic"], body);
+      const res = await authAPIv3(token).get(
+        END_POINTS["shipper-income"](params)
+      );
       return res.data.result;
     } catch (err) {
       console.log(err);

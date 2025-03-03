@@ -6,18 +6,20 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import { getInComeStatistic, getToken } from "../../../redux/shipperSlice";
-import { STATISTIC_TYPE } from "../../../constants";
-import { unwrapResult } from "@reduxjs/toolkit";
 import { formatCurrency, getVietnamesDay } from "../../../features/ultils";
 import Spinner from "react-native-loading-spinner-overlay";
+import { STATISTIC_TYPE } from "../../../constants";
+import { unwrapResult } from "@reduxjs/toolkit";
+import moment from "moment";
 const { width } = Dimensions.get("window");
 const getDayRange = () => {
-  const date = new Date();
-  const endOfWeek = new Date(date.setDate(date.getDate()));
-  const startOfWeek = new Date(date.setDate(endOfWeek.getDate() - 4));
+  const currentDate = moment().format("YYYY-MM-DDTHH:mm:ss");
+  const currentDateMinus4Days = moment()
+    .subtract(4, "days")
+    .format("YYYY-MM-DDTHH:mm:ss");
   return {
-    startDate: startOfWeek,
-    endDate: endOfWeek,
+    startDate: currentDateMinus4Days,
+    endDate: currentDate,
   };
 };
 const fillMissingDates = (data, startDate, endDate) => {
@@ -25,12 +27,13 @@ const fillMissingDates = (data, startDate, endDate) => {
   const existingDates = new Set(
     data.map((item) => item.dateTime.split("T")[0])
   );
-
   const formatDate = (date) => date.toISOString().split("T")[0];
-
-  for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+  for (
+    let d = new Date(startDate);
+    d <= new Date(endDate);
+    d.setDate(d.getDate() + 1)
+  ) {
     const formattedDate = formatDate(d) + "T00:00:00";
-
     if (!existingDates.has(formatDate(d))) {
       data.push({
         dateTime: formattedDate,
@@ -38,7 +41,7 @@ const fillMissingDates = (data, startDate, endDate) => {
         totalRevenue: 0.0,
         cashRevenue: 0.0,
         vnPayRevenue: 0.0,
-        type: "DAILY",
+        type: STATISTIC_TYPE.DAILY,
       });
     }
   }
@@ -49,9 +52,6 @@ const fillMissingDates = (data, startDate, endDate) => {
 
   return result.slice(-5);
 };
-const moment = require("moment-timezone");
-moment.tz.setDefault("Asia/Ho_Chi_Minh");
-moment.locale("vi");
 
 const DailyIncomeStatistic = ({ parentIndex, parentRoute }) => {
   const { access_token } = useSelector(getToken);
@@ -70,15 +70,11 @@ const DailyIncomeStatistic = ({ parentIndex, parentRoute }) => {
     const { endDate, startDate } = getDayRange();
     if (parentIndex === parentRoute) {
       // force re-render when tabindex change and only re-render when tab present
-      setLoading(true);
+      // setLoading(true);
       dispatch(
         getInComeStatistic({
           token: access_token,
-          body: {
-            startDate: startDate,
-            endDate: endDate,
-            type: STATISTIC_TYPE.DAILY,
-          },
+          params: `startDate=${startDate}&endDate=${endDate}&timeType=${STATISTIC_TYPE.DAILY}`,
         })
       )
         .then(unwrapResult)
