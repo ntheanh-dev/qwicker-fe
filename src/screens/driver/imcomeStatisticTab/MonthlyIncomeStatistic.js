@@ -8,20 +8,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { getInComeStatistic, getToken } from "../../../redux/shipperSlice";
 import { STATISTIC_TYPE } from "../../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
-import {
-  formatCurrency,
-  getVietnamesDay,
-  getVietnamesMonth,
-} from "../../../features/ultils";
+import { formatCurrency, getVietnamesMonth } from "../../../features/ultils";
+import moment from "moment";
 import Spinner from "react-native-loading-spinner-overlay";
 const { width } = Dimensions.get("window");
 const getMonthRange = () => {
-  const now = new Date();
-  const fiveMonthsAgo = new Date(now.getTime());
-  fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 4);
+  const currentDate = moment().format("YYYY-MM-DDTHH:mm:ss");
+  const currentDateMinus4Days = moment()
+    .subtract(4, "months")
+    .format("YYYY-MM-DDTHH:mm:ss");
   return {
-    startDate: fiveMonthsAgo,
-    endDate: now,
+    startDate: currentDateMinus4Days,
+    endDate: currentDate,
   };
 };
 const fillMissingMonths = (data, startDate, endDate) => {
@@ -30,7 +28,7 @@ const fillMissingMonths = (data, startDate, endDate) => {
   const formatMonth = (date) => date.toISOString().slice(0, 7);
   for (
     let d = new Date(startDate);
-    d <= endDate;
+    d <= new Date(endDate);
     d.setMonth(d.getMonth() + 1)
   ) {
     const formattedMonth = formatMonth(d);
@@ -50,9 +48,6 @@ const fillMissingMonths = (data, startDate, endDate) => {
   );
   return result.slice(-5);
 };
-const moment = require("moment-timezone");
-moment.tz.setDefault("Asia/Ho_Chi_Minh");
-moment.locale("vi");
 
 const MonthlyIncomeStatistic = ({ parentRoute, parentIndex }) => {
   const { access_token } = useSelector(getToken);
@@ -64,9 +59,7 @@ const MonthlyIncomeStatistic = ({ parentRoute, parentIndex }) => {
   });
   const [routes, setRoutes] = useState([]);
   const [index, setIndex] = useState(4);
-
   const dispatch = useDispatch();
-
   useEffect(() => {
     const { endDate, startDate } = getMonthRange();
     if (parentIndex === parentRoute) {
@@ -75,11 +68,7 @@ const MonthlyIncomeStatistic = ({ parentRoute, parentIndex }) => {
       dispatch(
         getInComeStatistic({
           token: access_token,
-          body: {
-            startDate: startDate,
-            endDate: endDate,
-            type: STATISTIC_TYPE.MONTHLY,
-          },
+          params: `startDate=${startDate}&endDate=${endDate}&timeType=${STATISTIC_TYPE.MONTHLY}`,
         })
       )
         .then(unwrapResult)

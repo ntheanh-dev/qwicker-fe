@@ -8,20 +8,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { getInComeStatistic, getToken } from "../../../redux/shipperSlice";
 import { STATISTIC_TYPE } from "../../../constants";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { formatCurrency, getVietnamesDay } from "../../../features/ultils";
+import { formatCurrency } from "../../../features/ultils";
 import Spinner from "react-native-loading-spinner-overlay";
+import moment from "moment";
 const { width } = Dimensions.get("window");
-const moment = require("moment-timezone");
-moment.tz.setDefault("Asia/Ho_Chi_Minh");
-moment.locale("vi");
 
 const getHourRange = () => {
-  const now = new Date();
-  const fiveHoursAgo = new Date(now.getTime());
-  fiveHoursAgo.setHours(fiveHoursAgo.getHours() - 4);
+  const currentDate = moment().format("YYYY-MM-DDTHH:mm:ss");
+  const currentDateMinus4Hours = moment()
+    .subtract(4, "hours")
+    .format("YYYY-MM-DDTHH:mm:ss");
   return {
-    startDate: fiveHoursAgo,
-    endDate: now,
+    startDate: currentDateMinus4Hours,
+    endDate: currentDate,
   };
 };
 const fillMissingHours = (data, startDate, endDate) => {
@@ -29,21 +28,23 @@ const fillMissingHours = (data, startDate, endDate) => {
   const existingHours = new Set(
     data.map((item) => new Date(item.dateTime).getHours())
   );
-  const formatDate = (date) => date.toISOString().replace(".000Z", "");
-  for (let d = startDate; d <= endDate; d.setHours(d.getHours() + 1)) {
+  for (
+    let d = new Date(startDate);
+    d <= new Date(endDate);
+    d.setHours(d.getHours() + 1)
+  ) {
     if (!existingHours.has(d.getHours())) {
       data.push({
-        dateTime: formatDate(d),
+        dateTime: d,
         totalPayments: 0,
         totalRevenue: 0.0,
         cashRevenue: 0.0,
         vnPayRevenue: 0.0,
-        type: "HOURLY",
+        type: STATISTIC_TYPE.HOURLY,
       });
     }
   }
 
-  // Sort the data by dateTime to maintain order
   const result = data.sort(
     (a, b) => new Date(a.dateTime) - new Date(b.dateTime)
   );
@@ -72,11 +73,7 @@ const HourlyIncomeStatistic = ({ parentIndex, parentRoute }) => {
       dispatch(
         getInComeStatistic({
           token: access_token,
-          body: {
-            startDate: moment(startDate).format("YYYY-MM-DDTHH:mm:ss"),
-            endDate: moment(endDate).format("YYYY-MM-DDTHH:mm:ss"),
-            type: STATISTIC_TYPE.HOURLY,
-          },
+          params: `startDate=${startDate}&endDate=${endDate}&timeType=${STATISTIC_TYPE.HOURLY}`,
         })
       )
         .then(unwrapResult)
