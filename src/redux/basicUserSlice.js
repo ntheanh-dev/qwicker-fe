@@ -353,12 +353,12 @@ export const vnPayCreatePaymentUrl = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     const { access_token, params } = data;
     try {
-      const res = await authAPI(access_token).get(
-        POST_ENDPOINTS["create-vnpay-url"](params)
+      const res = await authAPIv3(access_token).get(
+        END_POINTS["get-vnpay-url"](params)
       );
-      return res.data.result;
+      return res?.data?.result;
     } catch (err) {
-      console.log(err?.response?.data);
+      console.log("error: ", err);
       return rejectWithValue(err?.response?.data);
     }
   }

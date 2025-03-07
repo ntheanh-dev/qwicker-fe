@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { PAYMENT_METHOD } from "../constants";
 
 export const INIT_PAYMENT = {

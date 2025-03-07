@@ -91,6 +91,7 @@ const BottomNavigation = () => {
         component={FindOrderTab}
         options={() => ({
           headerShown: true,
+          unmountOnBlur: true,
         })}
       />
       <Tab.Screen

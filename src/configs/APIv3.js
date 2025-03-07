@@ -26,6 +26,7 @@ export const END_POINTS = {
   "get-feedback": (id) => `post/ratings/posts/${id}`,
   "collect-cash": (id) => `payment/payments/posts/${id}/collect-cash`,
   "shipper-income": (params) => `payment/statistic/shipper-income?${params}`,
+  "get-vnpay-url": (params) => `payment/payments/vn-pay?${params}`,
 };
 
 export const authAPIv3 = (access_token) =>

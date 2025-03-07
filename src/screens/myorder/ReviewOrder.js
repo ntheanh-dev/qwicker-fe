@@ -140,7 +140,7 @@ const ReviewOrder = ({ navigation, route }) => {
     dispatch(
       vnPayCreatePaymentUrl({
         access_token: access_token,
-        params: `?amount=${post?.payment?.price}&bankCode=NCB&orderInfo=${post.id}`,
+        params: `amount=${post?.payment?.price}&bankCode=NCB&orderInfo=${post.id}`,
       })
     )
       .then(unwrapResult)
@@ -156,7 +156,6 @@ const ReviewOrder = ({ navigation, route }) => {
         Toast.show({
           type: ALERT_TYPE.SUCCESS,
           title: `Không thể thanh toán lúc này`,
-          textBody: e,
         });
       });
   };

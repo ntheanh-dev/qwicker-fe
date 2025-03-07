@@ -274,6 +274,7 @@ const DrawerNavigation = () => {
         name={ROUTES.REVIEW_ORDER_DRAWER}
         component={ReviewOrder}
         options={({ navigation }) => ({
+          unmountOnBlur: true,
           drawerItemStyle: { height: 0 },
           headerTitle: "Xem lại đơn hàng",
           headerLeft: () => (
