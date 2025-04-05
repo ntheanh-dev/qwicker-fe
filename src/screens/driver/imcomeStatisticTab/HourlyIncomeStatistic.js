@@ -35,7 +35,7 @@ const fillMissingHours = (data, startDate, endDate) => {
   ) {
     if (!existingHours.has(d.getHours())) {
       data.push({
-        dateTime: d,
+        dateTime: d.getHours(),
         totalPayments: 0,
         totalRevenue: 0.0,
         cashRevenue: 0.0,
@@ -44,12 +44,19 @@ const fillMissingHours = (data, startDate, endDate) => {
       });
     }
   }
+  // Modify dateTime to only store the hour and then sort
+  data.forEach((i) => {
+    // If dateTime is a string, convert it to a Date object and update the dateTime to only the hour
+    if (typeof i.dateTime === "string") {
+      const date = new Date(i.dateTime);
+      i.dateTime = date.getHours();
+    }
+    // If dateTime is already a number (hour), no need to change anything
+  });
 
-  const result = data.sort(
-    (a, b) => new Date(a.dateTime) - new Date(b.dateTime)
-  );
-
-  return result.slice(-5);
+  // Sort the data array by dateTime (hour) in ascending order
+  data.sort((a, b) => a.dateTime - b.dateTime);
+  return data;
 };
 
 const HourlyIncomeStatistic = ({ parentIndex, parentRoute }) => {
@@ -82,7 +89,9 @@ const HourlyIncomeStatistic = ({ parentIndex, parentRoute }) => {
           setStatistic(data);
           const myDataSet = data.reduce(
             (prev, curr) => {
-              const title = `${new Date(curr.dateTime).getHours()}h`;
+              console.log("hour", curr.dateTime);
+
+              const title = `${curr.dateTime}h`;
               const preData = prev.datasets[0].data;
               const preColors = prev.datasets[0].colors;
               return {

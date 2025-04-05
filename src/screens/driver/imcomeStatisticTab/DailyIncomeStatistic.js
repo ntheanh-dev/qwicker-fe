@@ -80,7 +80,6 @@ const DailyIncomeStatistic = ({ parentIndex, parentRoute }) => {
         .then(unwrapResult)
         .then((res) => {
           const data = fillMissingDates(res, startDate, endDate);
-          setStatistic(data);
           const myDataSet = data.reduce(
             (prev, curr) => {
               const title = getVietnamesDay(moment(curr.dateTime));
@@ -106,8 +105,8 @@ const DailyIncomeStatistic = ({ parentIndex, parentRoute }) => {
               ],
             }
           );
+          setStatistic(data);
           setDataSet(myDataSet);
-          setLoading(false);
           setRoutes(
             myDataSet?.lables?.map((lb, index) => {
               return {
@@ -117,6 +116,7 @@ const DailyIncomeStatistic = ({ parentIndex, parentRoute }) => {
               };
             })
           );
+          setLoading(false);
         })
         .catch((e) => {
           setLoading(false);
