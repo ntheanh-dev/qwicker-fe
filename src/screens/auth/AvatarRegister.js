@@ -33,7 +33,7 @@ const AvatarRegister = ({ navigation }) => {
       alert("Permissions denied!");
     } else {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"],
+        mediaTypes: "Images",
         quality: 0.1,
         base64: true,
       });
