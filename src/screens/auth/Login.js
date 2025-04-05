@@ -48,9 +48,9 @@ const Login = ({ navigation }) => {
                   screen: ROUTES.HOME_DRAWER,
                 });
               } else {
-                // dispatch(
-                //   Shipper.setOnline({ ws: ws, shipperId: res.user.accountId })
-                // );
+                dispatch(
+                  Shipper.setOnline({ ws: ws, shipperId: res.user.accountId })
+                );
                 navigation.navigate(ROUTES.DRIVER_NAVIGATION, {
                   screen: ROUTES.FIND_ORDER_DRIVER_TAB,
                 });
@@ -161,7 +161,7 @@ const Login = ({ navigation }) => {
   // };
 
   return (
-    <SafeAreaView className="flex-1 flex-col justify-around h-full relative">
+    <View className="flex-1 flex-col justify-around h-full relative">
       <Spinner visible={loading} size="large" animation="fade" />
       <View className=" basis-1/6 flex justify-center items-center">
         <Image
@@ -256,7 +256,7 @@ const Login = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
