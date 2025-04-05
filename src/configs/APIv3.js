@@ -1,5 +1,5 @@
 import axios from "axios";
-const IP = "172.20.10.5";
+const IP = "";
 export const BASE_URL = `http://${IP}:8888/api/v3/`;
 export const webSocketUrl = `http://${IP}:8088/websocket/ws`;
 export const END_POINTS = {

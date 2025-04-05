@@ -13,18 +13,15 @@ import {
   AntDesign,
   Ionicons,
   Entypo,
-  Feather,
 } from "@expo/vector-icons";
 import { ROUTES } from "../../../constants";
 import { useSelector } from "react-redux";
 import { getShipperProfile } from "../../../redux/shipperSlice";
-import { averageRatingPoint } from "../../../features/ultils";
 
 const { height } = Dimensions.get("window");
 const top = (height * 25) / 100 - 32;
 const ProfileTab = ({ navigation }) => {
-  const { user, ratings } = useSelector(getShipperProfile);
-
+  const { profile, ratingAverage } = useSelector(getShipperProfile);
   return (
     <SafeAreaView className="flex-1 flex-col relative items-center">
       <View
@@ -42,12 +39,12 @@ const ProfileTab = ({ navigation }) => {
           style={{ height: 80, width: 80 }}
           className="rounded-full"
           source={
-            user?.avatar
-              ? { uri: user?.avatar }
+            profile?.avatar
+              ? { uri: profile?.avatar }
               : require("../../../assets/logo/user.png")
           }
         />
-        <Text className="font-semibold text-2xl mt-2 mb-3">{`${user?.lastName} ${user?.firstName}`}</Text>
+        <Text className="font-semibold text-2xl mt-2 mb-3">{`${profile?.lastName} ${profile?.firstName}`}</Text>
         <View className="flex-row items-center space-x-4">
           <FontAwesome name="map-marker" size={20} color="rgb(75, 85, 99)" />
           <Text className="font-semibold text-md text-gray-600">
@@ -59,7 +56,7 @@ const ProfileTab = ({ navigation }) => {
       <View className="bg-white basis-2/12 flex-row justify-between w-full h-full mb-4">
         <View className="flex-col justify-center items-center basis-1/2">
           <Text className="text-xl font-semibold text-red-600">
-            {averageRatingPoint(ratings)}
+            {ratingAverage}
           </Text>
           <Text className="text-xl font-semibold text-gray-600">Đánh giá</Text>
         </View>
