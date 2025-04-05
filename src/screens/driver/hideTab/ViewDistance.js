@@ -51,24 +51,25 @@ const ViewDistance = ({ navigation, route }) => {
         ref={mapRef}
         initialRegion={calculateRegionWithTowPoint(startPoint, endPoint)}
       >
-        <Marker.Animated coordinate={startPoint}>
-          <Image
-            source={{ uri: vehicle?.icon }}
-            style={{
-              width: 30,
-              height: 30,
-            }}
-            resizeMode="contain"
-          />
-        </Marker.Animated>
-        <Marker coordinate={endPoint} />
-
         {coordinates.length > 0 && (
-          <Polyline
-            strokeWidth={4}
-            strokeColor="#3422F1"
-            coordinates={coordinates}
-          />
+          <>
+            <Marker.Animated coordinate={coordinates[0]}>
+              <Image
+                source={{ uri: vehicle?.icon }}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
+            </Marker.Animated>
+            <Marker coordinate={coordinates[coordinates.length - 1]} />
+            <Polyline
+              strokeWidth={4}
+              strokeColor="#3422F1"
+              coordinates={coordinates}
+            />
+          </>
         )}
       </MapView>
 

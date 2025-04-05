@@ -161,7 +161,6 @@ const Routing = ({ navigation, route }) => {
       takePhotoRBS.current.close();
     }
   };
-
   return (
     <View className="flex-1 relative">
       <Spinner
@@ -175,24 +174,26 @@ const Routing = ({ navigation, route }) => {
         ref={mapRef}
         initialRegion={calculateRegionWithTowPoint(startPoint, endPoint)}
       >
-        <Marker.Animated coordinate={startPoint}>
-          <Image
-            source={{ uri: getVehicleFromReduxById(vehicleId)?.icon }}
-            style={{
-              width: 30,
-              height: 30,
-            }}
-            resizeMode="contain"
-          />
-        </Marker.Animated>
-        <Marker coordinate={endPoint} />
-
         {coordinates.length > 0 && (
-          <Polyline
-            strokeWidth={4}
-            strokeColor="#3422F1"
-            coordinates={coordinates}
-          />
+          <>
+            <Marker.Animated coordinate={coordinates[0]}>
+              <Image
+                source={{ uri: getVehicleFromReduxById(vehicleId)?.icon }}
+                style={{
+                  width: 30,
+                  height: 30,
+                }}
+                resizeMode="contain"
+              />
+            </Marker.Animated>
+            <Marker coordinate={coordinates[coordinates.length - 1]} />
+
+            <Polyline
+              strokeWidth={4}
+              strokeColor="#3422F1"
+              coordinates={coordinates}
+            />
+          </>
         )}
       </MapView>
       {processArrived === 0 && (
