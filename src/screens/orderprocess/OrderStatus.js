@@ -108,7 +108,7 @@ const OrderStatus = ({ navigation, route }) => {
   // === EFFECT ===
   useEffect(() => {
     let title = "Thông Tin Đơn Hàng Của Bạn";
-    switch (postData?.postData?.status) {
+    switch (postData?.status) {
       case POSTSTATUS.ORDER_CREATED:
         title = "Đang Tìm Shipper";
         break;
