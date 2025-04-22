@@ -49,7 +49,7 @@ function CarouselItem({ props }) {
 const CustomCarousel = () => {
   return (
     <View style={{ height: height / 4 }}>
-      {/* <Carousel
+      <Carousel
         loop
         width={width}
         height={width / 2}
@@ -61,7 +61,7 @@ const CustomCarousel = () => {
         renderItem={({ item }) => (
           <CarouselItem key={item.title} props={{ ...item }} />
         )}
-      /> */}
+      />
     </View>
   );
 };

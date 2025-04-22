@@ -186,6 +186,7 @@ const Routing = ({ navigation, route }) => {
                 resizeMode="contain"
               />
             </Marker.Animated>
+
             <Marker coordinate={coordinates[coordinates.length - 1]} />
 
             <Polyline

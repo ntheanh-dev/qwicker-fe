@@ -1,6 +1,12 @@
-import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { ROLE, ROUTES } from "../../constants";
 import { useDispatch, useSelector } from "react-redux";
 import { getRole } from "../../redux/appSlice";
@@ -114,51 +120,6 @@ const Login = ({ navigation }) => {
   useEffect(() => {
     requestLocationPermission();
   }, []);
-
-  // useEffect(() => {
-  //     (function () {
-  //         GoogleSignin.configure({
-  //             webClientId: "297909054584-ec2ra6tq46trk2gvj9ubqsf1rq20q335.apps.googleusercontent.com",
-  //             androidClientId: "297909054584-2tm4tc03cuv9iqp3vdmtlusbcrukof88.apps.googleusercontent.com",
-  //             iosClientId: "297909054584-gdp0dd9vhljuo9n6sk0q59lope7i0r4v.apps.googleusercontent.com",
-  //         });
-  //     })()
-  // }, []);
-
-  // const handleGoogleSignIn = async () => {
-  //     const handleErr = () => {
-  //         setLoading(false)
-  //         Toast.show({
-  //             type: ALERT_TYPE.WARNING,
-  //             title: "Đăng nhập thất bại",
-  //             textBody: "Hãy thử lại sau ít phút"
-  //         })
-  //     }
-  //     setLoading(true)
-  //     try {
-  //         await GoogleSignin.hasPlayServices();
-  //         const userInfo = await GoogleSignin.signIn();
-  //         if (userInfo) {
-  //             const res = await GoogleSignin.getTokens();
-  //             dispatch(BasicUser.googleLogin(res.accessToken))
-  //                 .then(unwrapResult)
-  //                 .then(res => {
-
-  //                     navigation.navigate(ROUTES.HOME)
-  //                 })
-  //                 .catch(e => {
-  //                     setLoading(false)
-  //                     handleErr()
-  //                 })
-  //         } else {
-  //             handleErr()
-  //         }
-  //         setLoading(false)
-  //     } catch (e) {
-  //         setLoading(false)
-  //         handleErr()
-  //     }
-  // };
 
   return (
     <View className="flex-1 flex-col justify-around h-full relative">

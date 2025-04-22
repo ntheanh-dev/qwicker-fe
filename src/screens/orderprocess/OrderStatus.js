@@ -125,213 +125,217 @@ const OrderStatus = ({ navigation, route }) => {
   useEffect(() => {
     let chanel = null;
     let shipperId = null;
-    dispatch(retrieve({ access_token: access_token, orderId: orderId }))
-      .then(unwrapResult)
-      .then((res) => {
-        setPostData({ post: res });
+    try {
+      dispatch(retrieve({ access_token: access_token, orderId: orderId }))
+        .then(unwrapResult)
+        .then((res) => {
+          setPostData({ post: res });
 
-        //----------------animation-------------------
-        if (res.status === POSTSTATUS.ORDER_CREATED) {
-          Animated.loop(
-            Animated.timing(animatedColor, {
-              toValue: 1,
-              duration: 2000,
-              useNativeDriver: true,
-              easing: Easing.linear,
-            })
-          ).start();
-          Animated.loop(
-            Animated.timing(animatedScale, {
-              toValue: 1.5,
-              duration: 2000,
-              useNativeDriver: true,
-              easing: Easing.linear,
-            })
-          ).start();
-        }
-        //---------------------websocket-----------------
-        chanel = `/topic/post/${orderId}`;
-        ws.subscribe(chanel, (message) => {
-          const body = JSON.parse(message.body);
-          const type = body.postMessageType;
-          const pickupLoc = {
-            latitude: res?.pickupLocation?.latitude,
-            longitude: res?.pickupLocation?.longitude,
-          };
-          const dropLoc = {
-            latitude: res?.dropLocation?.latitude,
-            longitude: res?.dropLocation?.longitude,
-          };
-          switch (type) {
-            case WS_MSG_TYPE.SEARCH_TIMEOUT:
-              setIsRequestShipperTimeOut(true);
-            case WS_MSG_TYPE.SHIPPER_FOUND:
-              dispatch(
-                getCurrentShipperLocationAndGetRoute({
-                  access_token: access_token,
-                  shipperId: body.shipperId,
-                  destination: pickupLoc,
-                })
-              )
-                .then(unwrapResult)
-                .then((r) => {
-                  const sPoint = {
-                    latitude: r.shipperLocation.latitude,
-                    longitude: r.shipperLocation.longitude,
-                  };
-                  const ePoint = pickupLoc;
+          //----------------animation-------------------
+          if (res.status === POSTSTATUS.ORDER_CREATED) {
+            Animated.loop(
+              Animated.timing(animatedColor, {
+                toValue: 1,
+                duration: 2000,
+                useNativeDriver: true,
+                easing: Easing.linear,
+              })
+            ).start();
+            Animated.loop(
+              Animated.timing(animatedScale, {
+                toValue: 1.5,
+                duration: 2000,
+                useNativeDriver: true,
+                easing: Easing.linear,
+              })
+            ).start();
+          }
+          //---------------------websocket-----------------
+          chanel = `/topic/post/${orderId}`;
+          ws.subscribe(chanel, (message) => {
+            const body = JSON.parse(message.body);
+            const type = body.postMessageType;
+            const pickupLoc = {
+              latitude: res?.pickupLocation?.latitude,
+              longitude: res?.pickupLocation?.longitude,
+            };
+            const dropLoc = {
+              latitude: res?.dropLocation?.latitude,
+              longitude: res?.dropLocation?.longitude,
+            };
+            switch (type) {
+              case WS_MSG_TYPE.SEARCH_TIMEOUT:
+                setIsRequestShipperTimeOut(true);
+              case WS_MSG_TYPE.SHIPPER_FOUND:
+                dispatch(
+                  getCurrentShipperLocationAndGetRoute({
+                    access_token: access_token,
+                    shipperId: body.shipperId,
+                    destination: pickupLoc,
+                  })
+                )
+                  .then(unwrapResult)
+                  .then((r) => {
+                    const sPoint = {
+                      latitude: r.shipperLocation.latitude,
+                      longitude: r.shipperLocation.longitude,
+                    };
+                    const ePoint = pickupLoc;
 
-                  setMapViewData({
-                    region: calculateRegionWithTowPoint(sPoint, ePoint),
-                    routeCoordinates: r.routes,
+                    setMapViewData({
+                      region: calculateRegionWithTowPoint(sPoint, ePoint),
+                      routeCoordinates: r.routes,
+                    });
+                    setPostData({
+                      status: POSTSTATUS.SHIPPER_FOUND,
+                      shipper: JSON.parse(body.shipperProfile),
+                      startPoint: sPoint,
+                      endPoint: ePoint,
+                      shipperPoint: sPoint,
+                    });
+
+                    shipperId = body.shipperId;
+
+                    mapRef.current.fitToCoordinates(r.routes, {
+                      edgePadding: {
+                        top: 100,
+                        right: 100,
+                        bottom: 10,
+                        left: 100,
+                      },
+                      animated: true,
+                    });
+                  })
+                  .catch((e) => {
+                    console.log(e);
                   });
-                  setPostData({
-                    status: POSTSTATUS.SHIPPER_FOUND,
-                    shipper: JSON.parse(body.shipperProfile),
-                    startPoint: sPoint,
-                    endPoint: ePoint,
-                    shipperPoint: sPoint,
-                  });
-
-                  shipperId = body.shipperId;
-
-                  mapRef.current.fitToCoordinates(r.routes, {
-                    edgePadding: {
-                      top: 100,
-                      right: 100,
-                      bottom: 10,
-                      left: 100,
-                    },
-                    animated: true,
-                  });
-                })
-                .catch((e) => {
-                  console.log(e);
+                Toast.show({
+                  type: ALERT_TYPE.SUCCESS,
+                  title: `Tìm thấy một shipper`,
                 });
-              Toast.show({
-                type: ALERT_TYPE.SUCCESS,
-                title: `Tìm thấy một shipper`,
-              });
-              break;
-            case WS_MSG_TYPE.SHIPPER_ON_THE_WAY:
-              break;
-            case WS_MSG_TYPE.PICKED_UP:
-              dispatch(
-                getCurrentShipperLocationAndGetRoute({
-                  access_token: access_token,
-                  shipperId: shipperId,
-                  destination: dropLoc,
-                })
-              )
-                .then(unwrapResult)
-                .then((r) => {
-                  const sPoint = {
-                    latitude: r.shipperLocation.latitude,
-                    longitude: r.shipperLocation.longitude,
-                  };
-                  const ePoint = dropLoc;
+                break;
+              case WS_MSG_TYPE.SHIPPER_ON_THE_WAY:
+                break;
+              case WS_MSG_TYPE.PICKED_UP:
+                dispatch(
+                  getCurrentShipperLocationAndGetRoute({
+                    access_token: access_token,
+                    shipperId: shipperId,
+                    destination: dropLoc,
+                  })
+                )
+                  .then(unwrapResult)
+                  .then((r) => {
+                    const sPoint = {
+                      latitude: r.shipperLocation.latitude,
+                      longitude: r.shipperLocation.longitude,
+                    };
+                    const ePoint = dropLoc;
 
-                  setMapViewData({
-                    region: calculateRegionWithTowPoint(sPoint, ePoint),
-                    routeCoordinates: r.routes,
+                    setMapViewData({
+                      region: calculateRegionWithTowPoint(sPoint, ePoint),
+                      routeCoordinates: r.routes,
+                    });
+                    setPostData({
+                      status: POSTSTATUS.PICKED_UP,
+                      shipper: JSON.parse(body.shipperProfile),
+                      startPoint: sPoint,
+                      endPoint: ePoint,
+                      shipperPoint: sPoint,
+                    });
+                    mapRef.current.fitToCoordinates(r.routes, {
+                      edgePadding: {
+                        top: 100,
+                        right: 100,
+                        bottom: 10,
+                        left: 100,
+                      },
+                      animated: true,
+                    });
+                  })
+                  .catch((e) => {
+                    console.log(e);
                   });
-                  setPostData({
-                    status: POSTSTATUS.PICKED_UP,
-                    shipper: JSON.parse(body.shipperProfile),
-                    startPoint: sPoint,
-                    endPoint: ePoint,
-                    shipperPoint: sPoint,
-                  });
-                  mapRef.current.fitToCoordinates(r.routes, {
-                    edgePadding: {
-                      top: 100,
-                      right: 100,
-                      bottom: 10,
-                      left: 100,
-                    },
-                    animated: true,
-                  });
-                })
-                .catch((e) => {
-                  console.log(e);
+                Toast.show({
+                  type: ALERT_TYPE.SUCCESS,
+                  title: `Shipper đã lấy hàng thành công, bắt đầu giao hàng`,
                 });
-              Toast.show({
-                type: ALERT_TYPE.SUCCESS,
-                title: `Shipper đã lấy hàng thành công, bắt đầu giao hàng`,
+                break;
+              case WS_MSG_TYPE.DELIVERED:
+                Toast.show({
+                  type: ALERT_TYPE.SUCCESS,
+                  title: `Đơn Hàng Của Bạn Đã Được Giao`,
+                });
+                navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, {
+                  orderId: orderId,
+                });
+                break;
+              // case POSTSTATUS.SHIPPER_LOCATION:
+              //   setPostData({
+              //     shipperPoint: {
+              //       latitude: messageBody.latitude,
+              //       longitude: messageBody.longitude,
+              //     },
+              //   });
+              //   break;
+              default:
+                console.log("NOT SUPPORT MESSAGE WITH TYPE: ", type);
+            }
+          });
+          //-----------------get winner---------------------
+          // FIXME
+          if (!postData.shipper && res.status != POSTSTATUS.ORDER_CREATED) {
+            setLoading(true);
+            dispatch(
+              getWinShipper({ access_token: access_token, orderId: res.id })
+            )
+              .then(unwrapResult)
+              .then((shipper) => {
+                //------------get current shipper location--------------
+                dispatch(
+                  getCurrentShipperLocation({
+                    access_token: access_token,
+                    shipperId: shipper.id,
+                  })
+                )
+                  .then(unwrapResult)
+                  .then((shipperLocation) => {
+                    const sPoint = {
+                      latitude: shipperLocation.latitude,
+                      longitude: shipperLocation.longitude,
+                    };
+                    const ePoint =
+                      POSTSTATUS.SHIPPED === res.status
+                        ? {
+                            latitude: res?.dropLocation?.latitude,
+                            longitude: res?.dropLocation?.longitude,
+                          }
+                        : {
+                            latitude: res?.pickupLocation?.latitude,
+                            longitude: res?.pickupLocation?.longitude,
+                          };
+                    setPostData({
+                      startPoint: sPoint,
+                      endPoint: ePoint,
+                      shipperPoint: sPoint,
+                      shipper: shipper,
+                    });
+                    getRoutePaths(sPoint, ePoint);
+                    setLoading(false);
+                  })
+                  .catch((e) => {
+                    console.log(e);
+                    setLoading(false);
+                  });
+              })
+              .catch((e) => {
+                setLoading(false);
               });
-              break;
-            case WS_MSG_TYPE.DELIVERED:
-              Toast.show({
-                type: ALERT_TYPE.SUCCESS,
-                title: `Đơn Hàng Của Bạn Đã Được Giao`,
-              });
-              navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, {
-                orderId: orderId,
-              });
-              break;
-            // case POSTSTATUS.SHIPPER_LOCATION:
-            //   setPostData({
-            //     shipperPoint: {
-            //       latitude: messageBody.latitude,
-            //       longitude: messageBody.longitude,
-            //     },
-            //   });
-            //   break;
-            default:
-              console.log("NOT SUPPORT MESSAGE WITH TYPE: ", type);
           }
         });
-        //-----------------get winner---------------------
-        // FIXME
-        if (!postData.shipper && res.status != POSTSTATUS.ORDER_CREATED) {
-          setLoading(true);
-          dispatch(
-            getWinShipper({ access_token: access_token, orderId: res.id })
-          )
-            .then(unwrapResult)
-            .then((shipper) => {
-              //------------get current shipper location--------------
-              dispatch(
-                getCurrentShipperLocation({
-                  access_token: access_token,
-                  shipperId: shipper.id,
-                })
-              )
-                .then(unwrapResult)
-                .then((shipperLocation) => {
-                  const sPoint = {
-                    latitude: shipperLocation.latitude,
-                    longitude: shipperLocation.longitude,
-                  };
-                  const ePoint =
-                    POSTSTATUS.SHIPPED === res.status
-                      ? {
-                          latitude: res?.dropLocation?.latitude,
-                          longitude: res?.dropLocation?.longitude,
-                        }
-                      : {
-                          latitude: res?.pickupLocation?.latitude,
-                          longitude: res?.pickupLocation?.longitude,
-                        };
-                  setPostData({
-                    startPoint: sPoint,
-                    endPoint: ePoint,
-                    shipperPoint: sPoint,
-                    shipper: shipper,
-                  });
-                  getRoutePaths(sPoint, ePoint);
-                  setLoading(false);
-                })
-                .catch((e) => {
-                  console.log(e);
-                  setLoading(false);
-                });
-            })
-            .catch((e) => {
-              setLoading(false);
-            });
-        }
-      });
+    } catch (error) {
+      console.log("Uncategory error: ", error);
+    }
     return () => {
       if (chanel) {
         ws.unsubscribe(chanel);

@@ -191,9 +191,7 @@ export const getTitleDependStatus = (status) => {
 };
 
 export const getCurrentLocation = async () => {
-  const currentLocation = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.High,
-  });
+  const currentLocation = await Location.getCurrentPositionAsync();
   return {
     latitude: currentLocation.coords.latitude,
     longitude: currentLocation.coords.longitude,
