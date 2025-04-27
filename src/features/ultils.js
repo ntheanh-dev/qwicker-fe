@@ -178,7 +178,7 @@ export const getTitleDependStatus = (status) => {
       return "Đã xác nhận với khách hàng";
     case POSTSTATUS.WAITING_PAY:
       return "Chờ thanh toán";
-    case POSTSTATUS.SHIPPER_ON_THE_WAY:
+    case POSTSTATUS.PICKED_UP:
       return "Đang giao";
     case POSTSTATUS.DELIVERED:
       return "Hoàn thành";

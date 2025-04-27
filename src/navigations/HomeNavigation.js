@@ -91,6 +91,7 @@ const HomeNavigation = () => {
         options={{
           headerTitle: "Thông tin đơn hàng của bạn",
           headerTitleAlign: "center",
+          unmountOnBlur: true,
         }}
       />
       <Stack.Screen

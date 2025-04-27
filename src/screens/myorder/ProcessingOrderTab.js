@@ -24,7 +24,7 @@ const ProcessingOrderTab = ({ parentIndex, parentRoute }) => {
   const fetchData = () => {
     const form = {
       access_token: access_token,
-      params: `status=${POSTSTATUS.ORDER_CREATED},${POSTSTATUS.FINDING_SHIPPER},${POSTSTATUS.WAITING_PAY},${POSTSTATUS.SHIPPER_ARRIVED},${POSTSTATUS.SHIPPER_ON_THE_WAY},${POSTSTATUS.DELIVERING}`,
+      params: `status=${POSTSTATUS.ORDER_CREATED},${POSTSTATUS.FINDING_SHIPPER},${POSTSTATUS.WAITING_PAY},${POSTSTATUS.SHIPPER_ARRIVED},${POSTSTATUS.SHIPPER_ON_THE_WAY},${POSTSTATUS.DELIVERING},${POSTSTATUS.SHIPPER_FOUND},${POSTSTATUS.PICKED_UP}`,
     };
     dispatch(myJob(form))
       .then(unwrapResult)
