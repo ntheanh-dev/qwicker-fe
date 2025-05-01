@@ -23,9 +23,7 @@ const CanceledOrderTab = () => {
     (isRefresh) => {
       const form = {
         access_token: access_token,
-        params: `status=${POSTSTATUS.CANCELED_BY_SHIPPER}
-              ,${POSTSTATUS.CANCELED_BY_USER}
-              ,${POSTSTATUS.CANCELED_SYSTEM_ERROR}`,
+        params: `status=${POSTSTATUS.CANCELED_BY_SHIPPER},${POSTSTATUS.CANCELED_BY_USER},${POSTSTATUS.CANCELED_SYSTEM_ERROR}`,
       };
       distpatch(myJob(form))
         .then(unwrapResult)

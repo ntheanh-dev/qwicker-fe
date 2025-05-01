@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert,
 } from "react-native";
 import React, {
   useCallback,
@@ -19,7 +20,9 @@ import call from "react-native-phone-call";
 import {
   MaterialIcons,
   Ionicons,
+  FontAwesome6,
   Entypo,
+  FontAwesome,
   Foundation,
   AntDesign,
   MaterialCommunityIcons,
@@ -36,6 +39,7 @@ import {
 import { POSTSTATUS, ROUTES, WS_MSG_TYPE } from "../../constants";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  cancelOrder,
   getAcceptedShipper,
   getBasicUserToken,
   getCurrentShipperLocationAndGetRoute,
@@ -61,6 +65,9 @@ const OrderStatus = ({ navigation, route }) => {
   const ws = useSelector(getSocket);
   // === STATE ===
   const [loading, setLoading] = useState(false);
+  const [isShowHelpBottomSheet, setIsShowHelpBottomSheet] = useState(true);
+  const [isRequestShipperTimeOut, setIsRequestShipperTimeOut] = useState(false);
+
   const [vehicles] = useState(useSelector(getVehicles));
   const [postData, setPostData] = useReducer(
     (prev, next) => ({
@@ -86,7 +93,6 @@ const OrderStatus = ({ navigation, route }) => {
       routeCoordinates: [],
     }
   );
-  const [isRequestShipperTimeOut, setIsRequestShipperTimeOut] = useState(false);
   // === REF ===
   const animatedColor = useRef(new Animated.Value(0)).current;
   const animatedScale = useRef(new Animated.Value(0)).current;
@@ -347,6 +353,17 @@ const OrderStatus = ({ navigation, route }) => {
           <AntDesign name="left" size={16} color="black" />
         </TouchableOpacity>
       ),
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
+              orderId: orderId,
+            });
+          }}
+        >
+          <Entypo name="dots-three-horizontal" size={24} color="black" />
+        </TouchableOpacity>
+      ),
     });
   }, []);
   // === HELPER ===
@@ -367,6 +384,38 @@ const OrderStatus = ({ navigation, route }) => {
     const expectVehicle = vehicles.find((v) => v.id == id);
     return expectVehicle;
   }, []);
+  const handleCanncelOrder = () => {
+    Alert.alert(
+      "Huỷ Đơn Hàng",
+      "Bạn có chắc chắn muốn huỷ đơn hàng này không?",
+      [
+        {
+          text: "Huỷ",
+          onPress: () => {
+            setIsShowHelpBottomSheet(true);
+          },
+        },
+        {
+          text: "Đồng Ý",
+          onPress: () => {
+            dispatch(
+              cancelOrder({
+                access_token: access_token,
+                id: orderId,
+              })
+            )
+              .then(unwrapResult)
+              .then(() => {
+                navigation.navigate(ROUTES.HOME_STACK);
+              })
+              .catch((e) => {
+                console.log(e);
+              });
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <View className="flex-1 relative">
@@ -470,6 +519,61 @@ const OrderStatus = ({ navigation, route }) => {
               className="flex justify-center items-center bg-[#3422F1] py-3 rounded-lg"
             >
               <Text className="text-lg font-bold text-white">Ok</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : isShowHelpBottomSheet ? (
+        <View
+          style={{ backgroundColor: "rgba(0,0,0,0.3)" }}
+          className="absolute top-0 left-0 right-0 bottom-0 flex justify-end "
+        >
+          <View className="px-4 pb-8 flex-col justify-between bg-white rounded-lg">
+            <View className="py-4 border-b border-gray-300">
+              <View className="flex-row items-center ">
+                <View className="flex items-center w-8">
+                  <FontAwesome name="pencil" size={24} color="gray" />
+                </View>
+                <View className="flex-col space-y-1">
+                  <Text className="text-lg text-gray-600 font-bold ml-4">
+                    Sửa đơn hàng
+                  </Text>
+                  <Text className="text-md text-gray-600 mx-4">
+                    Sửa chi tiết đơn hàng trước khi người giao hàng đến
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View className="py-4 border-b border-gray-300">
+              <View className="flex-row items-center ">
+                <View className="flex items-center w-8">
+                  <FontAwesome6
+                    name="users-viewfinder"
+                    size={24}
+                    color="gray"
+                  />
+                </View>
+                <View className="flex-col space-y-1">
+                  <Text className="text-lg text-gray-600 font-bold ml-4">
+                    Tìm một người giao hàng mới
+                  </Text>
+                  <Text className="text-md text-gray-600 mx-4">
+                    Được ghép nối với một người giao hàng mới nếu bạn gặp bất kỳ
+                    vấn đề nào
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <TouchableOpacity onPress={handleCanncelOrder} className="py-4 ">
+              <View className="flex-row items-center ">
+                <View className="flex items-center w-8">
+                  <MaterialIcons name="cancel" size={24} color="#3422F1" />
+                </View>
+                <View className="flex-col space-y-1">
+                  <Text className="text-lg font-bold ml-4">Huỷ đơn hàng</Text>
+                </View>
+              </View>
             </TouchableOpacity>
           </View>
         </View>

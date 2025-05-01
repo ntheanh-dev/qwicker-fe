@@ -364,6 +364,22 @@ export const vnPayCreatePaymentUrl = createAsyncThunk(
   }
 );
 
+export const cancelOrder = createAsyncThunk(
+  "order,orderCancelation",
+  async (data, { rejectWithValue }) => {
+    const { access_token, id } = data;
+    try {
+      const res = await authAPIv3(access_token).post(
+        END_POINTS["cancel-order"](id)
+      );
+      return res?.data?.result;
+    } catch (err) {
+      console.log("error: ", err);
+      return rejectWithValue(err?.response?.data);
+    }
+  }
+);
+
 export const getCoupon = createAsyncThunk(
   "coupon,getCoupon",
   async (data, { rejectWithValue }) => {

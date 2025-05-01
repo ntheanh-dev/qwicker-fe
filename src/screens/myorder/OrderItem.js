@@ -3,22 +3,23 @@ import React from "react";
 import { Entypo, Foundation } from "@expo/vector-icons";
 import { formatCurrency, getTitleDependStatus } from "../../features/ultils";
 import { useNavigation } from "@react-navigation/native";
-import { JOBSTATUS, ROUTES } from "../../constants";
+import { POSTSTATUS, ROUTES } from "../../constants";
 
 const OrderItem = ({ data }) => {
   const navigation = useNavigation();
   const handleNavigate = () => {
     switch (data.status) {
-      case JOBSTATUS.ORDER_CREATED:
+      case POSTSTATUS.ORDER_CREATED:
         navigation.navigate(ROUTES.ORDER_STATUS_STACK, {
           orderId: data.id,
           data: data,
         });
         break;
-      case JOBSTATUS.WAITING_PAY:
-        navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: data.id });
-        break;
-      case JOBSTATUS.DELIVERED:
+      case POSTSTATUS.WAITING_PAY:
+      case POSTSTATUS.CANCELED_BY_SHIPPER:
+      case POSTSTATUS.CANCELED_BY_USER:
+      case POSTSTATUS.CANCELED_SYSTEM_ERROR:
+      case POSTSTATUS.DELIVERED:
         navigation.navigate(ROUTES.REVIEW_ORDER_DRAWER, { orderId: data.id });
         break;
       default:

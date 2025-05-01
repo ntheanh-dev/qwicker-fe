@@ -22,6 +22,7 @@ export const END_POINTS = {
   "shipper-location": (id) => `location/shipper-location/${id}`,
   getRatingsByShipperId: (id) => `post/ratings/shipper/${id}`,
   "get-accepted-shipper": (id) => `post/posts/${id}/shippers?status=ACCEPTED`,
+  "cancel-order": (id) => `post/posts/${id}/cancel`,
   "sent-rating": "post/ratings",
   "get-feedback": (id) => `post/ratings/posts/${id}`,
   "collect-cash": (id) => `payment/payments/posts/${id}/collect-cash`,

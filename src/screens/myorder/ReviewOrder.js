@@ -2,7 +2,6 @@ import { View, Text, TouchableOpacity, Image, TextInput } from "react-native";
 import { ScrollView } from "react-native-virtualized-view";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import RBSheet from "react-native-raw-bottom-sheet";
-
 import {
   Feather,
   MaterialCommunityIcons,
@@ -58,7 +57,6 @@ const ReviewOrder = ({ navigation, route }) => {
   const [shipper, setShipper] = useState();
   const [vehicles] = useState(useSelector(getVehicles));
   const [text, setText] = useState("");
-
   // ### USEEFFECT ###
   useEffect(() => {
     navigation.setOptions({
@@ -77,6 +75,12 @@ const ReviewOrder = ({ navigation, route }) => {
           navigation.setOptions({
             headerTitle: () => (
               <Text className="font-medium text-lg">Chờ Thanh Toán</Text>
+            ),
+          });
+        } else if (res.status === POSTSTATUS.CANCELED_BY_USER) {
+          navigation.setOptions({
+            headerTitle: () => (
+              <Text className="font-medium text-lg">Đơn Hàng Đã Hủy</Text>
             ),
           });
         }
@@ -421,16 +425,20 @@ const ReviewOrder = ({ navigation, route }) => {
             )}
           </View>
 
-          {!feedback && post?.status !== POSTSTATUS.WAITING_PAY && (
-            <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
-              <TouchableOpacity
-                onPress={() => refRBSheet.current.open()}
-                className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
-              >
-                <Text className="text-lg font-medium text-white">Đánh Giá</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          {!feedback &&
+            post?.status !== POSTSTATUS.WAITING_PAY &&
+            post?.status !== POSTSTATUS.CANCELED_BY_USER && (
+              <View className="absolute left-0 right-0 bottom-0 bg-white border-t border-gray-300 px-4 py-6">
+                <TouchableOpacity
+                  onPress={() => refRBSheet.current.open()}
+                  className="rounded-lg w-full flex justify-center items-center h-14 mt-5 bg-[#3422F1]"
+                >
+                  <Text className="text-lg font-medium text-white">
+                    Đánh Giá
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
 
           {/* --------------Feadback bottom sheet---------- */}
           <RBSheet
