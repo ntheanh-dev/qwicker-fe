@@ -65,7 +65,7 @@ const OrderStatus = ({ navigation, route }) => {
   const ws = useSelector(getSocket);
   // === STATE ===
   const [loading, setLoading] = useState(false);
-  const [isShowHelpBottomSheet, setIsShowHelpBottomSheet] = useState(true);
+  const [isShowHelpBottomSheet, setIsShowHelpBottomSheet] = useState(false);
   const [isRequestShipperTimeOut, setIsRequestShipperTimeOut] = useState(false);
 
   const [vehicles] = useState(useSelector(getVehicles));
@@ -173,7 +173,7 @@ const OrderStatus = ({ navigation, route }) => {
                   });
                   setPostData({
                     status: POSTSTATUS.SHIPPER_FOUND,
-                    shipper: shipperResponse,
+                    shipper: JSON.parse(body.shipperProfile),
                     startPoint: sPoint,
                     endPoint: ePoint,
                     shipperPoint: sPoint,
