@@ -102,23 +102,45 @@ App.js: The main component that initiates the entire app.
 - [nativewind](https://www.nativewind.dev/) similar to tailwind CSS for styling the components
 
 ## 🛠️Prerequisites
-Before running this project, ensure you have the following installed:
-- [Node.js >= 20](https://nodejs.org/en) and npm
-- IDE (Recommended: use [Visual studio code](https://code.visualstudio.com/download))
-- [Android studio, Android SDK](https://developer.android.com/studio), [JDK > 11](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) or [Expo application](https://apps.apple.com/us/app/expo-go/id982107779) (choose one)
+
+This project uses Expo SDK 58, React 19.3, and React Native 0.88.
+Use Node 24 LTS (`.nvmrc` pins 24.16.0). For native development, install
+Xcode and CocoaPods on macOS, or Android Studio with the Android SDK and JDK 21.
 
 ## 🚀Getting Started
-After installing Expo on your mobile phone or Android studio run the following commands to start experiencing this project:
-```shell
-git clone https://github.com/Theanhmgt/qwicker-reactnative-frontend.git
 
-cd qwicker-reactnative-frontend/
-
-npm install -i
-
+```sh
+nvm use
+npm ci
 npm start
 ```
-During this stage, you'll be presented with a menu where you can choose from different options to utilize this project. These options include 'Press a' to open on Android, 'Press w' to open on the web, etc. or you can scan the QR code to launch the project in the [Expo](https://apps.apple.com/vn/app/expo-go/id982107779?l=vihttps://apps.apple.com/vn/app/expo-go/id982107779?l=vi) mobile app.
+
+Metro uses port **8089** because the backend profile service uses port 8081.
+Build a development client before connecting a simulator or device:
+
+```sh
+npm run ios
+# or
+npm run android
+```
+
+Native projects are generated from `app.json` and are ignored by Git. After changing
+native dependencies or config plugins, regenerate and rebuild:
+
+```sh
+npx expo prebuild
+```
+
+Use a development build for SDK 58. An older Expo Go installation cannot load this
+SDK. Rebuild existing development clients after this SDK upgrade.
+
+Validation commands:
+
+```sh
+npx expo install --check
+npx expo-doctor
+npx expo export --platform all --output-dir /tmp/qwicker-bundle
+```
 
 ## 🔗References
 Here are some helpful resources and references for further information:
@@ -133,3 +155,23 @@ Don't hesitate to contact me if you have any confusion or questions
 <a href="#qwicker-reliable-delivery-services" style="transition: all .25s ease-in-out; position: fixed; bottom: 0; right: 0; display: inline-flex; cursor: pointer; align-items: center; justify-content: center; margin: 0 2em 2em 0; padding: .25em; width: 8em; height: 2em;">
   🔼 Back to top
 </a>
+## Backend connection
+
+REST requests use the Expo/Metro host automatically, with port `8888` and prefix
+`/api/v3`. This supports an iOS simulator, an Android emulator, and a physical
+phone on the same Wi-Fi as the backend. SockJS uses port `8088` at
+`/websocket/ws` and sends the JWT in the STOMP `Authorization` header.
+
+Copy `.env.example` to `.env` to override `EXPO_PUBLIC_API_URL` or
+`EXPO_PUBLIC_WEBSOCKET_URL`. Set the full API base, for example
+`http://192.168.88.24:8888/api/v3`. Restart Expo after changing `.env` values.
+These variables are public and must not contain secrets.
+
+The seeded admin account can authenticate, but has no customer or driver profile.
+Mobile login requires the corresponding profile; a profile-not-found response is
+separate from a connectivity failure. Legacy registration, coupon, and job API
+contracts still need migration from the old backend; do not assume every screen
+is covered by the connection fix.
+
+Run `node --test scripts/backend.test.mjs` to verify host discovery and auth
+response compatibility.

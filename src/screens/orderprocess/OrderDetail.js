@@ -18,7 +18,7 @@ import {
 } from "@expo/vector-icons";
 import CheckBox from "react-native-check-box";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
+import { File } from "expo-file-system";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductCategories, getCategories } from "../../redux/appSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
@@ -55,7 +55,7 @@ const OrderDetail = ({ navigation }) => {
       alert("Permissions denied!");
     } else {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images"],
         quality: 1,
         base64: true,
       });
@@ -63,9 +63,7 @@ const OrderDetail = ({ navigation }) => {
         const uri = result.assets[0]?.uri;
         if (uri) {
           try {
-            const base64 = await FileSystem.readAsStringAsync(uri, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
+            const base64 = await new File(uri).base64();
             updateProductDetail({ image: base64 });
           } catch (readError) {
             console.error("Error reading image as base64:", readError);

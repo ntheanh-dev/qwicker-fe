@@ -12,7 +12,7 @@ import {
   getBasicAccountInfo,
   resetFormRegisterSlice,
 } from "../../redux/formRegisterSlice";
-import * as FileSystem from "expo-file-system";
+import { File } from "expo-file-system";
 import * as Shipper from "../../redux/shipperSlice";
 import * as BasicUser from "../../redux/basicUserSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
@@ -33,7 +33,7 @@ const AvatarRegister = ({ navigation }) => {
       alert("Permissions denied!");
     } else {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images"],
         quality: 0.5,
         base64: true,
       });
@@ -43,9 +43,7 @@ const AvatarRegister = ({ navigation }) => {
 
         if (uri) {
           try {
-            const base64 = await FileSystem.readAsStringAsync(uri, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
+            const base64 = await new File(uri).base64();
             setImage(base64);
             dispatch(addBasicField({ file: base64 }));
           } catch (readError) {

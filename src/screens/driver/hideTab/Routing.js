@@ -14,7 +14,7 @@ import { Feather, Entypo, AntDesign, MaterialIcons } from "@expo/vector-icons";
 import call from "react-native-phone-call";
 import RBSheet from "react-native-raw-bottom-sheet";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
+import { File } from "expo-file-system";
 import { LOCATION, POSTSTATUS, ROUTES } from "../../../constants";
 import { ALERT_TYPE, Toast } from "react-native-alert-notification";
 
@@ -148,7 +148,7 @@ const Routing = ({ navigation, route }) => {
       alert("Permissions denied!");
     } else {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images"],
         quality: 0.5,
         base64: true,
       });
@@ -156,9 +156,7 @@ const Routing = ({ navigation, route }) => {
         const uri = result.assets[0]?.uri;
         if (uri) {
           try {
-            const base64 = await FileSystem.readAsStringAsync(uri, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
+            const base64 = await new File(uri).base64();
             takePhotoRBS.current.close();
             updatePost(base64);
             setProcessArrived(0);

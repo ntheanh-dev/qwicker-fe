@@ -1,3 +1,4 @@
+import { normalizeAuthResult, normalizeProfile, getApiError } from "../configs/backend.mjs";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API, {
   ENDPOINTS,
@@ -90,7 +91,7 @@ export const register = createAsyncThunk(
       );
       return;
     } catch (e) {
-      return rejectWithValue(e.response.data);
+      return rejectWithValue(getApiError(e));
     }
   }
 );
@@ -104,17 +105,17 @@ export const login = createAsyncThunk(
         password: data?.password,
       });
 
-      let user = await authAPI(token.data?.result?.accessToken).get(
+      let user = await authAPI(normalizeAuthResult(token.data?.result).accessToken).get(
         shipperEndpoints["my-info"]
       );
 
       return {
-        user: user?.data?.result,
-        token: token?.data?.result,
+        user: normalizeProfile(user?.data?.result),
+        token: normalizeAuthResult(token?.data?.result),
       };
     } catch (err) {
       console.log(err);
-      return rejectWithValue(err?.response?.data);
+      return rejectWithValue(getApiError(err));
     }
   }
 );
@@ -130,7 +131,7 @@ export const viewJob = createAsyncThunk(
       return res.data;
     } catch (err) {
       console.log(err);
-      return rejectWithValue(err?.response?.data);
+      return rejectWithValue(getApiError(err));
     }
   }
 );
@@ -206,7 +207,7 @@ export const myJobs = createAsyncThunk(
       return res?.data.result;
     } catch (err) {
       console.log(err?.response?.data);
-      return rejectWithValue(err?.response?.data);
+      return rejectWithValue(getApiError(err));
     }
   }
 );
@@ -223,7 +224,7 @@ export const updateOrder = createAsyncThunk(
       return res.data.result;
     } catch (err) {
       console.log(err);
-      return rejectWithValue(err?.response?.data);
+      return rejectWithValue(getApiError(err));
     }
   }
 );

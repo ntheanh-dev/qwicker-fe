@@ -1,3 +1,4 @@
+import { normalizeAuthResult, normalizeProfile, getApiError } from "../configs/backend.mjs";
 import { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
 import API, {
   accountEndpoints,
@@ -6,7 +7,6 @@ import API, {
   basicUserEndpoints,
   ENDPOINTS,
   jobEndpoints,
-  paymentEndpoints,
   POST_ENDPOINTS,
 } from "../configs/API";
 import { objectToFormData } from "../features/ultils";
@@ -92,11 +92,11 @@ export const register = createAsyncThunk(
       });
 
       return {
-        user: user?.data?.result,
-        token: token?.data?.result,
+        user: normalizeProfile(user?.data?.result),
+        token: normalizeAuthResult(token?.data?.result),
       };
     } catch (e) {
-      return rejectWithValue(e.response.data);
+      return rejectWithValue(getApiError(e));
     }
   }
 );
@@ -110,18 +110,18 @@ export const login = createAsyncThunk(
         password: data?.password,
       });
 
-      let user = await authAPI(token.data?.result?.accessToken).get(
+      let user = await authAPI(normalizeAuthResult(token.data?.result).accessToken).get(
         basicUserEndpoints["my-info"]
       );
 
       return {
-        user: user?.data?.result,
-        token: token?.data?.result,
+        user: normalizeProfile(user?.data?.result),
+        token: normalizeAuthResult(token?.data?.result),
       };
     } catch (err) {
       console.log(err);
 
-      return rejectWithValue(err?.response?.data);
+      return rejectWithValue(getApiError(err));
     }
   }
 );
@@ -152,7 +152,7 @@ export const googleLogin = createAsyncThunk(
       };
     } catch (err) {
       console.log(err);
-      return rejectWithValue(err?.response?.data);
+      return rejectWithValue(getApiError(err));
     }
   }
 );
@@ -190,7 +190,7 @@ export const postJob = createAsyncThunk(
 
       return res?.data?.result;
     } catch (err) {
-      return rejectWithValue(err?.response?.data);
+      return rejectWithValue(getApiError(err));
     }
   }
 );
@@ -300,7 +300,7 @@ export const sendFeedback = createAsyncThunk(
       return res?.data?.result;
     } catch (err) {
       console.log(err);
-      return rejectWithValue(err?.response?.data);
+      return rejectWithValue(getApiError(err));
     }
   }
 );
@@ -331,7 +331,7 @@ export const vnPayCreatePaymentUrl = createAsyncThunk(
       return res.data.result;
     } catch (err) {
       console.log(err?.response?.data);
-      return rejectWithValue(err?.response?.data);
+      return rejectWithValue(getApiError(err));
     }
   }
 );

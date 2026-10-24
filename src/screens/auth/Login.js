@@ -54,7 +54,7 @@ const Login = ({ navigation }) => {
           Toast.show({
             type: ALERT_TYPE.WARNING,
             title: "Đăng nhập thất bại",
-            textBody: "Tài khoản hoặc mật khẩu không chính xác",
+            textBody: e?.message || "Tài khoản hoặc mật khẩu không chính xác",
           });
         });
     }

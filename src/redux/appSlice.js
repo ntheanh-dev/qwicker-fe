@@ -1,3 +1,4 @@
+import { getApiError } from "../configs/backend.mjs";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import API, { baseEndpoints } from "../configs/API";
 
@@ -70,7 +71,7 @@ export const fetchVehicles = createAsyncThunk(
       const res = await API.get(baseEndpoints["vehicles"]);
       return res.data?.result;
     } catch (e) {
-      return rejectWithValue(e.response.data);
+      return rejectWithValue(getApiError(e));
     }
   }
 );
@@ -83,7 +84,7 @@ export const fetchProductCategories = createAsyncThunk(
 
       return res.data.result;
     } catch (e) {
-      return rejectWithValue(e.response.data);
+      return rejectWithValue(getApiError(e));
     }
   }
 );
@@ -95,7 +96,7 @@ export const fetchPaymentMethods = createAsyncThunk(
       const res = await API.get(baseEndpoints["payment-method"]);
       return res.data.result;
     } catch (e) {
-      return rejectWithValue(e.response.data);
+      return rejectWithValue(getApiError(e));
     }
   }
 );

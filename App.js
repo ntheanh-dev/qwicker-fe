@@ -1,3 +1,4 @@
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigation from "./src/navigations/AuthNavigation";
 import { Provider } from "react-redux";
@@ -7,13 +8,15 @@ import { PersistGate } from "redux-persist/integration/react";
 import * as encoding from "text-encoding"; // for websocket
 function App() {
   return (
-    <Provider store={store}>
-      <AlertNotificationRoot>
-        <NavigationContainer>
-          <AuthNavigation />
-        </NavigationContainer>
-      </AlertNotificationRoot>
-    </Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <AlertNotificationRoot>
+          <NavigationContainer navigationInChildEnabled>
+            <AuthNavigation />
+          </NavigationContainer>
+        </AlertNotificationRoot>
+      </Provider>
+    </GestureHandlerRootView>
   );
 }
 export default App;

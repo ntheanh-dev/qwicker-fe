@@ -13,7 +13,7 @@ import { ROLE, ROUTES } from "../../constants";
 import { Dropdown } from "react-native-element-dropdown";
 import { Ionicons, AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
+import { File } from "expo-file-system";
 import { addAdditionalField } from "../../redux/formRegisterSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 
@@ -30,7 +30,7 @@ const DriverInfoRegister = ({ navigation }) => {
       alert("Permissions denied!");
     } else {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ["images"],
         quality: 1,
         base64: true,
       });
@@ -41,9 +41,7 @@ const DriverInfoRegister = ({ navigation }) => {
 
         if (uri) {
           try {
-            const base64 = await FileSystem.readAsStringAsync(uri, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
+            const base64 = await new File(uri).base64();
             setImage(base64);
           } catch (readError) {
             console.error("Error reading image as base64:", readError);

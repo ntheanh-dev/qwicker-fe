@@ -1,15 +1,27 @@
 import axios from "axios";
-export const BASE_URL = "http://192.168.100.16:8080";
-export const webSocketUrl = `${BASE_URL}/api/ws`;
+import Constants from "expo-constants";
+import { Platform } from "react-native";
+import { resolveBackendConfig } from "./backend.mjs";
+
+export { getApiError } from "./backend.mjs";
+const backend = resolveBackendConfig({
+  apiUrl: process.env.EXPO_PUBLIC_API_URL,
+  socketUrl: process.env.EXPO_PUBLIC_WEBSOCKET_URL,
+  hostUri: Constants.expoConfig?.hostUri,
+  platform: Platform.OS,
+  port: process.env.EXPO_PUBLIC_API_PORT || "8888",
+});
+export const BASE_URL = backend.apiUrl;
+export const webSocketUrl = backend.socketUrl;
 export const baseEndpoints = {
-  "product-categories": "/api/products/categories",
-  vehicles: "/api/vehicles",
+  "product-categories": "/post/product-category",
+  vehicles: "/post/vehicles",
   "payment-method": "/api/payment/methods",
   "my-coupon": "/api/coupon/my-coupon/",
 };
 export const accountEndpoints = {
   "change-password": "/api/account/change-password/",
-  login: "/api/auth/token",
+  login: "/identity/auth/token",
   "convert-token": "/api/auth/convert-token/",
   "sent-otp": "sent-otp",
   "verify-register-otp": "verify-register-otp",
@@ -20,7 +32,7 @@ export const accountEndpoints = {
 };
 export const basicUserEndpoints = {
   "basic-user-register": "/api/users/",
-  "my-info": "/api/users/my-info",
+  "my-info": "/profile/users/my-profile",
   "my-jobs": (params) => `/api/jobs/?${params}`,
   "job-retrieve": (jobId) => `/api/jobs/${jobId}/`,
   "assign-job": (jobId) => `/api/jobs/${jobId}/assign/`,
@@ -30,7 +42,7 @@ export const basicUserEndpoints = {
 };
 export const shipperEndpoints = {
   "shipper-register": "/api/shippers/",
-  "my-info": "/api/shippers/my-info",
+  "my-info": "/profile/shippers/my-profile",
   duration: (params) => `/api/location/duration?${params}`,
 };
 export const jobEndpoints = {
@@ -42,20 +54,20 @@ export const ENDPOINTS = {
   statistic: "/api/statistic",
   "current-shipper-location": (shipperId) =>
     `/api/shippers/${shipperId}/current-location`,
-  "collect-cash": (postId) => `/api/posts/${postId}/collect-cash`,
+  "collect-cash": (postId) => `/payment/payments/posts/${postId}/collect-cash`,
   "shipper-post": (params) => `/api/shippers/my-post?${params}`,
 };
 
 export const POST_ENDPOINTS = {
-  "create-post": "/api/posts",
-  posts: (params) => `/api/posts?${params}`,
-  "get-post-by-id": (id) => `/api/posts/${id}`,
-  "update-post-by-id": (id) => `/api/posts/${id}/update`,
-  "get-num-shipper-joined": (id) => `/api/posts/${id}/num-shipper-joined`,
-  "sent-feedback": (id) => `/api/posts/${id}/rating`,
-  "get-feedback": (id) => `/api/posts/${id}/rating`,
-  "get-winner": (id) => `/api/posts/${id}/winner`,
-  "create-vnpay-url": (params) => `/api/payment/vn-pay${params}`,
+  "create-post": "/post/posts",
+  posts: (params) => `/post/posts?${params}`,
+  "get-post-by-id": (id) => `/post/posts/${id}`,
+  "update-post-by-id": (id) => `/post/posts/${id}/update`,
+  "get-num-shipper-joined": (id) => `/post/posts/${id}/num-shipper-joined`,
+  "sent-feedback": (id) => `/post/posts/${id}/rating`,
+  "get-feedback": (id) => `/post/posts/${id}/rating`,
+  "get-winner": (id) => `/post/posts/${id}/winner`,
+  "create-vnpay-url": (params) => `/payment/payments/vn-pay${params}`,
 };
 
 export const ShipperJobEndpoints = {
@@ -68,6 +80,7 @@ export const ShipperJobEndpoints = {
 export const authAPI = (access_token) =>
   axios.create({
     baseURL: BASE_URL,
+    timeout: 15000,
     headers: {
       Authorization: `Bearer ${access_token}`,
     },
@@ -97,4 +110,5 @@ export const virtualearthDriving = (lat1, long1, lat2, long2) =>
 
 export default axios.create({
   baseURL: BASE_URL,
+  timeout: 15000,
 });

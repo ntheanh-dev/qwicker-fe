@@ -4,15 +4,12 @@ import SockJS from "sockjs-client";
 class SocketClient {
   constructor(url, jwt) {
     this.url = url;
-    this.jwt = jwt;
+    this._jwt = jwt;
     this.client = new Client();
-    const socket = new SockJS(url + `?token=${jwt}`);
     this.subscriptions = new Map();
     this.client.configure({
-      webSocketFactory: () => socket,
-      debug: (str) => {
-        console.log(str);
-      },
+      webSocketFactory: () => new SockJS(url),
+      connectHeaders: { Authorization: `Bearer ${jwt}` },
       onConnect: () => {
         console.log("connected!");
       },
@@ -102,10 +99,13 @@ class SocketClient {
   }
 
   get jwt() {
-    return this.jwt;
+    return this._jwt;
   }
 
-  set jwt(value) {}
+  set jwt(value) {
+    this._jwt = value;
+    this.client.connectHeaders = { Authorization: `Bearer ${value}` };
+  }
 }
 
 export default SocketClient;
